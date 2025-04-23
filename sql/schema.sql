@@ -36,18 +36,26 @@ CREATE TABLE areas (
 CREATE TABLE buyers (
     user_id NUMBER PRIMARY KEY,
     address VARCHAR2(255),
-    area_id NUMBER,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (area_id) REFERENCES areas(id)
+    city VARCHAR2(100),
+    postal_code VARCHAR2(20),
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- SELLERS table
 CREATE TABLE sellers (
     user_id NUMBER PRIMARY KEY,
     kitchen_name VARCHAR2(100),
-    area_id NUMBER,
+    kitchen_address VARCHAR2(255),
     status VARCHAR2(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
-    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Seller-Service Area Mapping
+CREATE TABLE seller_service_areas (
+    seller_id NUMBER NOT NULL,
+    area_id NUMBER NOT NULL,
+    PRIMARY KEY (seller_id, area_id),
+    FOREIGN KEY (seller_id) REFERENCES sellers(user_id),
     FOREIGN KEY (area_id) REFERENCES areas(id)
 );
 

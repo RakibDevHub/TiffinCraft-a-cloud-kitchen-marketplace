@@ -13,8 +13,8 @@
     <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         <a href="/index.php" class="text-xl font-bold text-gray-800">TiffinCraft</a>
         <ul class="flex space-x-6 text-gray-600 font-medium">
-            <li><a href="/auth/login.php" class="hover:underline">Login</a></li>
-            <li><a href="/auth/register.php" class="rounded  hover:bg-orange-400 hover:text-white">Register</a></li>
+            <li><a href="/login" class="hover:underline">Login</a></li>
+            <li><a href="/register" class="rounded  hover:bg-orange-400 hover:text-white">Register</a></li>
             <!-- <li><a href="#" class="hover:text-gray-900">Services</a></li>
             <li><a href="#" class="hover:text-gray-900">Contact</a></li> -->
         </ul>
