@@ -7,13 +7,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $address = $_POST['address'];
-    $city = $_POST['city'];
-    $postal_code = $_POST['postal_code'];
 
-    // Disable auto-commit
     oci_execute(oci_parse($conn, "BEGIN NULL; END;"), OCI_NO_AUTO_COMMIT);
 
-    $sql_user = "INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, 'buyer') RETURNING id INTO :user_id";
+    $sql_user = "INSERT INTO users (name, email, password, role) 
+                 VALUES (:name, :email, :password, 'buyer') 
+                 RETURNING id INTO :user_id";
     $stmt_user = oci_parse($conn, $sql_user);
     oci_bind_by_name($stmt_user, ':name', $name);
     oci_bind_by_name($stmt_user, ':email', $email);
@@ -21,12 +20,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     oci_bind_by_name($stmt_user, ':user_id', $user_id, -1, SQLT_INT);
 
     if (oci_execute($stmt_user, OCI_NO_AUTO_COMMIT)) {
-        $sql_buyer = "INSERT INTO buyers (user_id, address, postal_code, city) VALUES (:user_id, :address, :postal_code, :city)";
+        $sql_buyer = "INSERT INTO buyers (user_id, address) 
+                      VALUES (:user_id, :address)";
         $stmt_buyer = oci_parse($conn, $sql_buyer);
         oci_bind_by_name($stmt_buyer, ':user_id', $user_id);
         oci_bind_by_name($stmt_buyer, ':address', $address);
-        oci_bind_by_name($stmt_buyer, ':postal_code', $postal_code);
-        oci_bind_by_name($stmt_buyer, ':city', $city);
 
         if (oci_execute($stmt_buyer, OCI_NO_AUTO_COMMIT)) {
             oci_commit($conn);
@@ -43,4 +41,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "Error registering user.";
     }
 }
+
 ?>

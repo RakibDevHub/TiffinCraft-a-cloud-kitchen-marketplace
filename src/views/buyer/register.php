@@ -7,80 +7,73 @@ define('BASE_PATH', dirname(__DIR__, 3));
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TiffinCraft - Register</title>
+    <title>TiffinCraft - Buyer Register</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="font-sans">
-    <?php include BASE_PATH . '/src/includes/header.php' ?>
+<body class="font-sans bg-orange-50">
 
-    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-lg">
-            <div>
-                <h2 class="text-center text-3xl font-extrabold text-gray-900">Create Your Buyer Account</h2>
-            </div>
+    <?php include BASE_PATH . '/src/includes/header.php'; ?>
 
-            <form class="mt-8 space-y-6" action="/src/controllers/register_buyer.php" method="POST">
-                <div class="rounded-md shadow-sm -space-y-px">
+    <section class="min-h-screen relative top-1 bg-orange-50 flex items-center justify-center py-10">
+        <div class="w-full max-w-xl bg-white shadow-lg rounded-xl p-8">
+            <h2 class="text-2xl font-bold text-center text-blue-800 mb-6">Buyer Registration</h2>
+
+            <form id="buyerRegisterForm" method="POST" action="/src/controllers/register_buyer.php" class="space-y-6">
+                <!-- Step 1: Personal Info -->
+                <div id="step1">
                     <div class="mb-4">
-                        <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
-                        <input id="name" name="name" type="text" required
-                            class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            placeholder="John Doe">
+                        <label for="name" class="block font-semibold mb-1">Full Name</label>
+                        <input type="text" name="name" id="name" required class="w-full border p-2 rounded" />
                     </div>
 
                     <div class="mb-4">
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                        <input id="email" name="email" type="email" required
-                            class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            placeholder="you@example.com">
+                        <label for="address" class="block font-semibold mb-1">Address</label>
+                        <input type="text" name="address" id="address" required class="w-full border p-2 rounded"
+                            placeholder="e.g., Bashundhara, Block B, Vatara, Dhaka 1212" />
                     </div>
 
-                    <div class="mb-4">
-                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                        <input id="password" name="password" type="password" required
-                            class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            placeholder="••••••••">
-                    </div>
 
-                    <div class="mb-4">
-                        <label for="address" class="block text-sm font-medium text-gray-700">Address</label>
-                        <input id="address" name="address" type="text" required
-                            class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            placeholder="123 Street Name">
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="city" class="block text-sm font-medium text-gray-700">City</label>
-                        <input id="city" name="city" type="text" required
-                            class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            placeholder="Dhaka">
-                    </div>
-
-                    <div>
-                        <label for="postal_code" class="block text-sm font-medium text-gray-700">Postal Code</label>
-                        <input id="postal_code" name="postal_code" type="text" required
-                            class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            placeholder="1207">
-                    </div>
+                    <button type="button" onclick="nextStep()"
+                        class="bg-blue-700 text-white px-4 py-2 rounded">Next</button>
                 </div>
 
-                <div>
-                    <button type="submit"
-                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        Register
-                    </button>
+                <!-- Step 2: Account Setup -->
+                <div id="step2" class="hidden">
+                    <div class="mb-4">
+                        <label for="email" class="block font-semibold mb-1">Email</label>
+                        <input type="email" name="email" id="email" required class="w-full border p-2 rounded" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="block font-semibold mb-1">Password</label>
+                        <input type="password" name="password" id="password" required
+                            class="w-full border p-2 rounded" />
+                    </div>
+
+                    <div class="flex justify-between">
+                        <button type="button" onclick="prevStep()"
+                            class="bg-gray-500 text-white px-4 py-2 rounded">Back</button>
+                        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Register</button>
+                    </div>
                 </div>
             </form>
-
-            <p class="mt-2 text-center text-sm text-gray-600">
-                Already have an account?
-                <a href="/login" class="font-medium text-indigo-600 hover:text-indigo-500">Login here</a>
-            </p>
         </div>
-    </div>
+    </section>
 
-    <?php include BASE_PATH . '/src/includes/footer.php' ?>
+    <script>
+        function nextStep() {
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+        }
+        function prevStep() {
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step1').classList.remove('hidden');
+        }
+    </script>
+
+    <?php include BASE_PATH . '/src/includes/footer.php'; ?>
+
 </body>
 
 </html>
