@@ -37,43 +37,6 @@ define('BASE_PATH', dirname(__DIR__, 3));
             document.getElementById('profile_image').value = ""; // Clear the file input
         }
 
-        // Validate and submit the form
-        function submitForm() {
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const phoneNumber = document.getElementById('phone_number').value;
-            const address = document.getElementById('address').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm_password').value;
-
-            // Validate fields
-            if (!name || !email || !phoneNumber || !address) {
-                alert("Please fill in all required fields.");
-                return;
-            }
-
-            // Validate phone number (must start with 01 and have 11 digits)
-            const phoneRegex = /^01\d{9}$/;
-            if (!phoneRegex.test(phoneNumber)) {
-                alert("Please enter a valid phone number.");
-                return;
-            }
-
-            // Validate password match
-            if (password !== confirmPassword) {
-                alert("Passwords do not match.");
-                return;
-            }
-
-            // Validate terms checkbox
-            if (!document.getElementById('terms').checked) {
-                alert("You must agree to the terms and conditions.");
-                return;
-            }
-
-            // If all validation passes, submit the form
-            document.getElementById('buyerRegisterForm').submit();
-        }
     </script>
 </head>
 
@@ -85,8 +48,14 @@ define('BASE_PATH', dirname(__DIR__, 3));
         <div class="w-full max-w-xl bg-white shadow-lg rounded-xl p-8">
             <h2 class="text-2xl font-bold text-center text-blue-800 mb-6">Buyer Registration</h2>
 
-            <form id="buyerRegisterForm" method="POST" action="/register_buyer" enctype=" multipart/form-data"
-                class="space-y-6">
+            <?php if (isset($_SESSION['login_error'])): ?>
+                <div class="bg-red-100 text-red-700 p-2 rounded mb-4">
+                    <?= $_SESSION['login_error'] ?>
+                    <?php unset($_SESSION['login_error']); ?>
+                </div>
+            <?php endif; ?>
+
+            <form action="/register" enctype=" multipart/form-data" method="POST" class="space-y-6">
 
                 <!-- Image preview -->
                 <div class="mb-4 flex justify-center relative">
@@ -147,9 +116,9 @@ define('BASE_PATH', dirname(__DIR__, 3));
                     </label>
                 </div>
 
-                <button type="button" onclick="submitForm()"
-                    class="bg-green-600 text-white px-4 py-2 rounded w-full">Register</button>
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded w-full">Register</button>
             </form>
+
         </div>
     </section>
 
