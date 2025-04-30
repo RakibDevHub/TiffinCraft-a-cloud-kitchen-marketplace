@@ -81,12 +81,12 @@ define('BASE_PATH', dirname(__DIR__, 3));
 
     <?php include BASE_PATH . '/src/includes/header.php'; ?>
 
-    <section class="min-h-screen relative top-1 bg-orange-50 flex items-center justify-center py-10">
+    <section class="min-h-screen relative top-12 bg-orange-50 flex items-center justify-center py-10">
         <div class="w-full max-w-xl bg-white shadow-lg rounded-xl p-8">
             <h2 class="text-2xl font-bold text-center text-blue-800 mb-6">Buyer Registration</h2>
 
-            <form id="buyerRegisterForm" method="POST" action="/src/controllers/register_buyer.php"
-                enctype="multipart/form-data" class="space-y-6">
+            <form id="buyerRegisterForm" method="POST" action="/register_buyer" enctype=" multipart/form-data"
+                class="space-y-6">
 
                 <!-- Image preview -->
                 <div class="mb-4 flex justify-center relative">
