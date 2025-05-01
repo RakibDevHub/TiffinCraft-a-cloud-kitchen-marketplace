@@ -1,5 +1,4 @@
 <?php
-// src/core/Database.php
 namespace App\Core;
 
 class Database

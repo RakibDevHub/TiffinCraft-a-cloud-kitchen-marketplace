@@ -10,17 +10,13 @@ class User
         oci_bind_by_name($stmt, ':email', $email);
         oci_execute($stmt);
 
-        $user = oci_fetch_assoc($stmt);
-        oci_free_statement($stmt);
-        oci_close($conn);
-
-        return $user ?: null;
+        $row = oci_fetch_assoc($stmt);
+        return $row ?: false;
     }
+
 
     public static function registerBuyer($conn, $data)
     {
-        // require BASE_PATH . '/src/config/db.php';
-
         // Begin transaction
         oci_execute(oci_parse($conn, "BEGIN NULL; END;"), OCI_NO_AUTO_COMMIT);
 

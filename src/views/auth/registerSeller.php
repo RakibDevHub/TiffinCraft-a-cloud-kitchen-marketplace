@@ -19,10 +19,10 @@ define('BASE_PATH', dirname(__DIR__, 3));
             if (file) {
                 reader.onload = function (e) {
                     preview.src = e.target.result;
-                    preview.style.display = 'block'; // Show the preview image
-                    closeButton.style.display = 'block'; // Show the close button
+                    preview.style.display = 'block';
+                    closeButton.style.display = 'block';
                 }
-                reader.readAsDataURL(file); // Read the file as a data URL
+                reader.readAsDataURL(file);
             }
         }
 
@@ -47,6 +47,32 @@ define('BASE_PATH', dirname(__DIR__, 3));
                 list.appendChild(li);
             }
         }
+
+        function previewKitchenImage(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('kitchenImagePreview');
+            const closeButton = document.getElementById('kitchenCloseButton');
+            const reader = new FileReader();
+
+            if (file) {
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    closeButton.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeKitchenImage() {
+            const preview = document.getElementById('kitchenImagePreview');
+            const closeButton = document.getElementById('kitchenCloseButton');
+            preview.src = "";
+            preview.style.display = 'none';
+            closeButton.style.display = 'none';
+            document.getElementById('kitchen_image').value = "";
+        }
+
 
     </script>
 </head>
@@ -100,7 +126,8 @@ define('BASE_PATH', dirname(__DIR__, 3));
 
                 <div>
                     <label class="block text-gray-700 font-medium">Address</label>
-                    <textarea name="address" required class="w-full border border-gray-300 p-2 rounded"></textarea>
+                    <input type="text" name="address" required
+                        class="w-full border border-gray-300 p-2 rounded"></input>
                 </div>
 
                 <div>
@@ -110,14 +137,37 @@ define('BASE_PATH', dirname(__DIR__, 3));
 
                 <div>
                     <label class="block text-gray-700 font-medium">Kitchen Address</label>
-                    <textarea name="kitchen_address" required
-                        class="w-full border border-gray-300 p-2 rounded"></textarea>
+                    <input type="text" name="kitchen_address" required
+                        class="w-full border border-gray-300 p-2 rounded"></input>
                 </div>
+
                 <div>
                     <label for="service_areas" class="block font-medium mb-1">Service Areas (comma-separated)</label>
                     <input type="text" name="service_areas" id="service_areas" required
                         placeholder="e.g., Badda, Gulshan, Banani" class="w-full border p-2 rounded" />
                     <p class="text-sm text-gray-500 mt-1">Enter all service areas your kitchen can deliver to.</p>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-medium">Kitchen Description</label>
+                    <textarea name="kitchen_description" required class="w-full border border-gray-300 p-2 rounded"
+                        placeholder="Briefly describe your kitchen, cuisine, specialties, etc."></textarea>
+                </div>
+
+                <!-- Kitchen image preview -->
+                <div class="mb-4 flex justify-center relative">
+                    <img id="kitchenImagePreview" src="" alt="Kitchen Image Preview"
+                        class="hidden w-full h-48 object-cover rounded-lg" />
+                    <button type="button" id="kitchenCloseButton" onclick="removeKitchenImage()"
+                        class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hidden">
+                        &times;
+                    </button>
+                </div>
+
+                <div class="mb-4">
+                    <label for="kitchen_image" class="block font-semibold mb-1">Kitchen Image (optional)</label>
+                    <input type="file" name="kitchen_image" id="kitchen_image" accept="image/*"
+                        class="w-full border p-2 rounded" onchange="previewKitchenImage(event)" />
                 </div>
 
                 <div>

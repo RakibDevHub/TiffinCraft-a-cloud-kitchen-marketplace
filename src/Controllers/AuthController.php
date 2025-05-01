@@ -1,11 +1,12 @@
 <?php
 namespace App\Controllers;
 
+use App\Core\Database;
+
 use App\Models\User;
 use App\Models\Kitchen;
 use App\Models\ServiceArea;
 
-use App\Core\Database;
 
 class AuthController
 {
@@ -14,7 +15,7 @@ class AuthController
     {
 
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $conn = $this->getDBConnection();
+            $conn = Database::getConnection();
 
             $name = trim($_POST['name']);
             $email = trim($_POST['email']);
@@ -48,31 +49,7 @@ class AuthController
 
             $password_hashed = password_hash($password, PASSWORD_DEFAULT);
 
-            $profile_image_path = null;
-            if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
-                $file_tmp = $_FILES['profile_image']['tmp_name'];
-                $file_name = $_FILES['profile_image']['name'];
-                $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-                $valid_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-
-                if (!in_array($file_ext, $valid_extensions)) {
-                    $_SESSION['register_error'] = "Invalid image type.";
-                    header("Location: /register");
-                    exit;
-                }
-
-                $unique_name = uniqid() . '.' . $file_ext;
-                $upload_dir = BASE_PATH . '/public/assets/upload/';
-                $upload_path = $upload_dir . $unique_name;
-
-                if (!move_uploaded_file($file_tmp, $upload_path)) {
-                    $_SESSION['register_error'] = "Image upload failed.";
-                    header("Location: /register");
-                    exit;
-                }
-
-                $profile_image_path = '/assets/upload/' . $unique_name;
-            }
+            $profile_image_path = $this->handleImageUpload('profile_image', '/register');
 
             $user = [
                 'name' => $name,
@@ -105,7 +82,7 @@ class AuthController
     public function registerAsSeller()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $conn = $this->getDBConnection();
+            $conn = Database::getConnection();
 
             // Begin transaction
             oci_execute(oci_parse($conn, "BEGIN"), OCI_NO_AUTO_COMMIT);
@@ -118,17 +95,13 @@ class AuthController
                 $address = trim($_POST['address']);
                 $kitchenName = trim($_POST['kitchen_name']);
                 $kitchenAddress = trim($_POST['kitchen_address']);
+                $kitchenDescription = trim($_POST['kitchen_description']);
                 $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
                 $serviceAreas = $_POST['service_areas'] ?? '';
 
-                // Handle image upload
-                $imagePath = null;
-                if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
-                    $tmpName = $_FILES['profile_image']['tmp_name'];
-                    $ext = pathinfo($_FILES['profile_image']['name'], PATHINFO_EXTENSION);
-                    $imagePath = '/uploads/' . uniqid('seller_', true) . '.' . $ext;
-                    move_uploaded_file($tmpName, BASE_PATH . '/public' . $imagePath);
-                }
+                $profile_image_path = $this->handleImageUpload('profile_image', '/business/register');
+                $kitchen_image_path = $this->handleImageUpload('kitchen_image', '/business/register');
+
 
                 // Create user
                 $userId = User::registerSeller($conn, [
@@ -137,15 +110,17 @@ class AuthController
                     'phone' => $phone,
                     'address' => $address,
                     'password' => $password,
-                    'image' => $imagePath
+                    'image' => $profile_image_path
                 ]);
 
-                // Create kitchen
                 $kitchenId = Kitchen::create($conn, [
                     'owner_id' => $userId,
                     'name' => $kitchenName,
-                    'address' => $kitchenAddress
+                    'address' => $kitchenAddress,
+                    'description' => $kitchenDescription,
+                    'kitchen_image' => $kitchen_image_path
                 ]);
+
 
                 // Insert service areas
                 $areas = array_filter(array_map('trim', explode(',', $serviceAreas)));
@@ -172,11 +147,10 @@ class AuthController
         include __DIR__ . '/../views/auth/registerSeller.php';
     }
 
-
     public function login()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $conn = $this->getDBConnection();
+            $conn = Database::getConnection();
 
             $email = trim($_POST['email'] ?? '');
             $password = trim($_POST['password'] ?? '');
@@ -224,4 +198,35 @@ class AuthController
         header("Location: /login");
         exit;
     }
+
+    private function handleImageUpload($inputName, $redirectPath = '/register')
+    {
+        if (!isset($_FILES[$inputName]) || $_FILES[$inputName]['error'] !== UPLOAD_ERR_OK) {
+            return null;
+        }
+
+        $file_tmp = $_FILES[$inputName]['tmp_name'];
+        $file_name = $_FILES[$inputName]['name'];
+        $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+        $valid_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+        if (!in_array($file_ext, $valid_extensions)) {
+            $_SESSION['register_error'] = "Invalid image type for $inputName.";
+            header("Location: $redirectPath");
+            exit;
+        }
+
+        $unique_name = uniqid() . '.' . $file_ext;
+        $upload_dir = BASE_PATH . '/public/assets/upload/';
+        $upload_path = $upload_dir . $unique_name;
+
+        if (!move_uploaded_file($file_tmp, $upload_path)) {
+            $_SESSION['register_error'] = "Image upload failed for $inputName.";
+            header("Location: $redirectPath");
+            exit;
+        }
+
+        return '/assets/upload/' . $unique_name;
+    }
+
 }
