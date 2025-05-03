@@ -10,8 +10,9 @@ class User
         oci_bind_by_name($stmt, ':email', $email);
         oci_execute($stmt);
 
-        $row = oci_fetch_assoc($stmt);
-        return $row ?: false;
+        $user = oci_fetch_assoc($stmt);
+        $user = array_change_key_case($user, CASE_LOWER);
+        return $user ?: false;
     }
 
 

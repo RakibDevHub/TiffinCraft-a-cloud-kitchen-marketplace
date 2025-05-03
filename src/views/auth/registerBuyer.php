@@ -55,7 +55,7 @@ define('BASE_PATH', dirname(__DIR__, 3));
                 </div>
             <?php endif; ?>
 
-            <form action="/register" enctype=" multipart/form-data" method="POST" class="space-y-6">
+            <form action="/register" method="POST" enctype="multipart/form-data" class="space-y-6">
 
                 <!-- Image preview -->
                 <div class="mb-4 flex justify-center relative">

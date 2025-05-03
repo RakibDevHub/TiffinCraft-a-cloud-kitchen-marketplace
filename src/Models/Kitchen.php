@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Models;
+
 class Kitchen
 {
     public static function create($conn, $data)

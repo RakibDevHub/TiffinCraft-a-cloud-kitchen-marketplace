@@ -172,7 +172,14 @@ define('BASE_PATH', dirname(__DIR__, 3));
 
                 <div>
                     <label class="block text-gray-700 font-medium">Password</label>
-                    <input type="password" name="password" required class="w-full border border-gray-300 p-2 rounded">
+                    <input type="password" name="password" id="password" required
+                        class="w-full border border-gray-300 p-2 rounded" placeholder="Enter your password">
+                </div>
+
+                <div class="mb-4">
+                    <label for="confirm_password" class="block text-gray-700 font-medium">Confirm Password</label>
+                    <input type="password" name="confirm_password" id="confirm_password" required
+                        class="w-full border p-2 rounded" placeholder="Confirm your password" />
                 </div>
 
                 <div>
