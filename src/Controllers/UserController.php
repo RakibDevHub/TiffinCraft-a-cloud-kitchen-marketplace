@@ -9,11 +9,15 @@ class UserController
     public function adminDashboard()
     {
         $this->requireLogin('admin');
+
+        $this->renderView('admin/dashboard');
     }
 
     public function businessDashboard()
     {
         $this->requireLogin('seller');
+
+        $this->renderView('business/dashboard');
     }
 
     protected function isLoggedIn(): bool

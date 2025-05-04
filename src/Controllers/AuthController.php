@@ -119,7 +119,8 @@ class AuthController
             $this->startUserSession([
                 'user_id' => $user_id,
                 'name' => $data['name'],
-                'role' => 'buyer'
+                'role' => 'buyer',
+                'profile_image' => $uploadedImage
             ]);
             $this->redirect('/buyer/dashboard');
 
@@ -169,7 +170,8 @@ class AuthController
             $this->startUserSession([
                 'user_id' => $userId,
                 'name' => $data['name'],
-                'role' => 'seller'
+                'role' => 'seller',
+                'profile_image' => $profileImage
             ]);
             $this->redirect('/business/dashboard');
 
@@ -313,6 +315,8 @@ class AuthController
         $_SESSION['user_id'] = $userData['user_id'];
         $_SESSION['role'] = $userData['role'];
         $_SESSION['name'] = $userData['name'];
+        $_SESSION['profile_image'] = $userData['profile_image'];
+
     }
 
     protected function redirectToDashboard(string $role): void

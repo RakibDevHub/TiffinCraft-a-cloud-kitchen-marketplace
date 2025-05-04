@@ -16,8 +16,9 @@
     <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         <a href="/" class="text-xl font-bold text-gray-800">TiffinCraft</a>
         <ul class="flex space-x-6 text-gray-600 font-medium">
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <li><a href="/dashboard" class="hover:underline">Dashboard</a></li>
+            <?php if (isset($_SESSION['user_id']) && isset($_SESSION['role'])): ?>
+                <img class="h-8 w-8" src="<?= $_SESSION['profile_image'] ?>" alt="Profile">
+                <!-- <li><a href="/dashboard" class="hover:underline">Dashboard</a></li> -->
                 <li><a href="/logout" class="hover:underline">logout</a></li>
             <?php else: ?>
                 <li><a href="/login" class="hover:underline">Login</a></li>
