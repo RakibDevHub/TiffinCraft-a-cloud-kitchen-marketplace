@@ -5,7 +5,12 @@ class HomeController
 {
     public function index()
     {
-        include __DIR__ . '/../views/buyer/home.php';
+        $this->renderView('buyer/home');
 
+    }
+
+    protected function renderView(string $viewPath): void
+    {
+        include __DIR__ . '/../views/' . $viewPath . '.php';
     }
 }

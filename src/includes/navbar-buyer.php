@@ -1,26 +1,31 @@
 <!-- CTA Bar -->
-<div id="ctaBar"
-    class="fixed top-0 left-0 w-full bg-orange-100 text-orange-800 z-50 flex items-center justify-between px-4 py-2 shadow transition-all duration-300 transform -translate-y-full opacity-0">
-    <div>
-        <span class="font-semibold">Own a Tiffin Business?</span>
-        <a href="/business" class="ml-2 text-orange-700 underline hover:text-orange-900">Join TiffinCraft Business</a>
+<?php if (isset($_SESSION['user_id']) && isset($_SERVER['role'])): ?>
+<?php else: ?>
+    <div id="ctaBar"
+        class="fixed top-0 left-0 w-full bg-orange-100 text-orange-800 z-50 flex items-center justify-between px-4 py-2 shadow transition-all duration-300 transform -translate-y-full opacity-0">
+        <div>
+            <span class="font-semibold">Own a Tiffin Business?</span>
+            <a href="/business" class="ml-2 text-orange-700 underline hover:text-orange-900">Join TiffinCraft Business</a>
+        </div>
+        <button id="closeCta" class="ml-4 text-orange-800 hover:text-orange-900 text-xl font-bold">&times;</button>
     </div>
-    <button id="closeCta" class="ml-4 text-orange-800 hover:text-orange-900 text-xl font-bold">&times;</button>
-</div>
+<?php endif; ?>
 
 <!-- Fixed Navbar -->
 <nav id="mainNav" class="fixed top-0 left-0 w-full bg-white shadow z-40 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-        <a href="/index.php" class="text-xl font-bold text-gray-800">TiffinCraft</a>
+        <a href="/" class="text-xl font-bold text-gray-800">TiffinCraft</a>
         <ul class="flex space-x-6 text-gray-600 font-medium">
-            <li><a href="/auth/login.php" class="hover:underline">Login</a></li>
-            <li><a href="/auth/register.php" class="rounded  hover:bg-orange-400 hover:text-white">Register</a></li>
-            <!-- <li><a href="#" class="hover:text-gray-900">Services</a></li>
-            <li><a href="#" class="hover:text-gray-900">Contact</a></li> -->
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <li><a href="/dashboard" class="hover:underline">Dashboard</a></li>
+                <li><a href="/logout" class="hover:underline">logout</a></li>
+            <?php else: ?>
+                <li><a href="/login" class="hover:underline">Login</a></li>
+                <li><a href="/register" class="rounded  hover:bg-orange-400 hover:text-white">Register</a></li>
+            <?php endif; ?>
         </ul>
     </div>
 </nav>
-
 <script>
     const ctaBar = document.getElementById('ctaBar');
     const closeCta = document.getElementById('closeCta');

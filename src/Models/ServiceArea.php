@@ -1,69 +1,110 @@
 <?php
-
 namespace App\Models;
 
-use App\Core\Database;
 use Exception;
+use App\Core\Database;
 
 class ServiceArea
 {
-    // Get all available areas
-    public static function getAll()
+    public static function getAll(): array
     {
         $conn = Database::getConnection();
-        $stmt = oci_parse($conn, "SELECT area_id, name FROM service_areas ORDER BY name");
+        $stmt = oci_parse($conn, self::getAllAreasQuery());
         oci_execute($stmt);
 
-        $areas = [];
-        while ($row = oci_fetch_assoc($stmt)) {
-            $areas[] = $row;
-        }
-        return $areas;
+        return self::fetchAllResults($stmt);
     }
 
-    // Check if a kitchen is already linked to an area
-    public static function exists($conn, $kitchenId, $area)
+    public static function exists($conn, int $kitchenId, string $area): bool
     {
-        $sql = "SELECT 1
-                FROM kitchen_service_areas ksa
-                JOIN service_areas sa ON ksa.area_id = sa.area_id
-                WHERE ksa.kitchen_id = :kitchen_id AND LOWER(sa.name) = LOWER(:name)";
-        $stmt = oci_parse($conn, $sql);
-        oci_bind_by_name($stmt, ':kitchen_id', $kitchenId);
-        oci_bind_by_name($stmt, ':name', $area);
+        $stmt = oci_parse($conn, self::getExistsQuery());
+        self::bindExistsParameters($stmt, $kitchenId, $area);
         oci_execute($stmt);
+
         return oci_fetch($stmt) !== false;
     }
 
-    // Insert area (if not exists) and link to kitchen
-    public static function insert($conn, $kitchenId, $area)
+    public static function insert($conn, int $kitchenId, string $area): void
     {
         try {
-            // 1. Get or insert the area
-            $stmt = oci_parse($conn, "SELECT area_id FROM service_areas WHERE LOWER(name) = LOWER(:name)");
-            oci_bind_by_name($stmt, ':name', $area);
-            oci_execute($stmt);
-
-            $areaId = null;
-            if (oci_fetch($stmt)) {
-                $areaId = oci_result($stmt, 'AREA_ID');
-            } else {
-                $insertArea = oci_parse($conn, "INSERT INTO service_areas (name) VALUES (:name) RETURNING area_id INTO :area_id");
-                oci_bind_by_name($insertArea, ':name', $area);
-                oci_bind_by_name($insertArea, ':area_id', $areaId, -1, SQLT_INT);
-                oci_execute($insertArea);
-            }
-
-            // 2. Link kitchen and area
-            $linkStmt = oci_parse($conn, "INSERT INTO kitchen_service_areas (kitchen_id, area_id) VALUES (:kitchen_id, :area_id)");
-            oci_bind_by_name($linkStmt, ':kitchen_id', $kitchenId);
-            oci_bind_by_name($linkStmt, ':area_id', $areaId);
-
-            if (!oci_execute($linkStmt, OCI_NO_AUTO_COMMIT)) {
-                throw new Exception("Failed to link kitchen to area: $area");
-            }
+            $areaId = self::getOrCreateAreaId($conn, $area);
+            self::linkKitchenToArea($conn, $kitchenId, $areaId);
         } catch (Exception $e) {
             throw new Exception("ServiceArea insert failed: " . $e->getMessage());
+        }
+    }
+
+    private static function getAllAreasQuery(): string
+    {
+        return "SELECT area_id, name FROM service_areas ORDER BY name";
+    }
+
+    private static function fetchAllResults($stmt): array
+    {
+        $results = [];
+        while ($row = oci_fetch_assoc($stmt)) {
+            $results[] = $row;
+        }
+        return $results;
+    }
+
+    private static function getExistsQuery(): string
+    {
+        return "SELECT 1
+                FROM kitchen_service_areas ksa
+                JOIN service_areas sa ON ksa.area_id = sa.area_id
+                WHERE ksa.kitchen_id = :kitchen_id AND LOWER(sa.name) = LOWER(:name)";
+    }
+
+    private static function bindExistsParameters($stmt, int $kitchenId, string $area): void
+    {
+        oci_bind_by_name($stmt, ':kitchen_id', $kitchenId);
+        oci_bind_by_name($stmt, ':name', $area);
+    }
+
+    private static function getOrCreateAreaId($conn, string $area): int
+    {
+        $areaId = self::findAreaId($conn, $area);
+
+        if ($areaId === null) {
+            $areaId = self::createArea($conn, $area);
+        }
+
+        return $areaId;
+    }
+
+    private static function findAreaId($conn, string $area): ?int
+    {
+        $stmt = oci_parse($conn, "SELECT area_id FROM service_areas WHERE LOWER(name) = LOWER(:name)");
+        oci_bind_by_name($stmt, ':name', $area);
+        oci_execute($stmt);
+
+        if (oci_fetch($stmt)) {
+            return oci_result($stmt, 'AREA_ID');
+        }
+
+        return null;
+    }
+
+    private static function createArea($conn, string $area): int
+    {
+        $areaId = null;
+        $stmt = oci_parse($conn, "INSERT INTO service_areas (name) VALUES (:name) RETURNING area_id INTO :area_id");
+        oci_bind_by_name($stmt, ':name', $area);
+        oci_bind_by_name($stmt, ':area_id', $areaId, -1, SQLT_INT);
+        oci_execute($stmt);
+
+        return $areaId;
+    }
+
+    private static function linkKitchenToArea($conn, int $kitchenId, int $areaId): void
+    {
+        $stmt = oci_parse($conn, "INSERT INTO kitchen_service_areas (kitchen_id, area_id) VALUES (:kitchen_id, :area_id)");
+        oci_bind_by_name($stmt, ':kitchen_id', $kitchenId);
+        oci_bind_by_name($stmt, ':area_id', $areaId);
+
+        if (!oci_execute($stmt, OCI_NO_AUTO_COMMIT)) {
+            throw new Exception("Failed to link kitchen to area");
         }
     }
 }
