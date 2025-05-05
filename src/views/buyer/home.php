@@ -12,7 +12,7 @@ define('BASE_PATH', dirname(__DIR__, 3));
 </head>
 
 <body class="font-sans">
-    <?php include BASE_PATH . '/src/includes/header.php' ?>
+    <?php include BASE_PATH . '/src/includes/navbar.php' ?>
 
     <!-- Hero Section -->
     <section

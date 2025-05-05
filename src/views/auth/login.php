@@ -12,7 +12,7 @@ define('BASE_PATH', dirname(__DIR__, 3));
 </head>
 
 <body class="bg-gray-100 flex items-center justify-center h-screen">
-    <?php include BASE_PATH . '/src/includes/header.php'; ?>
+    <?php include BASE_PATH . '/src/includes/navbar.php'; ?>
 
     <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
         <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Login to TiffinCraft</h2>

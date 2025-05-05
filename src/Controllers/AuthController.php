@@ -119,6 +119,7 @@ class AuthController
             $this->startUserSession([
                 'user_id' => $user_id,
                 'name' => $data['name'],
+                'email' => $data['email'],
                 'role' => 'buyer',
                 'profile_image' => $uploadedImage
             ]);
@@ -170,6 +171,7 @@ class AuthController
             $this->startUserSession([
                 'user_id' => $userId,
                 'name' => $data['name'],
+                'email' => $data['email'],
                 'role' => 'seller',
                 'profile_image' => $profileImage
             ]);
@@ -315,6 +317,7 @@ class AuthController
         $_SESSION['user_id'] = $userData['user_id'];
         $_SESSION['role'] = $userData['role'];
         $_SESSION['name'] = $userData['name'];
+        $_SESSION['email'] = $userData['email'];
         $_SESSION['profile_image'] = $userData['profile_image'];
 
     }

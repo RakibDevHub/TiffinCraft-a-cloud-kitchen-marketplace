@@ -72,13 +72,11 @@ define('BASE_PATH', dirname(__DIR__, 3));
             closeButton.style.display = 'none';
             document.getElementById('kitchen_image').value = "";
         }
-
-
     </script>
 </head>
 
 <body class="font-sans bg-orange-50">
-    <?php include BASE_PATH . '/src/includes/header.php'; ?>
+    <?php include BASE_PATH . '/src/includes/navbar.php'; ?>
 
     <section class="min-h-screen relative top-12 bg-orange-50 flex items-center justify-center py-10">
         <div class="w-full max-w-xl bg-white shadow-lg rounded-xl p-8">
