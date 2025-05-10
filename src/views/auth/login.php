@@ -6,9 +6,8 @@ define('BASE_PATH', dirname(__DIR__, 3));
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Login - TiffinCraft</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <?php $title = 'TiffinCraft - Login';
+    include BASE_PATH . '/src/includes/_head.php'; ?>
 </head>
 
 <body class="bg-gray-100 flex items-center justify-center h-screen">

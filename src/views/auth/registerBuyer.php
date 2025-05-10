@@ -5,10 +5,8 @@ define('BASE_PATH', dirname(__DIR__, 3));
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TiffinCraft - Buyer Register</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <?php $title = 'TiffinCraft - Register';
+    include BASE_PATH . '/src/includes/_head.php'; ?>
     <script>
         // Preview image before uploading
         function previewImage(event) {
@@ -44,7 +42,7 @@ define('BASE_PATH', dirname(__DIR__, 3));
 
     <?php include BASE_PATH . '/src/includes/navbar.php'; ?>
 
-    <section class="min-h-screen relative top-12 bg-orange-50 flex items-center justify-center py-10">
+    <section class="min-h-screen relative top-12 bg-orange-50 flex items-center justify-center py-10 mb-16">
         <div class="w-full max-w-xl bg-white shadow-lg rounded-xl p-8">
             <h2 class="text-2xl font-bold text-center text-blue-800 mb-6">Buyer Registration</h2>
 

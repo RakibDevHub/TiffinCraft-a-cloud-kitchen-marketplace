@@ -2,13 +2,11 @@
 define('BASE_PATH', dirname(__DIR__, 3));
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TiffinCraft - Homemade Meals</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <?php $title = 'TiffinCraft - Homemade Meals';
+    include BASE_PATH . '/src/includes/_head.php'; ?>
 </head>
 
 <body class="font-sans">
@@ -60,7 +58,7 @@ define('BASE_PATH', dirname(__DIR__, 3));
     </section>
 
     <!-- How It Works -->
-    <section class="bg-white py-16">
+    <section class="bg-white py-16" id="how-it-works">
         <div class="container mx-auto text-center">
             <h2 class="text-3xl font-bold text-gray-800 mb-4">How It Works</h2>
             <p class="text-gray-600 mb-10">Simple steps to enjoy homemade food</p>
@@ -120,18 +118,28 @@ define('BASE_PATH', dirname(__DIR__, 3));
                 hygienic, and affordable meals made with love. Support local and enjoy food that feels like home.</p>
         </div>
         <!-- Shape Divider -->
-        <?php $color = '#fff7ed';
+        <?php $color = '#f97316';
         include BASE_PATH . '/src/includes/shape-divider.php' ?>
 
     </section>
 
     <!-- CTA Footer Section -->
-    <section class="bg-orange-500 py-12 text-center text-white">
-        <h2 class="text-3xl font-bold mb-4">Ready to taste the best homemade food?</h2>
+    <section class="bg-orange-500 pt-12 pb-20 text-center text-white">
+        <h2 class="text-3xl font-bold mb-8">Ready to taste the best homemade food?</h2>
         <a href="#explore"
             class="bg-white text-orange-500 font-semibold py-3 px-6 rounded-lg transition hover:bg-gray-100">Start
             Ordering Now</a>
     </section>
+
+
+    <?php
+    // $color = '#f97316';
+    // $bg = 'bg-amber-50';
+    // $rotate = 'rotate-0';
+    // $bottom = 'bottom-[0px]';
+    // include BASE_PATH . '/src/includes/shape-divider.php';
+    ?>
+
 
     <?php include BASE_PATH . '/src/includes/footer.php' ?>
 

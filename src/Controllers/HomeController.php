@@ -3,9 +3,15 @@ namespace App\Controllers;
 
 class HomeController
 {
-    public function index()
+    public function buyer()
     {
         $this->renderView('buyer/home');
+
+    }
+
+    public function seller()
+    {
+        $this->renderView('seller/home');
 
     }
 

@@ -1,18 +1,29 @@
 <?php
-$isBusinessView = strpos($_SERVER['REQUEST_URI'], '/business') !== false;
+$requestUri = $_SERVER['REQUEST_URI'];
+
+if ($requestUri === '/' || $requestUri === '/home') {
+    $isHomeView = true;
+} else {
+    $isHomeView = false;
+}
+
+$isBusinessView = strpos($requestUri, '/business') !== false;
 $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['role']);
 $currentRole = $isLoggedIn ? $_SESSION['role'] : null;
+
 ?>
 
-<?php if (!$isBusinessView && !$isLoggedIn): ?>
-    <!-- CTA Bar -->
+<?php if ($isHomeView && !$isLoggedIn): ?>
     <div id="ctaBar"
-        class="h-12 fixed top-0 left-0 w-full bg-orange-100 text-orange-800 z-50 flex items-center justify-between px-4 py-2 shadow transition-all duration-300 transform -translate-y-full opacity-0">
-        <div>
-            <span class="font-semibold">Own a Tiffin Business?</span>
-            <a href="/business" class="ml-2 text-orange-700 underline hover:text-orange-900">Join TiffinCraft Business</a>
+        class="h-12 fixed top-0 left-0 w-full bg-orange-100 text-orange-800 z-50 flex items-center justify-between shadow transition-all duration-300 transform -translate-y-full opacity-0">
+        <div class="flex items-center justify-between w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div>
+                <span class="font-semibold">Own a Tiffin Business?</span>
+                <a href="/business" class="ml-2 text-orange-700 underline hover:text-orange-900">Join TiffinCraft
+                    Business</a>
+            </div>
+            <button id="closeCta" class="ml-4 text-orange-800 hover:text-orange-900 text-xl font-bold">&times;</button>
         </div>
-        <button id="closeCta" class="ml-4 text-orange-800 hover:text-orange-900 text-xl font-bold">&times;</button>
     </div>
 <?php endif; ?>
 

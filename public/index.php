@@ -17,10 +17,11 @@ use App\Core\Router;
 
 $router = new Router();
 
-$router->addRoute('/', 'HomeController@index');
-$router->addRoute('/home', 'HomeController@index');
+$router->addRoute('/', 'HomeController@buyer');
+$router->addRoute('/home', 'HomeController@buyer');
 $router->addRoute('/login', 'AuthController@login');
 $router->addRoute('/register', 'AuthController@registerAsBuyer');
+$router->addRoute('/business', 'HomeController@seller');
 $router->addRoute('/business/register', 'AuthController@registerAsSeller');
 $router->addRoute('/logout', 'AuthController@logout');
 
