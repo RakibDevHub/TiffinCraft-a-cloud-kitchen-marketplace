@@ -6,6 +6,12 @@ use App\Core\Database;
 
 class UserController
 {
+    public function dashboard()
+    {
+        $this->requireLogin('buyer');
+
+        $this->renderView('buyer/dashboard');
+    }
     public function adminDashboard()
     {
         $this->requireLogin('admin');

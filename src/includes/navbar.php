@@ -11,6 +11,18 @@ $isBusinessView = strpos($requestUri, '/business') !== false;
 $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['role']);
 $currentRole = $isLoggedIn ? $_SESSION['role'] : null;
 
+$fullName = htmlspecialchars($_SESSION['name']);
+$token = strtok($fullName, ' ');
+$parts = [];
+$count = 0;
+while ($token !== false && $count < 2) {
+    $parts[] = $token;
+    $token = strtok(' ');
+    $count++;
+}
+$user_name = implode(' ', $parts);
+$user_type = htmlspecialchars($_SESSION['role']);
+
 ?>
 
 <?php if ($isHomeView && !$isLoggedIn): ?>
@@ -79,14 +91,17 @@ $currentRole = $isLoggedIn ? $_SESSION['role'] : null;
                     <!-- User dropdown -->
                     <div class="ml-3 relative">
                         <button type="button"
-                            class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                            class="bg-white rounded-full flex justify-center items-center gap-2 text-sm text-left leading-[1.5]"
                             id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                             <span class="sr-only">Open user menu</span>
-                            <img class="h-8 w-8 rounded-full"
+                            <img class="h-8 w-8 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
                                 src="<?= htmlspecialchars($_SESSION['profile_image'] ?? '/assets/images/default-profile.jpg') ?>"
                                 alt="User profile">
+                            <div class="flex flex-col">
+                                <span class="text-[14px] font-medium"><?= $user_name ?></span>
+                                <span class="text-[12px] font-normal capitalize"><?= $user_type ?></span>
+                            </div>
                         </button>
-
                         <!-- Dropdown menu -->
                         <div class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden"
                             role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" id="user-dropdown">
@@ -106,31 +121,31 @@ $currentRole = $isLoggedIn ? $_SESSION['role'] : null;
                             </div>
                             <div class="border-t border-gray-100"></div>
                             <?php if ($currentRole === 'buyer'): ?>
-                                <a href="/buyer/dashboard" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                <a href="/dashboard" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     role="menuitem">Dashboard</a>
                                 <a href="/marketplace/browse" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     role="menuitem">Browse
                                     Tiffins</a>
-                                <a href="/buyer/orders" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                <a href="/orders" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     role="menuitem">My Orders</a>
-                                <a href="/buyer/subscriptions" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                <a href="/subscriptions" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     role="menuitem">My
                                     Subscriptions</a>
-                                <a href="/buyer/reviews" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                <a href="/reviews" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     role="menuitem">My Reviews</a>
                             <?php elseif ($currentRole === 'seller'): ?>
-                                <a href="/seller/dashboard" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                <a href="/business/dashboard" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     role="menuitem">Dashboard</a>
-                                <a href="/seller/menu" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                <a href="/business/menu" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     role="menuitem">Manage Menu</a>
-                                <a href="/seller/orders" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                <a href="/business/orders" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     role="menuitem">View Orders</a>
-                                <a href="/seller/subscribers" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                <a href="/business/subscribers" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     role="menuitem">My
                                     Subscribers</a>
-                                <a href="/seller/reviews" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                <a href="/business/reviews" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     role="menuitem">Customer Reviews</a>
-                                <a href="/seller/kitchen" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                <a href="/business/kitchen" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     role="menuitem">My Kitchen</a>
                             <?php elseif ($currentRole === 'admin'): ?>
                                 <a href="/admin/dashboard" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
