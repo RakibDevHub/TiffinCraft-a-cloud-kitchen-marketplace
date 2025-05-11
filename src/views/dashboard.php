@@ -40,7 +40,7 @@ if ($currentRole === 'seller') {
 
 <body class="bg-gray-50">
     <!-- Sidebar -->
-    <aside class="fixed inset-y-0 left-0 bg-white shadow-md w-64">
+    <!-- <aside class="fixed inset-y-0 left-0 bg-white shadow-md w-64">
         <div class="flex items-center px-3 h-16 border-b">
             <a href="/admin">
                 <img src="/assets/images/TiffinCraft.png" alt="TiffinCraft Logo" class="h-10 mr-2">
@@ -121,10 +121,12 @@ if ($currentRole === 'seller') {
                 </li>
             </ul>
         </div>
-    </aside>
+    </aside> -->
+
+    <?php include BASE_PATH . '/src/includes/_dashboardSidebar.php'; ?>
 
     <!-- Main Content -->
-    <main class="ml-64 p-6 pt-2">
+    <main class="ml-64 p-6 pt-2 transition-all duration-300 ease-in-out" id="main-content">
         <!-- Top Navigation -->
         <div class="flex justify-between items-center mb-6">
             <!-- <h1 class="text-2xl font-bold text-gray-800">Dashboard Overview</h1> -->
@@ -404,7 +406,8 @@ if ($currentRole === 'seller') {
         </div>
     </main>
 
-    <script src="/assets/js/dropdown.js"></script>
+    <script src="/assets/js/profileDropdown.js"></script>
+    <script src="/assets/js/dashboardSidebar.js"></script>
 </body>
 
 </html>

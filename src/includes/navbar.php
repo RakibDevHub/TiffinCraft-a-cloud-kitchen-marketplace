@@ -121,4 +121,4 @@ if ($currentRole === 'seller') {
 </nav>
 
 <script src="/assets/js/navbar.js"></script>
-<script src="/assets/js/dropdown.js"></script>
+<script src="/assets/js/profileDropdown.js"></script>

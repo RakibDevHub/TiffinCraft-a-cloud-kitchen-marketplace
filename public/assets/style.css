@@ -1,0 +1,22 @@
+#dashboard-sidebar {
+    width: 16rem;
+}
+
+#dashboard-sidebar a {
+    transition: padding 300ms ease-in-out;
+}
+
+#main-content {
+    transition: margin-left 300ms ease-in-out;
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+    #dashboard-sidebar {
+        display: none;
+    }
+
+    #mobile-sidebar-overlay {
+        display: none;
+    }
+}
