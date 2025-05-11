@@ -5,13 +5,13 @@ class HomeController
 {
     public function buyer()
     {
-        $this->renderView('buyer/home');
+        $this->renderView('index');
 
     }
 
     public function seller()
     {
-        $this->renderView('seller/home');
+        $this->renderView('index');
 
     }
 

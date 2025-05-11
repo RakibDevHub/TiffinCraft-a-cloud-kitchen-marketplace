@@ -9,3 +9,25 @@ $title = $title ?? 'TiffinCraft';
     integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 <script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: {
+                        50: '#fefce8',
+                        100: '#fef9c3',
+                        200: '#fef08a',
+                        300: '#fde047',
+                        400: '#facc15',
+                        500: '#eab308',
+                        600: '#ca8a04',
+                        700: '#a16207',
+                        800: '#854d0e',
+                        900: '#713f12',
+                    }
+                }
+            }
+        }
+    }
+</script>

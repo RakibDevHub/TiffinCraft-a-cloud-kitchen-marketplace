@@ -1,45 +1,50 @@
 <?php
-define('BASE_PATH', dirname(__DIR__, 3));
+define('BASE_PATH', dirname(__DIR__, 2));
+$isBusinessView = strpos($_SERVER['REQUEST_URI'], '/business') !== false;
+$isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['role']);
+$currentRole = $isLoggedIn ? $_SESSION['role'] : null;
+
+$views = [
+    'profile' => '/profile',
+    'settings' => '/settings',
+    'dashboard' => '/dashboard'
+];
+
+$user = 'Buyer';
+
+if ($currentRole === 'seller') {
+    $views = [
+        'profile' => '/business/profile',
+        'settings' => '/business/settings',
+        'dashboard' => '/business/dashboard'
+    ];
+    $user = 'Business';
+} elseif ($currentRole === 'admin') {
+    $views = [
+        'profile' => '/admin/profile',
+        'settings' => '/admin/settings',
+        'dashboard' => '/admin/dashboard'
+    ];
+    $user = 'Admin';
+}
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TiffinCraft Admin Dashboard</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#fefce8',
-                            100: '#fef9c3',
-                            200: '#fef08a',
-                            300: '#fde047',
-                            400: '#facc15',
-                            500: '#eab308',
-                            600: '#ca8a04',
-                            700: '#a16207',
-                            800: '#854d0e',
-                            900: '#713f12',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <?php $title = $user . ' Dashboard';
+    include BASE_PATH . '/src/includes/_head.php'; ?>
 </head>
 
 <body class="bg-gray-50">
     <!-- Sidebar -->
     <aside class="fixed inset-y-0 left-0 bg-white shadow-md w-64">
         <div class="flex items-center px-3 h-16 border-b">
-            <img src="/assets/images/TiffinCraft.png" alt="TiffinCraft Logo" class="h-10 mr-2">
+            <a href="/admin">
+                <img src="/assets/images/TiffinCraft.png" alt="TiffinCraft Logo" class="h-10 mr-2">
+            </a>
         </div>
         <div class="overflow-y-auto h-full py-4 px-3">
             <ul class="space-y-2">
@@ -61,21 +66,28 @@ define('BASE_PATH', dirname(__DIR__, 3));
                     <a href="#"
                         class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
                         <i class="fas fa-store mr-3"></i>
-                        <span>Vendors</span>
+                        <span>Manage Users</span>
                     </a>
                 </li>
                 <li>
                     <a href="#"
                         class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
                         <i class="fas fa-users mr-3"></i>
-                        <span>Customers</span>
+                        <span>Manage Kitchens</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#"
+                        class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
+                        <i class="fas fa-users mr-3"></i>
+                        <span>Food Categories</span>
                     </a>
                 </li>
                 <li>
                     <a href="#"
                         class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
                         <i class="fas fa-shopping-bag mr-3"></i>
-                        <span>Orders</span>
+                        <span>Reports & Metrics</span>
                     </a>
                 </li>
                 <li>
@@ -90,6 +102,21 @@ define('BASE_PATH', dirname(__DIR__, 3));
                         class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
                         <i class="fas fa-cog mr-3"></i>
                         <span>Settings</span>
+                    </a>
+                </li>
+                <div class="border-t border-gray-100"></div>
+                <li>
+                    <a href="/" target="_blank" rel="noopener noreferrer"
+                        class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
+                        <i class="fas fa-cog mr-3"></i>
+                        <span>TiffinCraft Buyer</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/business" target="_blank" rel="noopener noreferrer"
+                        class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
+                        <i class="fas fa-cog mr-3"></i>
+                        <span>TiffinCraft Seller</span>
                     </a>
                 </li>
             </ul>
@@ -110,17 +137,8 @@ define('BASE_PATH', dirname(__DIR__, 3));
                 <button class="p-2 text-gray-500 hover:text-gray-700">
                     <i class="fas fa-bell"></i>
                 </button>
-                <!-- <div class="flex items-center">
-                    <img src="<?= htmlspecialchars($_SESSION['profile_image'] ?? '/assets/images/default-profile.jpg') ?>"
-                        alt="Profile" class="w-10 h-10 border-2 border-solid rounded-full">
-                    <div class="flex flex-col">
-                        <span class="ml-2 text-sm font-medium"><?= $user_name ?></span>
-                        <span class="ml-2 text-[12px] capitalize"><?= $user_type ?></span>
-                    </div>
-                </div> -->
 
                 <?php include BASE_PATH . '/src/includes/_profileDropdown.php' ?>
-
             </div>
         </div>
 
@@ -385,6 +403,8 @@ define('BASE_PATH', dirname(__DIR__, 3));
             </div>
         </div>
     </main>
+
+    <script src="/assets/js/dropdown.js"></script>
 </body>
 
 </html>

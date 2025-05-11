@@ -10,20 +10,20 @@ class UserController
     {
         $this->requireLogin('buyer');
 
-        $this->renderView('buyer/dashboard');
+        $this->renderView('dashboard');
     }
     public function adminDashboard()
     {
         $this->requireLogin('admin');
 
-        $this->renderView('admin/dashboard');
+        $this->renderView('dashboard');
     }
 
     public function businessDashboard()
     {
         $this->requireLogin('seller');
 
-        $this->renderView('business/dashboard');
+        $this->renderView('dashboard');
     }
 
     protected function isLoggedIn(): bool
