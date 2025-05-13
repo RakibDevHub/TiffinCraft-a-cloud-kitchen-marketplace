@@ -1,8 +1,8 @@
 <?php
 // src/includes/navbar.php
-
 $requestUri = $_SERVER['REQUEST_URI'];
 $isHomeView = ($requestUri === '/' || $requestUri === '/home');
+$isDashboardView = (strpos($requestUri, '/admin') !== false) || (strpos($requestUri, '/dashboard') !== false);
 $isBusinessView = strpos($requestUri, '/business') !== false;
 $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['role']);
 $currentRole = $isLoggedIn ? $_SESSION['role'] : null;
@@ -62,33 +62,40 @@ if ($currentRole === 'seller') {
 <nav id="mainNav" class="fixed top-0 left-0 w-full bg-white shadow z-40 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-14">
-            <!-- Mobile menu button -->
-            <div class="flex items-center md:hidden">
-                <button id="mobile-menu-button" type="button"
-                    class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500"
-                    aria-expanded="false">
-                    <span class="sr-only">Open main menu</span>
-                    <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                    <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
+            <!-- Mobile menu button and logo -->
+            <div class="flex flex-1 gap-2 items-center">
+                <div class="flex items-center <?= $isDashboardView ? '' : 'md:hidden' ?>">
+                    <button id="sidebar-navlinks-button" type="button"
+                        class="<?= $isDashboardView ? '' : 'md:hidden' ?> inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500 transition-colors duration-200"
+                        aria-expanded="false" aria-controls="sidebar-navlinks">
+                        <span class="sr-only">Open main menu</span>
+                        <!-- Hamburger icon -->
+                        <svg class="h-6 w-6" id="sidebar-navlinks-open-icon" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <!-- Close icon -->
+                        <svg class="hidden h-6 w-6" id="sidebar-navlinks-close-icon" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Logo -->
+                <a href="<?= $isBusinessView ? '/business' : '/' ?>"
+                    class="text-xl font-bold text-gray-800 flex flex-row items-center gap-2">
+                    <img class="h-10 w-auto"
+                        src="/assets/images/<?= $isBusinessView ? 'logo.png' : 'TiffinCraft.png' ?>" alt="LOGO">
+                    <?= $isBusinessView ? 'TiffinCraft Business' : '' ?>
+                </a>
             </div>
 
-            <!-- Logo and main links -->
-            <a href="<?= $isBusinessView ? '/business' : '/' ?>" class="text-xl font-bold text-gray-800">
-                <?= $isBusinessView ? 'TiffinCraft Business' : 'TiffinCraft' ?>
-            </a>
-
             <!-- Desktop navigation -->
-            <div class="hidden md:ml-6 md:flex md:space-x-8">
-                <?php if (!$isBusinessView): ?>
+            <?php if (!$isBusinessView && !$isDashboardView): ?>
+                <div class="hidden md:ml-6 md:flex flex-row gap-4">
                     <a href="/"
                         class="border-orange-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Home</a>
                     <a href="#dishes"
@@ -99,26 +106,26 @@ if ($currentRole === 'seller') {
                     <a href="#how-it-works"
                         class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">How
                         It Works</a>
-                <?php endif; ?>
-            </div>
+                </div>
+            <?php endif; ?>
 
             <!-- Right side (auth) -->
-            <div class="flex items-center">
-                <?php if ($isLoggedIn): ?>
-                    <?php include BASE_PATH . '/src/includes/_profileDropdown.php'; ?>
-                <?php else: ?>
-                    <div class="hidden md:flex items-center space-x-4">
-                        <a href="/login" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">Login</a>
-                        <a href="/register"
-                            class="bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-orange-700">Register</a>
-                    </div>
-                <?php endif; ?>
+            <div class="flex flex-1 justify-end">
+                <div class="flex items-center">
+                    <?php if ($isLoggedIn): ?>
+                        <?php include BASE_PATH . '/src/includes/_dropdownNavlinks.php'; ?>
+                    <?php else: ?>
+                        <div class="flex items-center flex-row">
+                            <a href="/login"
+                                class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">Login</a>
+                            <a href="/register"
+                                class="bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-orange-700">Register</a>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
 
-    <?php include BASE_PATH . '/src/includes/_mobileMenu.php'; ?>
+    <?php include BASE_PATH . '/src/includes/_sidebarNavlinks.php'; ?>
 </nav>
-
-<script src="/assets/js/navbar.js"></script>
-<script src="/assets/js/profileDropdown.js"></script>

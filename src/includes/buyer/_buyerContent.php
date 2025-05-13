@@ -2,7 +2,7 @@
 <section
     class="relative h-screen flex items-center justify-center bg-cover bg-center bg-[url(/assets/images/HeroBG.jpeg)]">
     <div class="absolute inset-0 bg-black bg-opacity-55"></div>
-    <div class="relative text-center px-4">
+    <div class="relative text-center px-4 z-10">
         <h1 class="text-white text-5xl font-extrabold mb-4">Welcome to TiffinCraft</h1>
         <p class="text-white text-xl mb-6">Discover Homemade Tiffins Near You</p>
         <a href="#explore"
@@ -10,7 +10,7 @@
             Tiffins</a>
     </div>
     <div
-        class="w-full aspect-[960/300] bg-no-repeat bg-center bg-cover bg-[url('../assets/images/layer3.svg')] absolute bottom-0 h-auto -mb-4">
+        class="z-0 w-full aspect-[960/300] bg-no-repeat bg-center bg-cover bg-[url('../assets/images/layer3.svg')] absolute bottom-0 h-auto -mb-4">
     </div>
 </section>
 

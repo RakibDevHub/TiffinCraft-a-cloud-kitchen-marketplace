@@ -1,9 +1,10 @@
 <?php
+// src/includes/_dropdownNavlinks.php
 
-// Default values if not provided
 $user_data = [
-    'name' => $_SESSION['name'] ?? 'User',
-    'role' => $_SESSION['role'] ?? 'Guest',
+    'name' => $_SESSION['name'],
+    'role' => $_SESSION['role'],
+    'email' => $_SESSION['email'],
     'profile_image' => $_SESSION['profile_image'] ?? '/assets/images/default-profile.jpg'
 ];
 
@@ -19,26 +20,30 @@ while ($token !== false && $count < 2) {
 }
 $user_name = implode(' ', $parts);
 $user_type = htmlspecialchars($user_data['role']);
+$user_email = htmlspecialchars($user_data['email']);
 ?>
 
 <div class="!ml-2 relative" id="user-dropdown-container">
     <!-- Dropdown Toggle Button -->
-    <button type="button" id="user-menu-button"
-        class="bg-white rounded-full flex justify-center items-center gap-2 text-sm text-left leading-[1.5]"
-        aria-expanded="false" aria-haspopup="true" aria-controls="user-dropdown">
+    <button type="button" id="user-dropdown-button"
+        class="bg-white rounded-full flex justify-center items-center gap-2 text-sm text-left" aria-expanded="false"
+        aria-haspopup="true" aria-controls="user-dropdown">
         <span class="sr-only">User menu</span>
         <img class="h-8 w-8 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
             src="<?= htmlspecialchars($user_data['profile_image']) ?>" alt="<?= $user_name ?>'s profile picture">
-        <div class="flex flex-col">
-            <span class="text-[14px] font-medium"><?= $user_name ?></span>
-            <span class="text-[12px] font-normal capitalize"><?= $user_type ?></span>
-        </div>
     </button>
 
-    <!-- Dropdown Menu -->
+    <!-- Dropdown -->
     <div id="user-dropdown"
-        class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-50"
-        role="menu" aria-labelledby="user-menu-button">
+        class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-60"
+        role="menu" aria-labelledby="user-dropdown-button">
+
+        <div class="flex flex-col justify-center items-center p-4 border-b border-gray-200">
+            <span class="font-medium text-gray-700"><?= $user_name ?></span>
+            <span class="font-normal text-sm text-gray-700"><?= $user_email ?></span>
+            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs"><?= $user_type ?></span>
+        </div>
+
         <a href="<?= $views['dashboard'] ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             role="menuitem" tabindex="-1">
             Dashboard

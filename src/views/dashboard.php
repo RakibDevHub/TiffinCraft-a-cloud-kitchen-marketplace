@@ -39,96 +39,13 @@ if ($currentRole === 'seller') {
 </head>
 
 <body class="bg-gray-50">
-    <!-- Sidebar -->
-    <!-- <aside class="fixed inset-y-0 left-0 bg-white shadow-md w-64">
-        <div class="flex items-center px-3 h-16 border-b">
-            <a href="/admin">
-                <img src="/assets/images/TiffinCraft.png" alt="TiffinCraft Logo" class="h-10 mr-2">
-            </a>
-        </div>
-        <div class="overflow-y-auto h-full py-4 px-3">
-            <ul class="space-y-2">
-                <li>
-                    <a href="#"
-                        class="flex items-center p-2 text-base font-medium text-white rounded-lg bg-primary-500">
-                        <i class="fas fa-tachometer-alt mr-3"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#"
-                        class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
-                        <i class="fas fa-utensils mr-3"></i>
-                        <span>Dishes</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#"
-                        class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
-                        <i class="fas fa-store mr-3"></i>
-                        <span>Manage Users</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#"
-                        class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
-                        <i class="fas fa-users mr-3"></i>
-                        <span>Manage Kitchens</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#"
-                        class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
-                        <i class="fas fa-users mr-3"></i>
-                        <span>Food Categories</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#"
-                        class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
-                        <i class="fas fa-shopping-bag mr-3"></i>
-                        <span>Reports & Metrics</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#"
-                        class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
-                        <i class="fas fa-chart-line mr-3"></i>
-                        <span>Analytics</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#"
-                        class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
-                        <i class="fas fa-cog mr-3"></i>
-                        <span>Settings</span>
-                    </a>
-                </li>
-                <div class="border-t border-gray-100"></div>
-                <li>
-                    <a href="/" target="_blank" rel="noopener noreferrer"
-                        class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
-                        <i class="fas fa-cog mr-3"></i>
-                        <span>TiffinCraft Buyer</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/business" target="_blank" rel="noopener noreferrer"
-                        class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100">
-                        <i class="fas fa-cog mr-3"></i>
-                        <span>TiffinCraft Seller</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </aside> -->
 
-    <?php include BASE_PATH . '/src/includes/_dashboardSidebar.php'; ?>
+    <?php include BASE_PATH . '/src/includes/navbar.php'; ?>
 
     <!-- Main Content -->
-    <main class="ml-64 p-6 pt-2 transition-all duration-300 ease-in-out" id="main-content">
+    <main class="max-w-7xl mx-auto p-4 transition-all duration-300 ease-in-out" id="main-content">
         <!-- Top Navigation -->
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-end gap-2 items-center mb-6">
             <!-- <h1 class="text-2xl font-bold text-gray-800">Dashboard Overview</h1> -->
             <div class="relative max-w-[500px] w-[300px]">
                 <input type="text" placeholder="Search..."
@@ -140,7 +57,7 @@ if ($currentRole === 'seller') {
                     <i class="fas fa-bell"></i>
                 </button>
 
-                <?php include BASE_PATH . '/src/includes/_profileDropdown.php' ?>
+                <?php include BASE_PATH . '/src/includes/_dropdownNavlinks.php' ?>
             </div>
         </div>
 
@@ -405,9 +322,6 @@ if ($currentRole === 'seller') {
             </div>
         </div>
     </main>
-
-    <script src="/assets/js/profileDropdown.js"></script>
-    <script src="/assets/js/dashboardSidebar.js"></script>
 </body>
 
 </html>
