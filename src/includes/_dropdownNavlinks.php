@@ -41,7 +41,8 @@ $user_email = htmlspecialchars($user_data['email']);
         <div class="flex flex-col justify-center items-center p-4 border-b border-gray-200">
             <span class="font-medium text-gray-700"><?= $user_name ?></span>
             <span class="font-normal text-sm text-gray-700"><?= $user_email ?></span>
-            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs"><?= $user_type ?></span>
+            <span
+                class="absolute top-[1px] right-[1px] bg-orange-200 text-orange-800 text-xs font-medium rounded-tr-md rounded-bl-md px-3 py-1 capitalize"><?= $user_type ?></span>
         </div>
 
         <a href="<?= $views['dashboard'] ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -57,7 +58,7 @@ $user_email = htmlspecialchars($user_data['email']);
             Settings
         </a>
         <form action="/logout" method="POST" role="none">
-            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-gray-100"
                 role="menuitem" tabindex="-1">
                 Log Out
             </button>
