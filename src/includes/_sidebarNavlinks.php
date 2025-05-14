@@ -14,7 +14,7 @@ $isBusinessView = strpos($requestUri, '/business') !== false;
 
     <!-- Links Container -->
     <div
-        class="relative flex flex-col w-4/5 max-w-sm h-full bg-white shadow-xl transform transition-all duration-300 ease-in-out -translate-x-full">
+        class="relative flex flex-col w-2/5 max-w-xs h-full bg-white shadow-xl transform transition-all duration-300 ease-in-out -translate-x-full">
         <div class="pb-3 space-y-1 overflow-y-auto flex-1">
             <?php if (!$isBusinessView && !$isDashboardView): ?>
                 <div class="border-t border-gray-200">
@@ -35,15 +35,24 @@ $isBusinessView = strpos($requestUri, '/business') !== false;
                 <div class="border-t border-gray-200 pb-3">
                     <div class="mt-3 space-y-1">
                         <a href="<?= $views['dashboard'] ?? '/dashboard' ?>"
-                            class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors duration-200 ease-in-out">Dashboard</a>
-                        <a href="<?= $views['profile'] ?? '/profile' ?>"
-                            class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors duration-200 ease-in-out">Profile</a>
+                            class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Dashboard</a>
+
+                        <div class="border-t border-gray-200"></div>
+                        <a href="/"
+                            class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">TiffinCraft</a>
+                        <a href="/business"
+                            class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">TiffinCraft
+                            Business</a>
+                        <div class="border-t border-gray-200"></div>
                         <a href="<?= $views['settings'] ?? '/settings' ?>"
-                            class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors duration-200 ease-in-out">Settings</a>
+                            class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Settings</a>
+                        <a href="<?= $views['profile'] ?? '/profile' ?>"
+                            class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Profile</a>
                         <form action="/logout" method="POST">
                             <button type="submit"
-                                class="block w-full text-left px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors duration-200 ease-in-out">Logout</button>
+                                class="block w-full text-left px-4 py-2 text-base font-medium text-red-500 hover:text-red-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Logout</button>
                         </form>
+
                     </div>
                 </div>
             <?php else: ?>

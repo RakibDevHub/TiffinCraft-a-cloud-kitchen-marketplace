@@ -43,24 +43,7 @@ if ($currentRole === 'seller') {
     <?php include BASE_PATH . '/src/includes/navbar.php'; ?>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto p-4 transition-all duration-300 ease-in-out" id="main-content">
-        <!-- Top Navigation -->
-        <div class="flex justify-end gap-2 items-center mb-6">
-            <!-- <h1 class="text-2xl font-bold text-gray-800">Dashboard Overview</h1> -->
-            <div class="relative max-w-[500px] w-[300px]">
-                <input type="text" placeholder="Search..."
-                    class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-            </div>
-            <div class="flex items-center space-x-4">
-                <button class="p-2 text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-bell"></i>
-                </button>
-
-                <?php include BASE_PATH . '/src/includes/_dropdownNavlinks.php' ?>
-            </div>
-        </div>
-
+    <main class="relative top-[56px] max-w-7xl mx-auto p-4 transition-all duration-300 ease-in-out" id="main-content">
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             <div class="bg-white p-6 rounded-lg shadow">
