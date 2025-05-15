@@ -19,7 +19,7 @@ class ServiceArea
     {
         $stmt = oci_parse($conn, self::getExistsQuery());
         self::bindExistsParameters($stmt, $kitchenId, $area);
-        oci_execute($stmt);
+        oci_execute($stmt, OCI_NO_AUTO_COMMIT); // Added transaction control
 
         return oci_fetch($stmt) !== false;
     }
@@ -77,7 +77,7 @@ class ServiceArea
     {
         $stmt = oci_parse($conn, "SELECT area_id FROM service_areas WHERE LOWER(name) = LOWER(:name)");
         oci_bind_by_name($stmt, ':name', $area);
-        oci_execute($stmt);
+        oci_execute($stmt, OCI_NO_AUTO_COMMIT); // Added transaction control
 
         if (oci_fetch($stmt)) {
             return oci_result($stmt, 'AREA_ID');
@@ -92,7 +92,10 @@ class ServiceArea
         $stmt = oci_parse($conn, "INSERT INTO service_areas (name) VALUES (:name) RETURNING area_id INTO :area_id");
         oci_bind_by_name($stmt, ':name', $area);
         oci_bind_by_name($stmt, ':area_id', $areaId, -1, SQLT_INT);
-        oci_execute($stmt);
+
+        if (!oci_execute($stmt, OCI_NO_AUTO_COMMIT)) {
+            throw new Exception("Failed to create service area: " . oci_error($stmt)['message']);
+        }
 
         return $areaId;
     }
@@ -104,7 +107,8 @@ class ServiceArea
         oci_bind_by_name($stmt, ':area_id', $areaId);
 
         if (!oci_execute($stmt, OCI_NO_AUTO_COMMIT)) {
-            throw new Exception("Failed to link kitchen to area");
+            throw new Exception("Failed to link kitchen to area: " . oci_error($stmt)['message']);
         }
     }
 }
+?>

@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initCTABar();
 
   // Initialize Dropdown
-  initDropdown();
+  initDropdowns();
 
   // Initialize Sidebar
   initSidebar();
@@ -61,24 +61,48 @@ function initCTABar() {
  * PROFILE DROPDOWN MENU
  * Handles the user profile dropdown in the navbar
  */
-function initDropdown() {
+/**
+ * Initializes dropdown menus including user dropdown and notifications
+ */
+function initDropdowns() {
+  // Initialize user profile dropdown
   const dropdownButton = document.getElementById("user-dropdown-button");
-  if (!dropdownButton) return;
+  if (dropdownButton) {
+    startDropdown({
+      button: dropdownButton,
+      menuId: "user-dropdown",
+      closeOnClickOutside: true,
+    });
+  }
 
-  const menu = document.getElementById("user-dropdown");
+  // Initialize notifications dropdown
+  const notificationButton = document.getElementById("notification-button");
+  if (notificationButton) {
+    startDropdown({
+      button: notificationButton,
+      menuId: "notification-dropdown",
+      closeOnClickOutside: true,
+    });
+  }
+}
+
+function startDropdown({ button, menuId, closeOnClickOutside }) {
+  const menu = document.getElementById(menuId);
   if (!menu) return;
 
   let isExpanded = false;
 
-  function toggleMenu(e) {
+  // Toggle menu visibility
+  const toggleMenu = (e) => {
     e?.stopPropagation();
     isExpanded = !isExpanded;
-    dropdownButton.setAttribute("aria-expanded", isExpanded);
-    showMenu(isExpanded);
-  }
+    button.setAttribute("aria-expanded", isExpanded);
+    updateMenuVisibility();
+  };
 
-  function showMenu(show) {
-    if (show) {
+  // Update menu visibility with animations
+  const updateMenuVisibility = () => {
+    if (isExpanded) {
       menu.classList.remove("hidden", "opacity-0", "scale-95");
       menu.classList.add("opacity-100", "scale-100");
       menu.querySelector("a, button")?.focus();
@@ -87,30 +111,37 @@ function initDropdown() {
       menu.classList.remove("opacity-100", "scale-100");
       setTimeout(() => menu.classList.add("hidden"), 200);
     }
-  }
+  };
 
-  function handleOutsideClick(e) {
-    if (!dropdownButton.contains(e.target) && !menu.contains(e.target)) {
+  // Handle clicks outside the dropdown
+  const handleOutsideClick = (e) => {
+    if (!button.contains(e.target) && !menu.contains(e.target)) {
       isExpanded = false;
-      dropdownButton.setAttribute("aria-expanded", "false");
-      showMenu(false);
+      button.setAttribute("aria-expanded", "false");
+      updateMenuVisibility();
     }
-  }
+  };
 
-  function handleKeyboard(e) {
+  // Handle keyboard navigation
+  const handleKeyboard = (e) => {
     if (e.key === "Escape") {
       isExpanded = false;
-      dropdownButton.setAttribute("aria-expanded", "false");
-      showMenu(false);
-      dropdownButton.focus();
+      button.setAttribute("aria-expanded", "false");
+      updateMenuVisibility();
+      button.focus();
     }
-  }
+  };
 
   // Set up event listeners
-  dropdownButton.addEventListener("click", toggleMenu);
-  document.addEventListener("click", handleOutsideClick);
+  button.addEventListener("click", toggleMenu);
+  if (closeOnClickOutside) {
+    document.addEventListener("click", handleOutsideClick);
+  }
   document.addEventListener("keydown", handleKeyboard);
 }
+
+// Initialize when DOM is loaded
+document.addEventListener("DOMContentLoaded", initDropdowns);
 
 /**
  * SIDEBAR NAVLINKS

@@ -58,8 +58,8 @@ class User
         self::validateUserData($data, ['name', 'email', 'phone', 'address', 'password', 'image']);
 
         $stmt = oci_parse($conn, self::INSERT_SELLER_QUERY);
+        
         $userId = null;
-
         self::bindSellerParameters($stmt, $data, $userId);
 
         if (!oci_execute($stmt, OCI_NO_AUTO_COMMIT)) {
@@ -68,7 +68,6 @@ class User
 
         return $userId;
     }
-
 
     private static function validateUserData(array $data, array $requiredFields): void
     {

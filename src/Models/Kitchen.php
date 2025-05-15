@@ -51,7 +51,7 @@ class Kitchen
                 RETURNING kitchen_id INTO :kitchen_id";
     }
 
-    private static function bindParameters($stmt, array $data, int $kitchenId): void
+    private static function bindParameters($stmt, array $data, &$kitchenId): void
     {
         oci_bind_by_name($stmt, ':owner_id', $data['owner_id']);
         oci_bind_by_name($stmt, ':name', $data['name']);

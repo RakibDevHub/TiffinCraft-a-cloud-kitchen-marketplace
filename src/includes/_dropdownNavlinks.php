@@ -23,12 +23,13 @@ $user_type = htmlspecialchars($user_data['role']);
 $user_email = htmlspecialchars($user_data['email']);
 ?>
 
-<div class="!ml-2 relative " id="user-dropdown-container">
+<div class="!ml-2 relative " id="dropdown-container">
     <div class="flex flex-row items-center gap-2">
-        <button
+        <button id="notification-button"
             class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-300 rounded-full bg-gray-100 hover:focus:outline-none hover:focus:ring-2 hover:focus:ring-inset hover:focus:ring-orange-500 transition-colors duration-200">
             <i class="fas fa-bell h-6 w-6 flex justify-center items-center"></i>
         </button>
+
         <!-- Dropdown Toggle Button -->
         <button type="button" id="user-dropdown-button"
             class="rounded-full bg-gray-300 flex justify-center items-center gap-2 text-sm text-left h-[40px] w-[40px] hover:focus:outline-none hover:focus:ring-2 hover:focus:ring-inset hover:focus:ring-orange-500 transition-colors duration-200"
@@ -40,6 +41,37 @@ $user_email = htmlspecialchars($user_data['email']);
     </div>
 
     <!-- Dropdown -->
+
+    <div id="notification-dropdown"
+        class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-60"
+        role="menu" aria-labelledby="notification-button">
+
+        <div class="flex flex-col justify-center items-center p-4 border-b border-gray-200">
+            <span class="font-medium text-gray-700"><?= $user_name ?></span>
+            <span class="font-normal text-sm text-gray-700"><?= $user_email ?></span>
+            <span
+                class="absolute top-[1px] right-[1px] bg-orange-200 text-orange-800 text-xs font-medium rounded-tr-md rounded-bl-md px-3 py-1 capitalize"><?= $user_type ?></span>
+        </div>
+
+        <a href="<?= $views['dashboard'] ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            role="menuitem" tabindex="-1">
+            Dashboard
+        </a>
+        <a href="/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1">
+            Profile
+        </a>
+        <a href="<?= $views['settings'] ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            role="menuitem" tabindex="-1">
+            Settings
+        </a>
+        <form action="/logout" method="POST" role="none">
+            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-gray-100"
+                role="menuitem" tabindex="-1">
+                Log Out
+            </button>
+        </form>
+    </div>
+
     <div id="user-dropdown"
         class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-60"
         role="menu" aria-labelledby="user-dropdown-button">

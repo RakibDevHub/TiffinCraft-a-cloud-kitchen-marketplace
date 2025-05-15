@@ -99,6 +99,8 @@ class AuthController
         $uploadedImage = null;
 
         try {
+            oci_execute(oci_parse($conn, "BEGIN"));
+
             $data = $this->validateBuyerInput($_POST);
             $uploadedImage = $this->handleImageUpload('profile_image');
 
@@ -126,6 +128,9 @@ class AuthController
             $this->redirect('/buyer/dashboard');
 
         } catch (Exception $e) {
+            if ($conn) {
+                oci_execute(oci_parse($conn, "ROLLBACK"));
+            }
             $this->cleanupUploadedFiles([$uploadedImage]);
             $this->setFlashError('register_error', $e->getMessage());
             $this->redirect('/register');
@@ -138,6 +143,8 @@ class AuthController
         $uploadedFiles = [];
 
         try {
+            oci_execute(oci_parse($conn, "BEGIN"));
+
             $data = $this->validateSellerInput($_POST);
 
             $profileImage = $this->handleImageUpload('profile_image');
@@ -166,6 +173,7 @@ class AuthController
             ]);
 
             $this->processServiceAreas($conn, $kitchenId, $data['service_areas']);
+
             oci_commit($conn);
 
             $this->startUserSession([
@@ -179,7 +187,7 @@ class AuthController
 
         } catch (Exception $e) {
             if ($conn) {
-                @oci_rollback($conn);
+                oci_execute(oci_parse($conn, "ROLLBACK"));
             }
             $this->cleanupUploadedFiles($uploadedFiles);
             $this->setFlashError('register_error', "Registration failed: " . $e->getMessage());
@@ -305,9 +313,14 @@ class AuthController
     protected function processServiceAreas($conn, $kitchenId, $areasInput): void
     {
         $areas = array_filter(array_map('trim', explode(',', $areasInput)));
+
         foreach ($areas as $area) {
-            if (!ServiceArea::exists($conn, $kitchenId, $area)) {
-                ServiceArea::insert($conn, $kitchenId, $area);
+            try {
+                if (!ServiceArea::exists($conn, $kitchenId, $area)) {
+                    ServiceArea::insert($conn, $kitchenId, $area);
+                }
+            } catch (Exception $e) {
+                throw new Exception("Failed to process service area '$area': " . $e->getMessage());
             }
         }
     }
