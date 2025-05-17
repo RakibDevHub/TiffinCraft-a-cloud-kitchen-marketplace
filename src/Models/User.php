@@ -5,6 +5,8 @@ use Exception;
 
 class User
 {
+
+
     private const FIND_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = :email";
     private const INSERT_BUYER_QUERY = "INSERT INTO users (name, email, password, phone_number, address, profile_image, role) 
                                       VALUES (:name, :email, :password, :phone_number, :address, :profile_image, :role)
@@ -13,6 +15,47 @@ class User
                                        VALUES (:name, :email, :phone, :address, :password, :image, 'seller')
                                        RETURNING user_id INTO :user_id";
 
+    private const GET_ALL_USERS = "SELECT user_id, name, email, role, phone_number, profile_image, address, created_at
+                                    FROM users
+                                    WHERE role = 'buyer' OR role = 'seller'
+                                    ORDER BY created_at DESC";
+
+
+    public static function getUsers($conn)
+    {
+        if (!$conn) {
+            throw new Exception("Database connection failed");
+        }
+
+        $stmt = oci_parse($conn, self::GET_ALL_USERS);
+        if (!$stmt) {
+            $error = oci_error($conn);
+            throw new Exception("Parse error: " . $error['message']);
+        }
+
+        $success = oci_execute($stmt); // Store the result of oci_execute
+        if (!$success) {
+            $error = oci_error($stmt);
+            throw new Exception("Execute error: " . $error['message']);
+        }
+
+        try {
+            $users = [];
+            while ($row = oci_fetch_assoc($stmt)) {
+                $users[] = array_change_key_case($row, CASE_LOWER);
+            }
+
+            return $users;
+
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return [];
+        } finally {
+            if (isset($stmt)) {
+                oci_free_statement($stmt);
+            }
+        }
+    }
 
     public static function findByEmail($conn, string $email)
     {
@@ -58,7 +101,7 @@ class User
         self::validateUserData($data, ['name', 'email', 'phone', 'address', 'password', 'image']);
 
         $stmt = oci_parse($conn, self::INSERT_SELLER_QUERY);
-        
+
         $userId = null;
         self::bindSellerParameters($stmt, $data, $userId);
 

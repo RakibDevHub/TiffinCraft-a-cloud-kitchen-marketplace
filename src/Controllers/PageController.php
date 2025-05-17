@@ -3,13 +3,16 @@ namespace App\Controllers;
 
 use Exception;
 use App\Core\Database;
+use App\Models\User;
+use App\Models\Kitchen;
+use App\Models\ServiceArea;
 
 class PageController
 {
     // TiffinCraft 
     public function buyer()
     {
-        $this->renderView('buyer/home');
+        $this->renderView('buyer/home', );
     }
 
     // TiffinCraft Business
@@ -44,7 +47,22 @@ class PageController
     {
         $this->requireLogin('admin');
 
-        $this->renderView('admin/users');
+        try {
+            $conn = Database::getConnection();
+            $users = User::getUsers($conn);
+
+            $this->renderView('admin/users', [
+                'users' => $users,
+                'error' => empty($users) ? "No users found in database" : null
+            ]);
+
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            $this->renderView('admin/users', [
+                'users' => [],
+                'error' => "Database error: " . $e->getMessage()
+            ]);
+        }
     }
 
     public function manageOrders()
@@ -99,7 +117,7 @@ class PageController
         exit;
     }
 
-    protected function renderView(string $viewPath): void
+    protected function renderView(string $viewPath, $data = []): void
     {
         include __DIR__ . '/../views/' . $viewPath . '.php';
     }

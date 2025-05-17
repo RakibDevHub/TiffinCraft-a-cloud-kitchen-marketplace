@@ -7,7 +7,6 @@
 </head>
 
 <body class="bg-gray-50">
-
     <?php include BASE_PATH . '/src/includes/navbar.php'; ?>
 
     <!-- Main Content -->
