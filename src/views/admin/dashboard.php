@@ -1,3 +1,9 @@
+<?php
+define('BASE_PATH', dirname(__DIR__, 3));
+$pageTitle = "Admin Dashboard";
+ob_start();
+?>
+
 <!-- ADMIN DASHBOARD CONTENT -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
     <!-- Total Users -->
@@ -198,3 +204,10 @@
         </div>
     </div>
 </div>
+
+<?php
+
+$content = ob_get_clean();
+include BASE_PATH . '/src/views/dashboard.php';
+
+?>

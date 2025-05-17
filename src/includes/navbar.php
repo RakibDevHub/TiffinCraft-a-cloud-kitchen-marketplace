@@ -63,7 +63,7 @@ if ($currentRole === 'seller') {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-14">
             <!-- Mobile menu button and logo -->
-            <div class="flex flex-1 gap-2 items-center">
+            <div class="flex gap-2 items-center">
                 <div class="flex items-center <?= $isDashboardView ? '' : 'md:hidden' ?>">
                     <button id="sidebar-navlinks-button" type="button"
                         class="<?= $isDashboardView ? '' : 'md:hidden' ?> inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500 transition-colors duration-200"
@@ -86,10 +86,20 @@ if ($currentRole === 'seller') {
 
                 <!-- Logo -->
                 <a href="<?= $isBusinessView ? '/business' : '/' ?>"
-                    class="text-xl font-bold text-gray-800 flex flex-row items-center gap-2">
-                    <img class="h-10 w-auto"
-                        src="/assets/images/<?= $isBusinessView ? 'logo.png' : 'TiffinCraft.png' ?>" alt="LOGO">
-                    <?= $isBusinessView ? 'TiffinCraft Business' : '' ?>
+                    class="text-xl font-bold text-gray-800 hover:text-orange-500 transition-colors flex items-centergroup">
+
+                    <!-- Logo Image - Added hover effect and better sizing -->
+                    <img class="h-8 sm:h-10 w-auto ml-[-5px]" src="/assets/images/main-logo.png"
+                        alt="TiffinCraft <?= $isBusinessView ? 'Business' : 'Home' ?>">
+
+                    <!-- Text Logo - Only shown in business view -->
+                    <?php if ($isBusinessView): ?>
+                        <span class="flex flex-start items-center">
+                            <span
+                                class="bg-orange-200 text-orange-600 px-2 py-1 rounded-md text-xs sm:text-sm font-semibold">BUSINESS</span>
+
+                        </span>
+                    <?php endif; ?>
                 </a>
             </div>
 
@@ -110,12 +120,12 @@ if ($currentRole === 'seller') {
             <?php endif; ?>
 
             <!-- Right side (auth) -->
-            <div class="flex flex-1 justify-end">
+            <div class="flex justify-end">
                 <div class="flex items-center">
                     <?php if ($isLoggedIn): ?>
                         <?php include BASE_PATH . '/src/includes/_dropdownNavlinks.php'; ?>
                     <?php else: ?>
-                        <div class="flex items-center flex-row">
+                        <div class="hidden <?= $isBusinessView ? 'min-[450px]:flex' : 'min-[350px]:flex' ?> items-center">
                             <a href="/login"
                                 class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">Login</a>
                             <a href="/register"

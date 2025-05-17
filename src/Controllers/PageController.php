@@ -4,26 +4,75 @@ namespace App\Controllers;
 use Exception;
 use App\Core\Database;
 
-class UserController
+class PageController
 {
+    // TiffinCraft 
+    public function buyer()
+    {
+        $this->renderView('buyer/home');
+    }
+
+    // TiffinCraft Business
+    public function seller()
+    {
+        $this->renderView('seller/home');
+    }
+
+
     public function dashboard()
     {
         $this->requireLogin('buyer');
 
-        $this->renderView('dashboard');
+        $this->renderView('buyer/dashboard');
     }
+
     public function adminDashboard()
     {
         $this->requireLogin('admin');
 
-        $this->renderView('dashboard');
+        $this->renderView('admin/dashboard');
     }
 
     public function businessDashboard()
     {
         $this->requireLogin('seller');
 
-        $this->renderView('dashboard');
+        $this->renderView('seller/dashboard');
+    }
+
+    public function manageUsers()
+    {
+        $this->requireLogin('admin');
+
+        $this->renderView('admin/users');
+    }
+
+    public function manageOrders()
+    {
+        $this->requireLogin('admin');
+
+        $this->renderView('admin/orders');
+    }
+
+    public function manageReports()
+    {
+        $this->requireLogin('admin');
+
+        $this->renderView('admin/reports');
+    }
+
+    public function manageKitchens()
+    {
+        $this->requireLogin('admin');
+
+        $this->renderView('admin/kitchens');
+    }
+
+    public function manageDishes()
+    {
+        $this->requireLogin('admin');
+
+        $this->renderView('admin/dishes');
     }
 
     protected function isLoggedIn(): bool

@@ -24,19 +24,22 @@ $user_email = htmlspecialchars($user_data['email']);
 ?>
 
 <div class="!ml-2 relative " id="dropdown-container">
-    <div class="flex flex-row items-center gap-2">
-        <button id="notification-button"
-            class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-300 rounded-full bg-gray-100 hover:focus:outline-none hover:focus:ring-2 hover:focus:ring-inset hover:focus:ring-orange-500 transition-colors duration-200">
-            <i class="fas fa-bell h-6 w-6 flex justify-center items-center"></i>
-        </button>
+    <div class="flex flex-row items-center gap-1 sm:gap-2">
+        <div class="">
+            <button id="notification-button"
+                class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-300 rounded-full bg-gray-100 hover:focus:outline-none hover:focus:ring-2 hover:focus:ring-inset hover:focus:ring-orange-500 transition-colors duration-200">
+                <i class="fas fa-bell h-4 sm:h-6 w-4 sm:w-6 flex justify-center items-center"></i>
+            </button>
+            <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-orange-500"></span>
+        </div>
 
         <!-- Dropdown Toggle Button -->
         <button type="button" id="user-dropdown-button"
-            class="rounded-full bg-gray-300 flex justify-center items-center gap-2 text-sm text-left h-[40px] w-[40px] hover:focus:outline-none hover:focus:ring-2 hover:focus:ring-inset hover:focus:ring-orange-500 transition-colors duration-200"
+            class="rounded-full bg-gray-300 flex justify-center items-center gap-2 text-sm text-left h-[32px] w-[32px] sm:h-[40px] sm:w-[40px] hover:focus:outline-none hover:focus:ring-2 hover:focus:ring-inset hover:focus:ring-orange-500 transition-colors duration-200"
             aria-expanded="false" aria-haspopup="true" aria-controls="user-dropdown">
             <span class="sr-only">User menu</span>
-            <img class="h-[35px] w-[35px] rounded-full" src="<?= htmlspecialchars($user_data['profile_image']) ?>"
-                alt="<?= $user_name ?>'s profile picture">
+            <img class="h-[27px] w-[27px] sm:h-[35px] sm:w-[35px] rounded-full"
+                src="<?= htmlspecialchars($user_data['profile_image']) ?>" alt="<?= $user_name ?>'s profile picture">
         </button>
     </div>
 

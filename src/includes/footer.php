@@ -7,10 +7,17 @@ $isBusinessView = strpos($_SERVER['REQUEST_URI'], '/business') !== false;
         <!-- Logo and Description -->
         <div class="flex-1 max-w-md">
             <div class="flex items-center">
-                <img src="/assets/images/<?= $isBusinessView ? 'logo.png' : 'TiffinCraft.png'; ?>"
-                    alt="TiffinCraft Logo" class="h-16 w-auto" />
+                <img class="h-10 sm:h-12 md:h-14 ml-[-10px]  w-auto transition-transform group-hover:scale-105"
+                    src="/assets/images/main-logo.png" alt="TiffinCraft <?= $isBusinessView ? 'Business' : 'Home' ?>">
+
                 <?php if ($isBusinessView): ?>
-                    <span class="font-semibold text-lg ml-3">TiffinCraft Business</span>
+                    <?php if ($isBusinessView): ?>
+                        <span class="flex flex-start items-center">
+                            <span
+                                class="bg-orange-200 text-orange-600 px-2 py-1 rounded-md text-sm sm:text-md font-semibold">BUSINESS</span>
+
+                        </span>
+                    <?php endif; ?>
                 <?php endif; ?>
             </div>
             <p class="text-sm text-gray-600 mt-3">

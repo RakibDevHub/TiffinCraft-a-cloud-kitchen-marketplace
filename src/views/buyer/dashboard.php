@@ -1,3 +1,9 @@
+<?php
+define('BASE_PATH', dirname(__DIR__, 3));
+$pageTitle = "Buyer Dashboard";
+ob_start();
+?>
+
 <!-- BUYER DASHBOARD CONTENT -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
     <!-- Orders Card -->
@@ -194,3 +200,10 @@
         </div>
     </div>
 </div>
+
+<?php
+
+$content = ob_get_clean();
+include BASE_PATH . '/src/views/dashboard.php';
+
+?>
