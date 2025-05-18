@@ -1,6 +1,5 @@
 <?php
 $pageTitle = "Dishes Management";
-define('BASE_PATH', dirname(__DIR__, 3));
 ob_start();
 ?>
 

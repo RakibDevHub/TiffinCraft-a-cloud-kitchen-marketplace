@@ -1,12 +1,11 @@
 <?php
-define('BASE_PATH', dirname(__DIR__, 3));
 $pageTitle = "TiffinCraft Business";
 ob_start();
 ?>
 
 <!-- Hero Section for Sellers -->
 <section
-    class="relative h-screen flex items-center justify-center bg-cover bg-center bg-[url(/assets/images/BusinessHeroBG.jpg)]">
+    class="relative top-[-56px] h-screen flex items-center justify-center bg-cover bg-center bg-[url(/assets/images/BusinessHeroBG.jpg)]">
     <div class="absolute inset-0 bg-black bg-opacity-70"></div>
     <div class="relative text-center px-4 z-10">
         <h1 class="text-white text-5xl font-extrabold mb-4">Grow Your Home Kitchen Business</h1>

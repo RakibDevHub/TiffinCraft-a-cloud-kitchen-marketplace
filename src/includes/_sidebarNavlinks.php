@@ -93,7 +93,7 @@ $isBusinessView = strpos($requestUri, '/business') !== false;
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Manage
                                 Users</a>
                             <a href="/admin/kitchens"
-                                class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Approve
+                                class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Manage
                                 Kitchens</a>
                             <a href="/admin/dishes"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Manage

@@ -8,7 +8,7 @@
 
 <body class="font-sans">
     <?php include BASE_PATH . '/src/includes/navbar.php' ?>
-    <main>
+    <main class="relative top-[56px]">
         <?= $content ?>
     </main>
     <?php include BASE_PATH . '/src/includes/footer.php' ?>

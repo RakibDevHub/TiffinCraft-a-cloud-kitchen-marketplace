@@ -2,7 +2,7 @@
 $isBusinessView = strpos($_SERVER['REQUEST_URI'], '/business') !== false;
 ?>
 
-<footer class="<?= $isBusinessView ? 'bg-white text-gray-800' : 'bg-amber-50 text-gray-800'; ?>">
+<footer class="relative top-[56px] <?= $isBusinessView ? 'bg-white text-gray-800' : 'bg-amber-50 text-gray-800'; ?>">
     <div class="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row justify-between gap-8">
         <!-- Logo and Description -->
         <div class="flex-1 max-w-md">

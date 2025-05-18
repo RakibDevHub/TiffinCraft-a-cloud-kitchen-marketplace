@@ -14,15 +14,34 @@ class Router
     {
         $path = parse_url($requestUri, PHP_URL_PATH);
 
-        if (!isset($this->routes[$path])) {
-            http_response_code(404);
-            echo "404 Not Found";
+        // Check for exact matches first
+        if (isset($this->routes[$path])) {
+            $this->callHandler($this->routes[$path]);
             return;
         }
 
-        $handler = $this->routes[$path];
-        [$controllerName, $method] = explode('@', $handler);
+        // Check for parameterized routes
+        foreach ($this->routes as $route => $handler) {
+            if (strpos($route, '{') !== false) {
+                $pattern = preg_replace('/\{[^}]+\}/', '([^/]+)', $route);
+                $pattern = "@^" . $pattern . "$@";
 
+                if (preg_match($pattern, $path, $matches)) {
+                    array_shift($matches); // Remove full match
+                    $this->callHandler($handler, $matches);
+                    return;
+                }
+            }
+        }
+
+        // No route found
+        http_response_code(404);
+        echo "404 Not Found";
+    }
+
+    private function callHandler($handler, $params = [])
+    {
+        [$controllerName, $method] = explode('@', $handler);
         $controllerClass = "\\App\\Controllers\\$controllerName";
 
         if (!class_exists($controllerClass)) {
@@ -39,6 +58,6 @@ class Router
             return;
         }
 
-        $controller->$method();
+        call_user_func_array([$controller, $method], $params);
     }
 }

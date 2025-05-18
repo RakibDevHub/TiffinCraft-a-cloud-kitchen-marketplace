@@ -1,19 +1,17 @@
 <?php
-define('BASE_PATH', dirname(__DIR__, 3));
+$pageTitle = "TiffinCraft Login";
+ob_start();
+
+$helper = new App\Utils\Helper();
+
+// Generate CSRF token if not exists
+if (empty($_SESSION['csrf_token'])) {
+    $csrfToken = $helper->generateCsrfToken();
+}
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <?php $title = 'TiffinCraft - Login';
-    include BASE_PATH . '/src/includes/_head.php'; ?>
-</head>
-
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-    <?php include BASE_PATH . '/src/includes/navbar.php'; ?>
-
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+<section class="relative h-max py-10">
+    <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8">
         <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Login to TiffinCraft</h2>
 
         <?php if (isset($_SESSION['login_error'])): ?>
@@ -22,8 +20,9 @@ define('BASE_PATH', dirname(__DIR__, 3));
                 <?php unset($_SESSION['login_error']); ?>
             </div>
         <?php endif; ?>
-
         <form action="/login" method="POST" class="space-y-4">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+
             <div>
                 <label class="block text-gray-700 mb-1">Email</label>
                 <input type="email" name="email" required
@@ -45,7 +44,11 @@ define('BASE_PATH', dirname(__DIR__, 3));
             <a href="/register" class="text-blue-600 hover:underline">Register here</a>
         </p>
     </div>
+</section>
 
-</body>
+<?php
 
-</html>
+$content = ob_get_clean();
+include BASE_PATH . '/src/views/index.php';
+
+?>

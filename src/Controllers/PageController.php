@@ -65,6 +65,28 @@ class PageController
         }
     }
 
+    public function manageKitchens()
+    {
+        $this->requireLogin('admin');
+
+        try {
+            $conn = Database::getConnection();
+            $kitchens = Kitchen::getAll($conn);
+
+            $this->renderView('admin/kitchens', [
+                'kitchens' => $kitchens,
+                'error' => empty($kitchens) ? "No kitchens found in database" : null
+            ]);
+
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            $this->renderView('admin/kitchens', [
+                'kitchens' => [],
+                'error' => "Database error: " . $e->getMessage()
+            ]);
+        }
+    }
+
     public function manageOrders()
     {
         $this->requireLogin('admin');
@@ -77,13 +99,6 @@ class PageController
         $this->requireLogin('admin');
 
         $this->renderView('admin/reports');
-    }
-
-    public function manageKitchens()
-    {
-        $this->requireLogin('admin');
-
-        $this->renderView('admin/kitchens');
     }
 
     public function manageDishes()

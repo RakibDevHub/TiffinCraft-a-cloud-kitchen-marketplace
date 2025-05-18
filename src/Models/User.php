@@ -15,7 +15,7 @@ class User
                                        VALUES (:name, :email, :phone, :address, :password, :image, 'seller')
                                        RETURNING user_id INTO :user_id";
 
-    private const GET_ALL_USERS = "SELECT user_id, name, email, role, phone_number, profile_image, address, created_at
+    private const GET_ALL_USERS = "SELECT user_id, name, email, role, status, phone_number, profile_image, address, created_at
                                     FROM users
                                     WHERE role = 'buyer' OR role = 'seller'
                                     ORDER BY created_at DESC";

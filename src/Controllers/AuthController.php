@@ -3,6 +3,7 @@ namespace App\Controllers;
 
 use Exception;
 use App\Core\Database;
+use App\Utils\Helper;
 use App\Models\User;
 use App\Models\Kitchen;
 use App\Models\ServiceArea;
@@ -20,8 +21,22 @@ class AuthController
 
         // Handle POST request (login form submission)
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->handleLogin();
-            return;
+            if (isset($_POST['csrf_token'])) {
+                $token = $_POST['csrf_token'];
+                $success = Helper::validateCsrfToken($token);
+                if ($success) {
+                    $this->handleLogin();
+                    return;
+                } else {
+                    // CSRF token is invalid
+                    $_SESSION['login_error'] = "Invalid request. Security token mismatch.";
+                    $this->redirect('/login');
+                }
+            } else {
+                // CSRF token is missing
+                $_SESSION['login_error'] = "Invalid request. Missing security token.";
+                $this->redirect('/login');
+            }
         }
 
         // Show login page for GET requests
@@ -47,6 +62,25 @@ class AuthController
             return;
         }
 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (isset($_POST['csrf_token'])) {
+                $token = $_POST['csrf_token'];
+                $success = Helper::validateCsrfToken($token);
+                if ($success) {
+                    $this->handleBuyerRegistration();
+                    return;
+                } else {
+                    // CSRF token is invalid
+                    $_SESSION['login_error'] = "Invalid request. Security token mismatch.";
+                    $this->redirect('/register');
+                }
+            } else {
+                // CSRF token is missing
+                $_SESSION['login_error'] = "Invalid request. Missing security token.";
+                $this->redirect('/register');
+            }
+        }
+
         $this->renderView('auth/registerBuyer');
     }
 
@@ -59,9 +93,24 @@ class AuthController
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->handleSellerRegistration();
-            return;
+            if (isset($_POST['csrf_token'])) {
+                $token = $_POST['csrf_token'];
+                $success = Helper::validateCsrfToken($token);
+                if ($success) {
+                    $this->handleSellerRegistration();
+                    return;
+                } else {
+                    // CSRF token is invalid
+                    $_SESSION['login_error'] = "Invalid request. Security token mismatch.";
+                    $this->redirect('/register');
+                }
+            } else {
+                // CSRF token is missing
+                $_SESSION['login_error'] = "Invalid request. Missing security token.";
+                $this->redirect('/register');
+            }
         }
+
 
         $this->renderView('auth/registerSeller');
     }
@@ -89,8 +138,10 @@ class AuthController
             $this->redirect('/login');
         }
 
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32)); // Regenerate token
         $this->startUserSession($user);
         $this->redirectToDashboard($user['role']);
+
     }
 
     protected function handleBuyerRegistration()
@@ -118,6 +169,7 @@ class AuthController
                 throw new Exception("Registration failed.");
             }
 
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             $this->startUserSession([
                 'user_id' => $user_id,
                 'name' => $data['name'],
@@ -176,6 +228,7 @@ class AuthController
 
             oci_commit($conn);
 
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             $this->startUserSession([
                 'user_id' => $userId,
                 'name' => $data['name'],
@@ -356,7 +409,7 @@ class AuthController
         exit;
     }
 
-    protected function renderView(string $viewPath): void
+    protected function renderView(string $viewPath, $data = []): void
     {
         include __DIR__ . '/../views/' . $viewPath . '.php';
     }

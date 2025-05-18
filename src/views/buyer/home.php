@@ -1,12 +1,11 @@
 <?php
-define('BASE_PATH', dirname(__DIR__, 3));
 $pageTitle = "TiffinCraft";
 ob_start();
 ?>
 
 <!-- Hero Section with Value Proposition -->
 <section
-    class="relative h-screen flex items-center justify-center bg-cover bg-center bg-[url(/assets/images/HeroBG.jpeg)]">
+    class="relative top-[-56px] h-screen flex items-center justify-center bg-cover bg-center bg-[url(/assets/images/HeroBG.jpeg)]">
     <div class="absolute inset-0 bg-black bg-opacity-70"></div>
     <div class="relative text-center px-4 z-10 max-w-4xl">
         <h1 class="text-white text-5xl md:text-6xl font-bold mb-6 leading-tight">Authentic Homemade Meals Delivered to

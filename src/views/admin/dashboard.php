@@ -1,5 +1,4 @@
 <?php
-define('BASE_PATH', dirname(__DIR__, 3));
 $pageTitle = "Admin Dashboard";
 ob_start();
 ?>
