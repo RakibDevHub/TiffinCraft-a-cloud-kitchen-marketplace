@@ -3,13 +3,10 @@ namespace App\Controllers;
 
 use Exception;
 use App\Core\Database;
-use App\Models\User;
 use App\Models\Kitchen;
-use App\Models\ServiceArea;
 
 class KitchenController
 {
-
     // For Admin 
     public function fetchKitchens()
     {
@@ -21,9 +18,8 @@ class KitchenController
 
             $this->renderView('admin/kitchens', [
                 'kitchens' => $kitchens,
-                'error' => empty($kitchens) ? "No kitchens found in database" : null
+                'error' => empty($kitchens) ? "No kitchens found" : null
             ]);
-
         } catch (Exception $e) {
             error_log($e->getMessage());
             $this->renderView('admin/kitchens', [
@@ -35,11 +31,8 @@ class KitchenController
 
     public function approveKitchen($id)
     {
-        // Verify CSRF token first
-        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-            $_SESSION['error'] = "Invalid CSRF token";
-            $this->redirect("/admin/kitchens");
-        }
+        $this->requireLogin('admin');
+        $this->validateCsrfToken();
 
         try {
             $conn = Database::getConnection();
@@ -49,18 +42,13 @@ class KitchenController
             $_SESSION['error'] = $e->getMessage();
         }
 
-        header("Location: /admin/kitchens");
-        exit();
+        $this->redirect("/admin/kitchens");
     }
 
     public function rejectKitchen($id)
     {
-        // Similar CSRF verification
-        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-            $_SESSION['error'] = "Invalid CSRF token";
-            header("Location: /admin/kitchens");
-            exit();
-        }
+        $this->requireLogin('admin');
+        $this->validateCsrfToken();
 
         try {
             $conn = Database::getConnection();
@@ -70,8 +58,51 @@ class KitchenController
             $_SESSION['error'] = $e->getMessage();
         }
 
-        header("Location: /admin/kitchens");
-        exit();
+        $this->redirect("/admin/kitchens");
+    }
+
+    public function suspendKitchen($id)
+    {
+        $this->requireLogin('admin');
+        $this->validateCsrfToken();
+
+        try {
+            $conn = Database::getConnection();
+            Kitchen::suspend($conn, $id);
+            $_SESSION['success'] = "Kitchen rejected successfully";
+        } catch (Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
+        }
+
+        $this->redirect("/admin/kitchens");
+    }
+
+    public function viewKitchen($id)
+    {
+        $this->requireLogin('admin');
+
+        try {
+            $conn = Database::getConnection();
+            $kitchen = Kitchen::getById($conn, $id);
+
+            if (!$kitchen) {
+                throw new Exception("Kitchen not found");
+            }
+
+            $this->renderView('admin/viewKitchen', $kitchen);
+        } catch (Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
+            $this->redirect("/admin/kitchens");
+        }
+    }
+
+
+    protected function validateCsrfToken(): void
+    {
+        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            $_SESSION['error'] = "Invalid CSRF token";
+            $this->redirect("/admin/kitchens");
+        }
     }
 
     protected function isLoggedIn(): bool
@@ -83,12 +114,10 @@ class KitchenController
     {
         if (!$this->isLoggedIn()) {
             $this->redirect('/login');
-            exit;
         }
 
         if ($requiredRole && $_SESSION['role'] !== $requiredRole) {
             $this->redirect('/unauthorized');
-            exit;
         }
     }
 
@@ -98,10 +127,9 @@ class KitchenController
         exit;
     }
 
-    protected function renderView(string $viewPath, $data = []): void
+    protected function renderView(string $viewPath, array $data = []): void
     {
+        extract($data);
         include __DIR__ . '/../views/' . $viewPath . '.php';
     }
-
 }
-?>

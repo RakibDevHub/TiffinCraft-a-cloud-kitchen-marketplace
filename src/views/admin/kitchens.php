@@ -10,19 +10,9 @@ $statusClasses = [
     1 => ['class' => 'bg-green-100 text-green-800', 'text' => 'Approved'],
     2 => ['class' => 'bg-red-100 text-red-800', 'text' => 'Rejected']
 ];
-
-$helper = new App\Utils\Helper();
-
-// Generate CSRF token if not exists
-if (empty($_SESSION['csrf_token'])) {
-    $csrfToken = $helper->generateCsrfToken();
-}
-
-// Check if we're viewing a specific kitchen
-$viewingKitchen = isset($_GET['view']) ? array_filter($kitchens, fn($k) => $k['kitchen_id'] == $_GET['view']) : [];
-$viewingKitchen = reset($viewingKitchen) ?: null;
 ?>
 
+<!-- Main Content Section -->
 <div class="space-y-6">
     <!-- Header and Filters -->
     <div class="flex justify-between items-center">
@@ -31,8 +21,9 @@ $viewingKitchen = reset($viewingKitchen) ?: null;
             <div class="flex space-x-2">
                 <button id="filterAll"
                     class="px-3 py-2 border rounded-lg text-sm font-medium bg-white hover:bg-gray-50">
-                    All <span id="allCount"
-                        class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs ml-1"><?= count($kitchens) ?></span>
+                    All <span id="allCount" class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs ml-1">
+                        <?= count($kitchens) ?>
+                    </span>
                 </button>
                 <button id="filterPending"
                     class="px-3 py-2 border rounded-lg text-sm font-medium bg-orange-100 text-orange-700 hover:bg-orange-200">
@@ -76,6 +67,7 @@ $viewingKitchen = reset($viewingKitchen) ?: null;
                 <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow"
                     data-status="<?= $kitchen['is_approved'] ?>"
                     data-search="<?= strtolower(htmlspecialchars($kitchen['name'] . ' ' . $kitchen['address'] . ' ' . $kitchen['owner_name'])) ?>">
+
                     <!-- Kitchen Image -->
                     <div class="h-48 bg-gray-200 relative">
                         <?php if (!empty($kitchen['kitchen_image'])): ?>
@@ -139,187 +131,234 @@ $viewingKitchen = reset($viewingKitchen) ?: null;
                                     </button>
                                 </form>
                             <?php else: ?>
-                                <a href="?view=<?= $kitchen['kitchen_id'] ?>"
-                                    class="flex-1 bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors text-center">
+                                <button onclick="showKitchenModal(this)"
+                                    data-kitchen='<?= htmlspecialchars(json_encode($kitchen), ENT_QUOTES, 'UTF-8') ?>'
+                                    class="w-max flex-1 bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">
                                     <i class="fas fa-eye mr-1"></i> View
-                                </a>
-                                <a href="/admin/kitchens/edit/<?= $kitchen['kitchen_id'] ?>"
-                                    class="flex-1 bg-gray-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-gray-600 transition-colors text-center">
-                                    <i class="fas fa-edit mr-1"></i> Edit
-                                </a>
+                                </button>
+                                <!-- <a href="/admin/kitchens/edit/<?= $kitchen['kitchen_id'] ?>"
+                                    class="flex-1 bg-red-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors text-center">
+                                    <i class="fas fa-edit mr-1"></i> Action
+                                </a> -->
                             <?php endif; ?>
                         </div>
+
                     </div>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>
     </div>
 
-    <!-- Kitchen Details Modal (shown when ?view=ID is in URL) -->
-    <?php if ($viewingKitchen): ?>
-        <div id="kitchenModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-fade-in">
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 id="modalKitchenName" class="text-xl font-bold"><?= htmlspecialchars($viewingKitchen['name']) ?>
-                        </h3>
-                        <a href="?" class="text-gray-500 hover:text-gray-700 transition-colors">
-                            <i class="fas fa-times"></i>
-                        </a>
+    <!-- Kitchen Details Modal -->
+    <div id="kitchenModal"
+        class="fixed !mt-0 inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div
+            class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-fade-in p-6">
+            <div class="flex justify-between items-start mb-4">
+                <h3 id="modalKitchenName" class="text-xl font-bold">Kitchen Name</h3>
+                <button onclick="closeModal()"
+                    class="text-gray-500 hover:text-gray-700 transition-colors bg-gray-300 p-0.5 rounded-md h-8 w-8 absolute right-2 top-2">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Left side -->
+                <div>
+                    <div class="h-48 bg-gray-200 rounded-lg mb-4" id="modalKitchenImageWrapper">
+                        <img id="modalKitchenImage" src="" alt="Kitchen Image"
+                            class="w-full h-full object-cover rounded-lg hidden">
+                        <div id="modalKitchenFallbackImage"
+                            class="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
+                            <i class="fas fa-utensils text-4xl text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Owner Information</h4>
+                            <p class="text-gray-600">Name: <span id="modalOwnerName"></span></p>
+                            <p class="text-gray-600">Email: <span id="modalOwnerEmail"></span></p>
+                            <p class="text-gray-600">Phone: <span id="modalOwnerPhone"></span></p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Address</h4>
+                            <p class="text-gray-600" id="modalAddress"></p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Service Areas</h4>
+                            <p class="text-gray-600" id="modalServiceAreas"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right side -->
+                <div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700">Description</h4>
+                        <p class="text-gray-600" id="modalDescription"></p>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <div id="modalKitchenImage" class="h-48 bg-gray-200 rounded-lg mb-4">
-                                <?php if (!empty($viewingKitchen['kitchen_image'])): ?>
-                                    <img src="<?= htmlspecialchars($viewingKitchen['kitchen_image']) ?>"
-                                        class="w-full h-full object-cover rounded-lg">
-                                <?php else: ?>
-                                    <div class="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
-                                        <i class="fas fa-utensils text-4xl text-gray-400"></i>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                            <div class="space-y-3">
-                                <div>
-                                    <h4 class="font-semibold text-gray-700">Owner Information</h4>
-                                    <p id="modalOwnerName" class="text-gray-600">Name:
-                                        <?= htmlspecialchars($viewingKitchen['owner_name']) ?>
-                                    </p>
-                                    <p id="modalOwnerEmail" class="text-gray-600">Email:
-                                        <?= htmlspecialchars($viewingKitchen['owner_email']) ?>
-                                    </p>
-                                    <p id="modalOwnerPhone" class="text-gray-600">Phone:
-                                        <?= htmlspecialchars($viewingKitchen['owner_phone'] ?? 'N/A') ?>
-                                    </p>
-                                </div>
-                                <div>
-                                    <h4 class="font-semibold text-gray-700">Address</h4>
-                                    <p id="modalKitchenAddress" class="text-gray-600">
-                                        <?= htmlspecialchars($viewingKitchen['address']) ?>
-                                    </p>
-                                </div>
-                                <div>
-                                    <h4 class="font-semibold text-gray-700">Service Areas</h4>
-                                    <p id="modalKitchenAreas" class="text-gray-600">
-                                        <?= htmlspecialchars($viewingKitchen['service_areas'] ?? 'No service areas specified') ?>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700">Status</h4>
+                        <span id="modalStatusBadge" class="px-2 py-1 text-xs rounded-full"></span>
+                    </div>
 
-                        <div>
-                            <div class="mb-4">
-                                <h4 class="font-semibold text-gray-700">Description</h4>
-                                <p id="modalKitchenDescription" class="text-gray-600">
-                                    <?= htmlspecialchars($viewingKitchen['description'] ?? 'No description provided') ?>
-                                </p>
-                            </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700">Registration Date</h4>
+                        <p class="text-gray-600" id="modalCreatedAt"></p>
+                    </div>
 
-                            <div class="mb-4">
-                                <h4 class="font-semibold text-gray-700">Status</h4>
-                                <span id="modalKitchenStatus"
-                                    class="px-2 py-1 text-xs rounded-full <?= $statusClasses[$viewingKitchen['is_approved']]['class'] ?>">
-                                    <?= $statusClasses[$viewingKitchen['is_approved']]['text'] ?>
-                                </span>
-                            </div>
-
-                            <div class="mb-4">
-                                <h4 class="font-semibold text-gray-700">Registration Date</h4>
-                                <p id="modalKitchenCreatedAt" class="text-gray-600">
-                                    <?= date('M j, Y \a\t g:i a', strtotime($viewingKitchen['created_at'])) ?>
-                                </p>
-                            </div>
-
-                            <?php if ($viewingKitchen['is_approved'] == 1 && isset($viewingKitchen['avg_rating'])): ?>
-                                <div class="mb-4">
-                                    <h4 class="font-semibold text-gray-700">Rating</h4>
-                                    <div id="modalKitchenRating" class="flex items-center">
-                                        <i class="fas fa-star text-yellow-400 mr-1"></i>
-                                        <span id="ratingValue"><?= round($viewingKitchen['avg_rating'], 1) ?></span>
-                                        <span id="reviewCount"
-                                            class="text-gray-500 ml-1">(<?= $viewingKitchen['review_count'] ?> reviews)</span>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
+                    <div class="mb-4 hidden" id="modalRatingWrapper">
+                        <h4 class="font-semibold text-gray-700">Rating</h4>
+                        <div class="flex items-center">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span id="modalRating"></span>
+                            <span class="text-gray-500 ml-1" id="modalReviewCount"></span>
                         </div>
                     </div>
 
-                    <div class="mt-6 flex justify-end space-x-3">
-                        <a href="?"
-                            class="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
-                            Close
-                        </a>
+                    <div class="flex space-x-2">
+                        <?php if ($kitchen['is_approved'] == 1): ?>
+                            <form method="post" action="/admin/kitchens/reject/<?= $kitchen['kitchen_id'] ?>"
+                                class="flex-1">
+                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                <button type="submit"
+                                    class="w-full bg-red-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors">
+                                    <i class="fas fa-times mr-1"></i> Reject
+                                </button>
+                            </form>
+                            <form method="post" action="/admin/kitchens/suspend/<?= $kitchen['kitchen_id'] ?>"
+                                class="flex-1">
+                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                <button type="submit"
+                                    class="w-full bg-gray-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-gray-600 transition-colors">
+                                    <i class="fas fa-pause mr-1"></i> Suspend
+                                </button>
+                            </form>
+                        <?php else: ?>
+                            <form method="post" action="/admin/kitchens/approve/<?= $kitchen['kitchen_id'] ?>"
+                                class="flex-1">
+                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                <button type="submit"
+                                    class="w-full bg-green-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors">
+                                    <i class="fas fa-check mr-1"></i> Approve
+                                </button>
+                            </form>
+                            <form method="post" action="/admin/kitchens/suspend/<?= $kitchen['kitchen_id'] ?>"
+                                class="flex-1">
+                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                <button type="submit"
+                                    class="w-full bg-gray-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-gray-600 transition-colors">
+                                    <i class="fas fa-pause mr-1"></i> Suspend
+                                </button>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
-    <?php endif; ?>
+    </div>
 </div>
 
-<style>
-    .animate-fade-in {
-        animation: fadeIn 0.3s ease-out forwards;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-</style>
-
+<!-- JavaScript Section -->
 <script>
-    // Filter and Search Functionality
-    document.getElementById('filterAll').addEventListener('click', () => filterKitchens('all'));
-    document.getElementById('filterPending').addEventListener('click', () => filterKitchens(0));
-    document.getElementById('kitchenSearch').addEventListener('input', searchKitchens);
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize filter buttons
+        document.getElementById('filterAll')?.addEventListener('click', () => filterKitchens('all'));
+        document.getElementById('filterPending')?.addEventListener('click', () => filterKitchens(0));
+
+        // Initialize search functionality
+        document.getElementById('kitchenSearch')?.addEventListener('input', searchKitchens);
+    });
+
+    function showKitchenModal(buttonElement) {
+        try {
+            const kitchen = JSON.parse(buttonElement.dataset.kitchen);
+            if (!kitchen) throw new Error("Invalid kitchen data");
+
+            populateModal(kitchen);
+            document.getElementById('kitchenModal').classList.remove('hidden');
+        } catch (error) {
+            console.error("Error showing kitchen modal:", error);
+            alert("Error loading kitchen details. Please try again.");
+        }
+    }
+
+    function populateModal(kitchen) {
+        document.getElementById('modalKitchenName').textContent = kitchen.name || 'Unnamed Kitchen';
+        document.getElementById('modalOwnerName').textContent = kitchen.owner_name || 'Not available';
+        document.getElementById('modalOwnerEmail').textContent = kitchen.owner_email || 'Not available';
+        document.getElementById('modalOwnerPhone').textContent = kitchen.owner_phone || 'Not available';
+        document.getElementById('modalAddress').textContent = kitchen.address || 'Not available';
+        document.getElementById('modalServiceAreas').textContent = kitchen.service_areas || 'Not specified';
+        document.getElementById('modalDescription').textContent = kitchen.description || 'No description provided';
+
+        // Image handling
+        const imgEl = document.getElementById('modalKitchenImage');
+        const fallbackEl = document.getElementById('modalKitchenFallbackImage');
+        if (kitchen.kitchen_image) {
+            imgEl.src = kitchen.kitchen_image;
+            imgEl.classList.remove('hidden');
+            fallbackEl.classList.add('hidden');
+        } else {
+            imgEl.classList.add('hidden');
+            fallbackEl.classList.remove('hidden');
+        }
+
+        // Status badge
+        const statusMap = {
+            0: { text: 'Pending', class: 'bg-yellow-100 text-yellow-800' },
+            1: { text: 'Approved', class: 'bg-green-100 text-green-800' },
+            2: { text: 'Rejected', class: 'bg-red-100 text-red-800' },
+        };
+        const badge = document.getElementById('modalStatusBadge');
+        const status = statusMap[kitchen.is_approved] || { text: 'Unknown', class: 'bg-gray-100 text-gray-800' };
+        badge.textContent = status.text;
+        badge.className = `px-2 py-1 text-xs rounded-full ${status.class}`;
+
+        // Date formatting
+        try {
+            const date = kitchen.created_at ? new Date(kitchen.created_at) : new Date();
+            document.getElementById('modalCreatedAt').textContent = date.toLocaleString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        } catch (e) {
+            console.error("Date formatting error:", e);
+            document.getElementById('modalCreatedAt').textContent = 'Unknown date';
+        }
+
+        // Rating display
+        const ratingWrapper = document.getElementById('modalRatingWrapper');
+        if (kitchen.is_approved == 1 && kitchen.avg_rating !== null) {
+            document.getElementById('modalRating').textContent = (kitchen.avg_rating || 0).toFixed(1);
+            document.getElementById('modalReviewCount').textContent = `(${kitchen.review_count || 0} reviews)`;
+            ratingWrapper.classList.remove('hidden');
+        } else {
+            ratingWrapper.classList.add('hidden');
+        }
+    }
+
+    // Utility Functions
+    function closeModal() {
+        document.getElementById('kitchenModal').classList.add('hidden');
+    }
+
+    function toggleDropdown() {
+        document.getElementById('kitchenModal').classList.add('hidden');
+    }
 
     function filterKitchens(status) {
-        const kitchenCards = document.querySelectorAll('#kitchenGrid > div[data-status]');
-
-        kitchenCards.forEach(card => {
-            if (status === 'all' || card.dataset.status == status) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
+        document.querySelectorAll('#kitchenGrid > div[data-status]').forEach(card => {
+            card.style.display = (status === 'all' || card.dataset.status == status) ? '' : 'none';
         });
     }
 
     function searchKitchens() {
         const searchTerm = document.getElementById('kitchenSearch').value.toLowerCase();
-        const kitchenCards = document.querySelectorAll('#kitchenGrid > div[data-search]');
-
-        kitchenCards.forEach(card => {
-            const searchText = card.dataset.search;
-            if (searchText.includes(searchTerm)) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
+        document.querySelectorAll('#kitchenGrid > div[data-search]').forEach(card => {
+            card.style.display = (card.dataset.search || '').includes(searchTerm) ? '' : 'none';
         });
-    }
-
-    function showToast(message, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg text-white flex items-center ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
-        toast.innerHTML = `
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
-            <span>${message}</span>
-        `;
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-            toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
     }
 </script>
 

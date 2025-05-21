@@ -16,9 +16,9 @@ require_once BASE_PATH . '/src/controllers/KitchenController.php';
 require_once BASE_PATH . '/src/controllers/AuthController.php';
 require_once BASE_PATH . '/src/controllers/PageController.php';
 
-require_once BASE_PATH . '/src/Models/User.php';
-require_once BASE_PATH . '/src/Models/Kitchen.php';
-require_once BASE_PATH . '/src/Models/ServiceArea.php';
+require_once BASE_PATH . '/src/Models/UserModel.php';
+require_once BASE_PATH . '/src/Models/KitchenModel.php';
+require_once BASE_PATH . '/src/Models/ServiceAreaModel.php';
 
 use App\Core\Router;
 
@@ -51,8 +51,7 @@ $router->addRoute('/admin/dishes', 'PageController@manageDishes');
 $router->addRoute('/admin/kitchens', 'KitchenController@fetchKitchens');
 $router->addRoute('/admin/kitchens/approve/{id}', 'KitchenController@approveKitchen');
 $router->addRoute('/admin/kitchens/reject/{id}', 'KitchenController@rejectKitchen');
-$router->addRoute('/admin/kitchens/edit/{id}', 'PageController@editKitchen');
-$router->addRoute('/admin/kitchens/view/{id}', 'PageController@viewKitchen');
+$router->addRoute('/admin/kitchens/suspend/{id}', 'KitchenController@suspendKitchen');
 
 // Business Owner Kitchen Routes
 $router->addRoute('/business/kitchens', 'PageController@businessKitchens');
