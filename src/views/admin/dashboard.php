@@ -1,5 +1,7 @@
 <?php
 $pageTitle = "Admin Dashboard";
+$users = $data['users'];
+$error = $data['error'];
 ob_start();
 ?>
 
@@ -10,7 +12,7 @@ ob_start();
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-medium text-gray-500">Total Users</p>
-                <p class="text-2xl font-bold">2,541</p>
+                <p class="text-2xl font-bold"><?= $users['users_count'] ?></p>
             </div>
             <div
                 class="h-[2.5rem] w-[2.5rem] flex items-center justify-center rounded-full bg-primary-100 text-primary-500">

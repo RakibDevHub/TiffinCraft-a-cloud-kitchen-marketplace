@@ -5,7 +5,12 @@ use Exception;
 
 class User
 {
-
+    private const USER_COUNT = "SELECT
+                                    SUM(CASE WHEN role = 'buyer' THEN 1 ELSE 0 END) AS buyer_count,
+                                    SUM(CASE WHEN role = 'seller' THEN 1 ELSE 0 END) AS seller_count,
+                                    COUNT(*) AS users_count
+                                    FROM users
+                                    WHERE role IN ('buyer', 'seller')";
 
     private const FIND_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = :email";
     private const INSERT_BUYER_QUERY = "INSERT INTO users (name, email, password, phone_number, address, profile_image, role) 
@@ -19,6 +24,39 @@ class User
                                     FROM users
                                     WHERE role = 'buyer' OR role = 'seller'
                                     ORDER BY created_at DESC";
+
+    public static function getUserCount($conn)
+    {
+        if (!$conn) {
+            throw new Exception("Database connection failed");
+        }
+
+        $stmt = oci_parse($conn, self::USER_COUNT);
+        if (!$stmt) {
+            $error = oci_error($conn);
+            throw new Exception("Parse error: " . $error['message']);
+        }
+
+        $success = oci_execute($stmt);
+        if (!$success) {
+            $error = oci_error($stmt);
+            throw new Exception("Execute error: " . $error['message']);
+        }
+
+        try {
+            $row = oci_fetch_assoc($stmt);
+            if ($row) {
+                return array_change_key_case($row, CASE_LOWER);
+            } else {
+                return ['buyer_count' => 0, 'seller_count' => 0, 'users_count' => 0];
+            }
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return ['buyer_count' => 0, 'seller_count' => 0, 'users_count' => 0];
+        } finally {
+            oci_free_statement($stmt);
+        }
+    }
 
 
     public static function getUsers($conn)

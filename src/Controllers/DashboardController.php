@@ -10,7 +10,6 @@ use App\Models\ServiceArea;
 
 class DashboardController
 {
-
     public function dashboard()
     {
         $this->requireLogin('buyer');
@@ -22,7 +21,22 @@ class DashboardController
     {
         $this->requireLogin('admin');
 
-        $this->renderView('admin/dashboard');
+        try {
+            $conn = Database::getConnection();
+            $users = User::getUserCount($conn);
+
+            $this->renderView('admin/dashboard', [
+                'users' => $users,
+                'error' => empty($users) ? "No users found in database" : null
+            ]);
+
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            $this->renderView('admin/dashboard', [
+                'users' => [],
+                'error' => "Database error: " . $e->getMessage()
+            ]);
+        }
     }
 
     public function businessDashboard()
@@ -30,6 +44,11 @@ class DashboardController
         $this->requireLogin('seller');
 
         $this->renderView('seller/dashboard');
+    }
+
+    protected function countUsers()
+    {
+
     }
 
     protected function isLoggedIn(): bool
