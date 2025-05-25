@@ -4,10 +4,11 @@ namespace App\Controllers;
 use Exception;
 use App\Core\Database;
 use App\Models\Kitchen;
+use App\Utils\Helper;
 
 class KitchenController
 {
-    // For Admin 
+    // Admin: View all kitchens
     public function fetchKitchens()
     {
         $this->requireLogin('admin');
@@ -29,10 +30,11 @@ class KitchenController
         }
     }
 
+    // Admin: Approve a kitchen
     public function approveKitchen($id)
     {
         $this->requireLogin('admin');
-        $this->validateCsrfToken();
+        $this->validateCsrf();
 
         try {
             $conn = Database::getConnection();
@@ -45,10 +47,11 @@ class KitchenController
         $this->redirect("/admin/kitchens");
     }
 
+    // Admin: Reject a kitchen
     public function rejectKitchen($id)
     {
         $this->requireLogin('admin');
-        $this->validateCsrfToken();
+        $this->validateCsrf();
 
         try {
             $conn = Database::getConnection();
@@ -61,15 +64,16 @@ class KitchenController
         $this->redirect("/admin/kitchens");
     }
 
+    // Admin: Suspend a kitchen
     public function suspendKitchen($id)
     {
         $this->requireLogin('admin');
-        $this->validateCsrfToken();
+        $this->validateCsrf();
 
         try {
             $conn = Database::getConnection();
             Kitchen::suspend($conn, $id);
-            $_SESSION['success'] = "Kitchen rejected successfully";
+            $_SESSION['success'] = "Kitchen suspended successfully";
         } catch (Exception $e) {
             $_SESSION['error'] = $e->getMessage();
         }
@@ -77,6 +81,7 @@ class KitchenController
         $this->redirect("/admin/kitchens");
     }
 
+    // Admin: View a kitchen's detail
     public function viewKitchen($id)
     {
         $this->requireLogin('admin');
@@ -96,11 +101,15 @@ class KitchenController
         }
     }
 
-
-    protected function validateCsrfToken(): void
+    // CSRF Token Validation
+    protected function validateCsrf(): void
     {
-        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-            $_SESSION['error'] = "Invalid CSRF token";
+        if (
+            $_SERVER['REQUEST_METHOD'] !== 'POST' ||
+            !isset($_POST['csrf_token']) ||
+            !Helper::validateCsrfToken($_POST['csrf_token'])
+        ) {
+            $_SESSION['error'] = "Invalid or missing CSRF token.";
             $this->redirect("/admin/kitchens");
         }
     }

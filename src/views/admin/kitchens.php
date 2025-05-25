@@ -4,7 +4,6 @@ $kitchens = $data['kitchens'];
 $error = $data['error'];
 ob_start();
 
-// Status configuration
 $statusClasses = [
     0 => ['class' => 'bg-yellow-100 text-yellow-800', 'text' => 'Pending'],
     1 => ['class' => 'bg-green-100 text-green-800', 'text' => 'Approved'],
@@ -12,9 +11,8 @@ $statusClasses = [
 ];
 ?>
 
-<!-- Main Content Section -->
+<!-- Main Content -->
 <div class="space-y-6">
-    <!-- Header and Filters -->
     <div class="flex justify-between items-center">
         <h1 class="text-2xl font-bold">Kitchen Approvals</h1>
         <div class="flex space-x-3">
@@ -131,18 +129,13 @@ $statusClasses = [
                                     </button>
                                 </form>
                             <?php else: ?>
-                                <button onclick="showKitchenModal(this)"
-                                    data-kitchen='<?= htmlspecialchars(json_encode($kitchen), ENT_QUOTES, 'UTF-8') ?>'
-                                    class="w-max flex-1 bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">
+                                <button
+                                    onclick="openKitchenModal(<?= htmlspecialchars(json_encode($kitchen), ENT_QUOTES, 'UTF-8') ?>)"
+                                    class="flex-1 bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">
                                     <i class="fas fa-eye mr-1"></i> View
                                 </button>
-                                <!-- <a href="/admin/kitchens/edit/<?= $kitchen['kitchen_id'] ?>"
-                                    class="flex-1 bg-red-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors text-center">
-                                    <i class="fas fa-edit mr-1"></i> Action
-                                </a> -->
                             <?php endif; ?>
                         </div>
-
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -163,7 +156,7 @@ $statusClasses = [
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Left side -->
+                <!-- Left Column -->
                 <div>
                     <div class="h-48 bg-gray-200 rounded-lg mb-4" id="modalKitchenImageWrapper">
                         <img id="modalKitchenImage" src="" alt="Kitchen Image"
@@ -191,7 +184,7 @@ $statusClasses = [
                     </div>
                 </div>
 
-                <!-- Right side -->
+                <!-- Right Column -->
                 <div>
                     <div class="mb-4">
                         <h4 class="font-semibold text-gray-700">Description</h4>
@@ -217,7 +210,8 @@ $statusClasses = [
                         </div>
                     </div>
 
-                    <div class="flex space-x-2">
+                    <!-- Modal Action Buttons -->
+                    <div class="flex space-x-2 mt-4">
                         <?php if ($kitchen['is_approved'] == 1): ?>
                             <form method="post" action="/admin/kitchens/reject/<?= $kitchen['kitchen_id'] ?>"
                                 class="flex-1">
@@ -263,88 +257,71 @@ $statusClasses = [
 <!-- JavaScript Section -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Initialize filter buttons
         document.getElementById('filterAll')?.addEventListener('click', () => filterKitchens('all'));
         document.getElementById('filterPending')?.addEventListener('click', () => filterKitchens(0));
-
-        // Initialize search functionality
         document.getElementById('kitchenSearch')?.addEventListener('input', searchKitchens);
     });
 
-    function showKitchenModal(buttonElement) {
+    function openKitchenModal(kitchen) {
         try {
-            const kitchen = JSON.parse(buttonElement.dataset.kitchen);
-            if (!kitchen) throw new Error("Invalid kitchen data");
+            // Basic information
+            document.getElementById('modalKitchenName').textContent = kitchen.name || 'Unnamed Kitchen';
+            document.getElementById('modalOwnerName').textContent = kitchen.owner_name || 'Not available';
+            document.getElementById('modalOwnerEmail').textContent = kitchen.owner_email || 'Not available';
+            document.getElementById('modalOwnerPhone').textContent = kitchen.owner_phone || 'Not available';
+            document.getElementById('modalAddress').textContent = kitchen.address || 'Not available';
+            document.getElementById('modalServiceAreas').textContent = kitchen.service_areas || 'Not specified';
+            document.getElementById('modalDescription').textContent = kitchen.description || 'No description provided';
 
-            populateModal(kitchen);
+            const imgEl = document.getElementById('modalKitchenImage');
+            const fallbackEl = document.getElementById('modalKitchenFallbackImage');
+            if (kitchen.kitchen_image) {
+                imgEl.src = kitchen.kitchen_image;
+                imgEl.classList.remove('hidden');
+                fallbackEl.classList.add('hidden');
+            } else {
+                imgEl.classList.add('hidden');
+                fallbackEl.classList.remove('hidden');
+            }
+
+            const statusMap = {
+                0: { text: 'Pending', class: 'bg-yellow-100 text-yellow-800' },
+                1: { text: 'Approved', class: 'bg-green-100 text-green-800' },
+                2: { text: 'Rejected', class: 'bg-red-100 text-red-800' },
+            };
+            const badge = document.getElementById('modalStatusBadge');
+            const status = statusMap[kitchen.is_approved] || { text: 'Unknown', class: 'bg-gray-100 text-gray-800' };
+            badge.textContent = status.text;
+            badge.className = `px-2 py-1 text-xs rounded-full ${status.class}`;
+
+            try {
+                const date = kitchen.created_at ? new Date(kitchen.created_at) : new Date();
+                document.getElementById('modalCreatedAt').textContent = date.toLocaleString('en-US', {
+                    year: 'numeric', month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                });
+            } catch (e) {
+                console.error("Date formatting error:", e);
+                document.getElementById('modalCreatedAt').textContent = 'Unknown date';
+            }
+
+            const ratingWrapper = document.getElementById('modalRatingWrapper');
+            if (kitchen.is_approved == 1 && kitchen.avg_rating !== null) {
+                document.getElementById('modalRating').textContent = (kitchen.avg_rating || 0).toFixed(1);
+                document.getElementById('modalReviewCount').textContent = `(${kitchen.review_count || 0} reviews)`;
+                ratingWrapper.classList.remove('hidden');
+            } else {
+                ratingWrapper.classList.add('hidden');
+            }
+
             document.getElementById('kitchenModal').classList.remove('hidden');
         } catch (error) {
-            console.error("Error showing kitchen modal:", error);
+            console.error("Error opening kitchen modal:", error);
             alert("Error loading kitchen details. Please try again.");
         }
     }
 
-    function populateModal(kitchen) {
-        document.getElementById('modalKitchenName').textContent = kitchen.name || 'Unnamed Kitchen';
-        document.getElementById('modalOwnerName').textContent = kitchen.owner_name || 'Not available';
-        document.getElementById('modalOwnerEmail').textContent = kitchen.owner_email || 'Not available';
-        document.getElementById('modalOwnerPhone').textContent = kitchen.owner_phone || 'Not available';
-        document.getElementById('modalAddress').textContent = kitchen.address || 'Not available';
-        document.getElementById('modalServiceAreas').textContent = kitchen.service_areas || 'Not specified';
-        document.getElementById('modalDescription').textContent = kitchen.description || 'No description provided';
-
-        // Image handling
-        const imgEl = document.getElementById('modalKitchenImage');
-        const fallbackEl = document.getElementById('modalKitchenFallbackImage');
-        if (kitchen.kitchen_image) {
-            imgEl.src = kitchen.kitchen_image;
-            imgEl.classList.remove('hidden');
-            fallbackEl.classList.add('hidden');
-        } else {
-            imgEl.classList.add('hidden');
-            fallbackEl.classList.remove('hidden');
-        }
-
-        // Status badge
-        const statusMap = {
-            0: { text: 'Pending', class: 'bg-yellow-100 text-yellow-800' },
-            1: { text: 'Approved', class: 'bg-green-100 text-green-800' },
-            2: { text: 'Rejected', class: 'bg-red-100 text-red-800' },
-        };
-        const badge = document.getElementById('modalStatusBadge');
-        const status = statusMap[kitchen.is_approved] || { text: 'Unknown', class: 'bg-gray-100 text-gray-800' };
-        badge.textContent = status.text;
-        badge.className = `px-2 py-1 text-xs rounded-full ${status.class}`;
-
-        // Date formatting
-        try {
-            const date = kitchen.created_at ? new Date(kitchen.created_at) : new Date();
-            document.getElementById('modalCreatedAt').textContent = date.toLocaleString('en-US', {
-                year: 'numeric', month: 'short', day: 'numeric',
-                hour: '2-digit', minute: '2-digit'
-            });
-        } catch (e) {
-            console.error("Date formatting error:", e);
-            document.getElementById('modalCreatedAt').textContent = 'Unknown date';
-        }
-
-        // Rating display
-        const ratingWrapper = document.getElementById('modalRatingWrapper');
-        if (kitchen.is_approved == 1 && kitchen.avg_rating !== null) {
-            document.getElementById('modalRating').textContent = (kitchen.avg_rating || 0).toFixed(1);
-            document.getElementById('modalReviewCount').textContent = `(${kitchen.review_count || 0} reviews)`;
-            ratingWrapper.classList.remove('hidden');
-        } else {
-            ratingWrapper.classList.add('hidden');
-        }
-    }
-
-    // Utility Functions
     function closeModal() {
-        document.getElementById('kitchenModal').classList.add('hidden');
-    }
-
-    function toggleDropdown() {
         document.getElementById('kitchenModal').classList.add('hidden');
     }
 

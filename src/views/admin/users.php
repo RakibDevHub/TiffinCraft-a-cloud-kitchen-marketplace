@@ -174,9 +174,9 @@ if (empty($_SESSION['csrf_token'])) {
 
                                 <!-- Actions Column -->
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <button onclick="openEditModal(<?= htmlspecialchars(json_encode($user)) ?>)"
+                                    <button onclick="openUserModal(<?= htmlspecialchars(json_encode($user)) ?>)"
                                         class="text-orange-600 hover:text-orange-900 mr-3">
-                                        <i class="fas fa-edit"></i> Edit
+                                        <i class="fas fa-eye mr-1"></i> View
                                     </button>
                                 </td>
                             </tr>
@@ -233,7 +233,7 @@ if (empty($_SESSION['csrf_token'])) {
         });
     }
 
-    function openEditModal(user) {
+    function openUserModal(user) {
         console.log('Editing user:', user);
         // Modal implementation would go here
     }

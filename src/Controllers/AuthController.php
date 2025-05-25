@@ -57,11 +57,6 @@ class AuthController
             return;
         }
 
-        if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $this->handleBuyerRegistration();
-            return;
-        }
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['csrf_token'])) {
                 $token = $_POST['csrf_token'];

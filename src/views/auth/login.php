@@ -6,8 +6,9 @@ $helper = new App\Utils\Helper();
 
 // Generate CSRF token if not exists
 if (empty($_SESSION['csrf_token'])) {
-    $csrfToken = $helper->generateCsrfToken();
+    $helper->generateCsrfToken();
 }
+$csrfToken = $_SESSION['csrf_token'];
 ?>
 
 <section class="relative h-max py-10">
