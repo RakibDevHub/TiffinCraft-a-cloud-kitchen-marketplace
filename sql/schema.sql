@@ -20,7 +20,9 @@ CREATE TABLE users (
     phone_number VARCHAR2(20),
     profile_image VARCHAR2(255),
     address VARCHAR2(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status NUMBER,
+    suspended_until TIMESTAMP
 );
 
 -- Kitchens / Stores
@@ -31,7 +33,9 @@ CREATE TABLE kitchens (
     description CLOB,
     address VARCHAR2(255),
     kitchen_image VARCHAR2(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_approved NUMBER,
+    suspended_until TIMESTAMP
 );
 
 -- Service Areas for each kitchen

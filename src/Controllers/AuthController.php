@@ -1,6 +1,7 @@
 <?php
 namespace App\Controllers;
 
+use DateTime;
 use Exception;
 use App\Core\Database;
 use App\Utils\Helper;
@@ -133,7 +134,6 @@ class AuthController
             $this->redirect('/login');
         }
 
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32)); // Regenerate token
         $this->startUserSession($user);
         $this->redirectToDashboard($user['role']);
 
@@ -381,12 +381,21 @@ class AuthController
         $_SESSION['email'] = $userData['email'];
         $_SESSION['profile_image'] = $userData['profile_image'];
 
+        $_SESSION['is_suspended'] = false;
+        $_SESSION['suspended_until'] = '';
+
+        if (!empty($userData['suspended_until']) && strtotime($userData['suspended_until']) > time()) {
+            $_SESSION['is_suspended'] = true;
+            $_SESSION['suspended_until'] = $userData['suspended_until'];
+        }
+
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
 
     protected function redirectToDashboard(string $role): void
     {
         $routes = [
-            'buyer' => '/',
+            'buyer' => '/dashboard',
             'seller' => '/business/dashboard',
             'admin' => '/admin',
         ];

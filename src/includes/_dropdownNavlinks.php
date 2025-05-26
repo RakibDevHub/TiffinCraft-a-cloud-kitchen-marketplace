@@ -5,7 +5,7 @@ $user_data = [
     'name' => $_SESSION['name'],
     'role' => $_SESSION['role'],
     'email' => $_SESSION['email'],
-    'profile_image' => $_SESSION['profile_image'] ?? '/assets/images/default-profile.jpg'
+    'profile_image' => $_SESSION['profile_image'] ?? '/assets/images/default-profile.jpg',
 ];
 
 // Extract first and last name

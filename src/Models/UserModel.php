@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use DateTime;
 use Exception;
 
 class User
@@ -13,14 +14,16 @@ class User
                                     WHERE role IN ('buyer', 'seller')";
 
     private const FIND_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = :email";
+
     private const INSERT_BUYER_QUERY = "INSERT INTO users (name, email, password, phone_number, address, profile_image, role) 
                                       VALUES (:name, :email, :password, :phone_number, :address, :profile_image, :role)
                                       RETURNING user_id INTO :user_id";
+
     private const INSERT_SELLER_QUERY = "INSERT INTO users (name, email, phone_number, address, password, profile_image, role) 
                                        VALUES (:name, :email, :phone, :address, :password, :image, 'seller')
                                        RETURNING user_id INTO :user_id";
 
-    private const GET_ALL_USERS = "SELECT user_id, name, email, role, status, phone_number, profile_image, address, created_at
+    private const GET_ALL_USERS = "SELECT user_id, name, email, role, status, phone_number, profile_image, address, created_at, suspended_until
                                     FROM users
                                     WHERE role = 'buyer' OR role = 'seller'
                                     ORDER BY created_at DESC";
@@ -58,7 +61,6 @@ class User
         }
     }
 
-
     public static function getUsers($conn)
     {
         if (!$conn) {
@@ -71,7 +73,7 @@ class User
             throw new Exception("Parse error: " . $error['message']);
         }
 
-        $success = oci_execute($stmt); // Store the result of oci_execute
+        $success = oci_execute($stmt);
         if (!$success) {
             $error = oci_error($stmt);
             throw new Exception("Execute error: " . $error['message']);
@@ -102,10 +104,16 @@ class User
         oci_execute($stmt);
 
         $user = oci_fetch_assoc($stmt);
+
+        if ($user && !empty($user['SUSPENDED_UNTIL'])) {
+            $user['SUSPENDED_UNTIL'] = self::processOracleDate($user['SUSPENDED_UNTIL']);
+        }
+
         oci_free_statement($stmt);
 
         return $user ? array_change_key_case($user, CASE_LOWER) : false;
     }
+
 
     public static function registerBuyer($conn, array $data)
     {
@@ -148,6 +156,17 @@ class User
         }
 
         return $userId;
+    }
+
+    private static function processOracleDate(string $dateString): string
+    {
+        try {
+            $date = DateTime::createFromFormat('d-M-y h.i.s.u A', strtoupper($dateString));
+            return $date ? $date->format(DateTime::ATOM) : $dateString;
+        } catch (Exception $e) {
+            error_log("Date processing error: " . $e->getMessage());
+            return $dateString;
+        }
     }
 
     private static function validateUserData(array $data, array $requiredFields): void

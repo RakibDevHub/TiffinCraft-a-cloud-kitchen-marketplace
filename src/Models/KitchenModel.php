@@ -11,9 +11,11 @@ class Kitchen
     private const GET_ALL_KITCHENS = "
         SELECT 
             k.*,
+            k.suspended_until as kitchen_suspended,
             u.name as owner_name,
             u.email as owner_email,
             u.phone_number as owner_phone,
+            u.suspended_until as user_suspended,
             (SELECT COUNT(*) FROM kitchen_reviews WHERE kitchen_id = k.kitchen_id) as review_count,
             (SELECT AVG(rating) FROM kitchen_reviews WHERE kitchen_id = k.kitchen_id) as avg_rating,
             (SELECT LISTAGG(sa.name, ', ') WITHIN GROUP (ORDER BY sa.name) 
@@ -27,9 +29,11 @@ class Kitchen
     private const GET_KITCHEN_BY_ID = "
         SELECT 
             k.*,
+            k.suspended_until as kitchen_suspended,
             u.name as owner_name,
             u.email as owner_email,
             u.phone_number as owner_phone,
+            u.suspended_until as user_suspended,
             (SELECT COUNT(*) FROM kitchen_reviews WHERE kitchen_id = k.kitchen_id) as review_count,
             (SELECT AVG(rating) FROM kitchen_reviews WHERE kitchen_id = k.kitchen_id) as avg_rating,
             (SELECT LISTAGG(sa.name, ', ') WITHIN GROUP (ORDER BY sa.name) 
@@ -120,6 +124,7 @@ class Kitchen
 
         // Process dates
         $kitchen['created_at'] = self::processOracleDate($kitchen['created_at'] ?? '');
+        $kitchen['suspended_until'] = self::processOracleDate($kitchen['suspended_until'] ?? '');
 
         // Convert numeric strings
         if (isset($kitchen['is_approved'])) {
