@@ -2,25 +2,9 @@
 $pageTitle = "Buyer Dashboard";
 ob_start();
 
-$sessionData = [
-    'isUserSuspended' => $_SESSION['isUserSuspended'] ?? false,
-    'userSuspendedUntil' => $_SESSION['userSuspendedUntil'] ?? '',
-];
-
 ?>
 
 <!-- BUYER DASHBOARD CONTENT -->
-
-<?php if (!empty($sessionData['isUserSuspended']) && !empty($sessionData['userSuspendedUntil'])): ?>
-    <?php
-    $dt = new DateTime($sessionData['userSuspendedUntil']);
-    $formatted = $dt->format('d M Y, g:i A');
-    ?>
-    <div class="bg-white p-6 rounded-lg shadow mb-6">
-        <span class="font-medium text-sm text-red-600">Your Account Hasbeen Suspended until <?= $formatted ?></span>
-    </div>
-<?php endif; ?>
-
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
     <!-- Orders Card -->
     <div class="bg-white p-6 rounded-lg shadow">
