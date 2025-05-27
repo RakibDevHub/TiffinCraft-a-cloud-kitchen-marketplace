@@ -2,18 +2,18 @@
 $pageTitle = "Buyer Dashboard";
 ob_start();
 
-$userData = [
-    'is_suspended' => $_SESSION['is_suspended'] ?? false,
-    'suspended_until' => $_SESSION['suspended_until'] ?? ''
+$sessionData = [
+    'isUserSuspended' => $_SESSION['isUserSuspended'] ?? false,
+    'userSuspendedUntil' => $_SESSION['userSuspendedUntil'] ?? '',
 ];
 
 ?>
 
 <!-- BUYER DASHBOARD CONTENT -->
 
-<?php if (!empty($userData['is_suspended']) && !empty($userData['suspended_until'])): ?>
+<?php if (!empty($sessionData['isUserSuspended']) && !empty($sessionData['userSuspendedUntil'])): ?>
     <?php
-    $dt = new DateTime($userData['suspended_until']);
+    $dt = new DateTime($sessionData['userSuspendedUntil']);
     $formatted = $dt->format('d M Y, g:i A');
     ?>
     <div class="bg-white p-6 rounded-lg shadow mb-6">

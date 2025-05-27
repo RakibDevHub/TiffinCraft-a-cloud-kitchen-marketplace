@@ -14,6 +14,7 @@ class User
                                     WHERE role IN ('buyer', 'seller')";
 
     private const FIND_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = :email";
+    private const FIND_BY_ID_QUERY = "SELECT * FROM users WHERE user_id = :user_id";
 
     private const INSERT_BUYER_QUERY = "INSERT INTO users (name, email, password, phone_number, address, profile_image, role) 
                                       VALUES (:name, :email, :password, :phone_number, :address, :profile_image, :role)
@@ -95,6 +96,23 @@ class User
                 oci_free_statement($stmt);
             }
         }
+    }
+
+    public static function findById($conn, int $userId)
+    {
+        $stmt = oci_parse($conn, self::FIND_BY_ID_QUERY);
+        oci_bind_by_name($stmt, ':user_id', $userId);
+        oci_execute($stmt);
+
+        $user = oci_fetch_assoc($stmt);
+
+        if ($user && !empty($user['SUSPENDED_UNTIL'])) {
+            $user['SUSPENDED_UNTIL'] = self::processOracleDate($user['SUSPENDED_UNTIL']);
+        }
+
+        oci_free_statement($stmt);
+
+        return $user ? array_change_key_case($user, CASE_LOWER) : false;
     }
 
     public static function findByEmail($conn, string $email)

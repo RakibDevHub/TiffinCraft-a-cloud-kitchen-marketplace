@@ -14,6 +14,25 @@ class DashboardController
     {
         $this->requireLogin('buyer');
 
+        if (!empty($_SESSION['user_id'])) {
+            $conn = Database::getConnection();
+            $user = User::findById($conn, $_SESSION['user_id']);
+
+            $isSuspended = false;
+            $suspendedUntil = null;
+
+            if (!empty($user['suspended_until'])) {
+                $timestamp = strtotime($user['suspended_until']);
+                if ($timestamp > time()) {
+                    $isSuspended = true;
+                    $suspendedUntil = $user['suspended_until'];
+                }
+            }
+
+            $_SESSION['is_suspended'] = $isSuspended;
+            $_SESSION['suspended_until'] = $suspendedUntil;
+        }
+
         $this->renderView('buyer/dashboard');
     }
 

@@ -11,11 +11,9 @@ class Kitchen
     private const GET_ALL_KITCHENS = "
         SELECT 
             k.*,
-            k.suspended_until as kitchen_suspended,
             u.name as owner_name,
             u.email as owner_email,
             u.phone_number as owner_phone,
-            u.suspended_until as user_suspended,
             (SELECT COUNT(*) FROM kitchen_reviews WHERE kitchen_id = k.kitchen_id) as review_count,
             (SELECT AVG(rating) FROM kitchen_reviews WHERE kitchen_id = k.kitchen_id) as avg_rating,
             (SELECT LISTAGG(sa.name, ', ') WITHIN GROUP (ORDER BY sa.name) 
@@ -29,11 +27,9 @@ class Kitchen
     private const GET_KITCHEN_BY_ID = "
         SELECT 
             k.*,
-            k.suspended_until as kitchen_suspended,
             u.name as owner_name,
             u.email as owner_email,
             u.phone_number as owner_phone,
-            u.suspended_until as user_suspended,
             (SELECT COUNT(*) FROM kitchen_reviews WHERE kitchen_id = k.kitchen_id) as review_count,
             (SELECT AVG(rating) FROM kitchen_reviews WHERE kitchen_id = k.kitchen_id) as avg_rating,
             (SELECT LISTAGG(sa.name, ', ') WITHIN GROUP (ORDER BY sa.name) 
@@ -43,6 +39,38 @@ class Kitchen
         FROM kitchens k
         JOIN users u ON k.owner_id = u.user_id
         WHERE k.kitchen_id = :kitchen_id";
+
+    private const GET_KITCHEN_BY_OWNER_ID = "
+        SELECT 
+            k.*,
+            u.name AS owner_name,
+            u.email AS owner_email,
+            u.phone_number AS owner_phone,
+            (SELECT COUNT(*) FROM kitchen_reviews WHERE kitchen_id = k.kitchen_id) AS review_count,
+            (SELECT AVG(rating) FROM kitchen_reviews WHERE kitchen_id = k.kitchen_id) AS avg_rating,
+            (SELECT LISTAGG(sa.name, ', ') WITHIN GROUP (ORDER BY sa.name) 
+            FROM service_areas sa
+            JOIN kitchen_service_areas ksa ON sa.area_id = ksa.area_id
+            WHERE ksa.kitchen_id = k.kitchen_id) AS service_areas
+        FROM kitchens k
+        JOIN users u ON k.owner_id = u.user_id
+        WHERE k.owner_id = :owner_id";
+
+
+    private const INSERT_KITCHEN_QUERY = "INSERT INTO kitchens (
+                    owner_id, 
+                    name, 
+                    description, 
+                    address, 
+                    kitchen_image
+                ) VALUES (
+                    :owner_id, 
+                    :name, 
+                    :description, 
+                    :address, 
+                    :kitchen_image
+                ) 
+                RETURNING kitchen_id INTO :kitchen_id";
 
     private const APPROVE_KITCHEN_QUERY = "
         UPDATE kitchens SET
@@ -77,12 +105,17 @@ class Kitchen
 
         $kitchens = [];
         while ($row = oci_fetch_assoc($stmt)) {
+            if (!empty($row['SUSPENDED_UNTIL'])) {
+                $row['SUSPENDED_UNTIL'] = self::processOracleDate($row['SUSPENDED_UNTIL']);
+            }
+
             $kitchens[] = self::processKitchenData($row);
         }
 
         oci_free_statement($stmt);
         return $kitchens;
     }
+
 
     public static function getById($conn, int $kitchenId): ?array
     {
@@ -94,9 +127,83 @@ class Kitchen
         }
 
         $kitchen = oci_fetch_assoc($stmt);
+
+        if ($kitchen && !empty($kitchen['SUSPENDED_UNTIL'])) {
+            $kitchen['SUSPENDED_UNTIL'] = self::processOracleDate($kitchen['SUSPENDED_UNTIL']);
+        }
+
         oci_free_statement($stmt);
 
         return $kitchen ? self::processKitchenData($kitchen) : null;
+    }
+
+
+    public static function getByOwnerId($conn, int $userId): ?array
+    {
+        $stmt = oci_parse($conn, self::GET_KITCHEN_BY_OWNER_ID);
+        oci_bind_by_name($stmt, ':owner_id', $userId);
+
+        if (!oci_execute($stmt)) {
+            throw new Exception("Failed to fetch kitchen: " . oci_error($stmt)['message']);
+        }
+
+        $kitchen = oci_fetch_assoc($stmt);
+
+        if ($kitchen && !empty($kitchen['SUSPENDED_UNTIL'])) {
+            $kitchen['SUSPENDED_UNTIL'] = self::processOracleDate($kitchen['SUSPENDED_UNTIL']);
+        }
+
+        oci_free_statement($stmt);
+
+        return $kitchen ? self::processKitchenData($kitchen) : null;
+    }
+
+
+    public static function create($conn, array $data): int
+    {
+        self::validateKitchenData($data);
+
+        $stmt = oci_parse($conn, self::INSERT_KITCHEN_QUERY);
+        $kitchenId = null;
+
+        oci_bind_by_name($stmt, ':owner_id', $data['owner_id']);
+        oci_bind_by_name($stmt, ':name', $data['name']);
+        oci_bind_by_name($stmt, ':description', $data['description']);
+        oci_bind_by_name($stmt, ':address', $data['address']);
+        oci_bind_by_name($stmt, ':kitchen_image', $data['kitchen_image']);
+        oci_bind_by_name($stmt, ':kitchen_id', $kitchenId, -1, SQLT_INT);
+
+        if (!oci_execute($stmt, OCI_NO_AUTO_COMMIT)) {
+            throw new Exception("Failed to create kitchen: " . oci_error($stmt));
+        }
+
+        oci_commit($conn);
+        oci_free_statement($stmt);
+
+        return $kitchenId;
+    }
+
+    public static function update($conn, int $kitchenId, array $data): bool
+    {
+        self::validateKitchenData($data);
+
+        $stmt = oci_parse($conn, self::UPDATE_KITCHEN_QUERY);
+
+        oci_bind_by_name($stmt, ':kitchen_id', $kitchenId);
+        oci_bind_by_name($stmt, ':name', $data['name']);
+        oci_bind_by_name($stmt, ':description', $data['description']);
+        oci_bind_by_name($stmt, ':address', $data['address']);
+        oci_bind_by_name($stmt, ':kitchen_image', $data['kitchen_image']);
+
+        $success = oci_execute($stmt, OCI_NO_AUTO_COMMIT);
+        if (!$success) {
+            throw new Exception("Failed to update kitchen: " . oci_error($stmt));
+        }
+
+        oci_commit($conn);
+        oci_free_statement($stmt);
+
+        return $success;
     }
 
     public static function approve($conn, int $kitchenId): bool
@@ -114,6 +221,21 @@ class Kitchen
         return self::updateKitchenStatus($conn, $kitchenId, self::SUSPEND_KITCHEN_QUERY);
     }
 
+
+    private static function validateKitchenData(array $data): void
+    {
+        $requiredFields = ['owner_id', 'name', 'description', 'address', 'kitchen_image'];
+
+        foreach ($requiredFields as $field) {
+            if (empty($data[$field])) {
+                throw new Exception("Missing required field: $field");
+            }
+        }
+
+        if (!is_numeric($data['owner_id'])) {
+            throw new Exception("Owner ID must be numeric");
+        }
+    }
 
     private static function processKitchenData(array $row): array
     {

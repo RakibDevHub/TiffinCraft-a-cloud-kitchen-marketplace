@@ -2,7 +2,35 @@
 define('BASE_PATH', dirname(__DIR__, 3));
 $pageTitle = "Seller Dashboard";
 ob_start();
+
+$sessionData = [
+    'isUserSuspended' => $_SESSION['isUserSuspended'] ?? false,
+    'userSuspendedUntil' => $_SESSION['userSuspendedUntil'] ?? '',
+    'isKitchenSuspended' => $_SESSION['isKitchenSuspended'] ?? false,
+    'kitchenSuspendedUntil' => $_SESSION['kitchenSuspendedUntil'] ?? ''
+];
+
 ?>
+
+<?php if (!empty($sessionData['isUserSuspended']) && !empty($sessionData['userSuspendedUntil'])): ?>
+    <?php
+    $dt = new DateTime($sessionData['userSuspendedUntil']);
+    $formatted = $dt->format('d M Y, g:i A');
+    ?>
+    <div class="bg-white p-6 rounded-lg shadow mb-6">
+        <span class="font-medium text-sm text-red-600">Your Account Hasbeen Suspended until <?= $formatted ?></span>
+    </div>
+<?php endif; ?>
+
+<?php if (!empty($sessionData['isKitchenSuspended']) && !empty($sessionData['kitchenSuspendedUntil'])): ?>
+    <?php
+    $dt = new DateTime($sessionData['kitchenSuspendedUntil']);
+    $formatted = $dt->format('d M Y, g:i A');
+    ?>
+    <div class="bg-white p-6 rounded-lg shadow mb-6">
+        <span class="font-medium text-sm text-red-600">Your Kitchen Hasbeen Suspended until <?= $formatted ?></span>
+    </div>
+<?php endif; ?>
 
 <!-- SELLER DASHBOARD CONTENT -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">

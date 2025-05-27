@@ -5,6 +5,7 @@ session_start();
 
 define('BASE_PATH', dirname(__DIR__, 1));
 require_once BASE_PATH . '/src/utils/helper.php';
+require_once BASE_PATH . '/src/utils/session_helper.php';
 
 require_once BASE_PATH . '/src/core/Router.php';
 require_once BASE_PATH . '/src/core/Database.php';
@@ -21,6 +22,9 @@ require_once BASE_PATH . '/src/Models/KitchenModel.php';
 require_once BASE_PATH . '/src/Models/ServiceAreaModel.php';
 
 use App\Core\Router;
+use App\Utils\SessionHelper;
+
+SessionHelper::refreshUserSession();
 
 $router = new Router();
 

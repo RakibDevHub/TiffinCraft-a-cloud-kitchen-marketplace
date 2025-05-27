@@ -1,7 +1,6 @@
 <?php
 namespace App\Controllers;
 
-use DateTime;
 use Exception;
 use App\Core\Database;
 use App\Utils\Helper;
@@ -14,13 +13,11 @@ class AuthController
 
     public function login()
     {
-        // If user is already logged in, redirect to appropriate dashboard
         if ($this->isLoggedIn()) {
             $this->redirectToDashboard($_SESSION['role']);
             return;
         }
 
-        // Handle POST request (login form submission)
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['csrf_token'])) {
                 $token = $_POST['csrf_token'];
@@ -29,18 +26,15 @@ class AuthController
                     $this->handleLogin();
                     return;
                 } else {
-                    // CSRF token is invalid
                     $_SESSION['login_error'] = "Invalid request. Security token mismatch.";
                     $this->redirect('/login');
                 }
             } else {
-                // CSRF token is missing
                 $_SESSION['login_error'] = "Invalid request. Missing security token.";
                 $this->redirect('/login');
             }
         }
 
-        // Show login page for GET requests
         $this->renderView('auth/login');
     }
 
@@ -52,7 +46,6 @@ class AuthController
 
     public function registerAsBuyer()
     {
-        // If user is already logged in, redirect to appropriate dashboard
         if ($this->isLoggedIn()) {
             $this->redirectToDashboard($_SESSION['role']);
             return;
@@ -66,12 +59,10 @@ class AuthController
                     $this->handleBuyerRegistration();
                     return;
                 } else {
-                    // CSRF token is invalid
                     $_SESSION['login_error'] = "Invalid request. Security token mismatch.";
                     $this->redirect('/register');
                 }
             } else {
-                // CSRF token is missing
                 $_SESSION['login_error'] = "Invalid request. Missing security token.";
                 $this->redirect('/register');
             }
@@ -82,7 +73,6 @@ class AuthController
 
     public function registerAsSeller()
     {
-        // If user is already logged in, redirect to appropriate dashboard
         if ($this->isLoggedIn()) {
             $this->redirectToDashboard($_SESSION['role']);
             return;
@@ -96,17 +86,14 @@ class AuthController
                     $this->handleSellerRegistration();
                     return;
                 } else {
-                    // CSRF token is invalid
                     $_SESSION['login_error'] = "Invalid request. Security token mismatch.";
                     $this->redirect('/register');
                 }
             } else {
-                // CSRF token is missing
                 $_SESSION['login_error'] = "Invalid request. Missing security token.";
                 $this->redirect('/register');
             }
         }
-
 
         $this->renderView('auth/registerSeller');
     }
@@ -134,7 +121,7 @@ class AuthController
             $this->redirect('/login');
         }
 
-        $this->startUserSession($user);
+        $this->startUserSession($user['user_id']);
         $this->redirectToDashboard($user['role']);
 
     }
@@ -150,7 +137,7 @@ class AuthController
             $data = $this->validateBuyerInput($_POST);
             $uploadedImage = $this->handleImageUpload('profile_image');
 
-            $user_id = User::registerBuyer($conn, [
+            $userId = User::registerBuyer($conn, [
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => password_hash($data['password'], PASSWORD_DEFAULT),
@@ -160,18 +147,11 @@ class AuthController
                 'role' => 'buyer'
             ]);
 
-            if (!$user_id) {
+            if (!$userId) {
                 throw new Exception("Registration failed.");
             }
 
-            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-            $this->startUserSession([
-                'user_id' => $user_id,
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'role' => 'buyer',
-                'profile_image' => $uploadedImage
-            ]);
+            $this->startUserSession($userId);
             $this->redirect('/buyer/dashboard');
 
         } catch (Exception $e) {
@@ -224,13 +204,7 @@ class AuthController
             oci_commit($conn);
 
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-            $this->startUserSession([
-                'user_id' => $userId,
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'role' => 'seller',
-                'profile_image' => $profileImage
-            ]);
+            $this->startUserSession($userId);
             $this->redirect('/business/dashboard');
 
         } catch (Exception $e) {
@@ -373,22 +347,9 @@ class AuthController
         }
     }
 
-    protected function startUserSession(array $userData): void
+    protected function startUserSession($userId): void
     {
-        $_SESSION['user_id'] = $userData['user_id'];
-        $_SESSION['role'] = $userData['role'];
-        $_SESSION['name'] = $userData['name'];
-        $_SESSION['email'] = $userData['email'];
-        $_SESSION['profile_image'] = $userData['profile_image'];
-
-        $_SESSION['is_suspended'] = false;
-        $_SESSION['suspended_until'] = '';
-
-        if (!empty($userData['suspended_until']) && strtotime($userData['suspended_until']) > time()) {
-            $_SESSION['is_suspended'] = true;
-            $_SESSION['suspended_until'] = $userData['suspended_until'];
-        }
-
+        $_SESSION['user_id'] = $userId;
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
 
