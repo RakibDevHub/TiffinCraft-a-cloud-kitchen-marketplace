@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Core\Database;
 use DateTime;
 use Exception;
 
@@ -16,13 +17,9 @@ class User
     private const FIND_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = :email";
     private const FIND_BY_ID_QUERY = "SELECT * FROM users WHERE user_id = :user_id";
 
-    private const INSERT_BUYER_QUERY = "INSERT INTO users (name, email, password, phone_number, address, profile_image, role) 
-                                      VALUES (:name, :email, :password, :phone_number, :address, :profile_image, :role)
+    private const INSERT_USER_QUERY = "INSERT INTO users (name, email, password, phone_number, address, profile_image, role, status) 
+                                      VALUES (:name, :email, :password, :phone_number, :address, :profile_image, :role, 1)
                                       RETURNING user_id INTO :user_id";
-
-    private const INSERT_SELLER_QUERY = "INSERT INTO users (name, email, phone_number, address, password, profile_image, role) 
-                                       VALUES (:name, :email, :phone, :address, :password, :image, 'seller')
-                                       RETURNING user_id INTO :user_id";
 
     private const GET_ALL_USERS = "SELECT user_id, name, email, role, status, phone_number, profile_image, address, created_at, suspended_until
                                     FROM users
@@ -132,49 +129,51 @@ class User
         return $user ? array_change_key_case($user, CASE_LOWER) : false;
     }
 
+    // public static function registerUser($conn, array $data): ?int
+    // {
+    //     self::validateUserData($data, ['name', 'email', 'phone_number', 'address', 'profile_image', 'role', 'password']);
 
-    public static function registerBuyer($conn, array $data)
+    //     try {
+    //         // self::beginTransaction($conn);
+
+    //         $stmt = oci_parse($conn, self::INSERT_USER_QUERY);
+    //         $userId = null;
+
+    //         self::bindUserParameters($stmt, $data, $userId);
+
+    //         if (!oci_execute($stmt, OCI_NO_AUTO_COMMIT)) {
+    //             throw new Exception("Failed to execute registration query: " . oci_error($stmt)['message']);
+    //         }
+
+    //         self::commitTransaction($conn);
+
+    //         return $userId;
+
+    //     } catch (Exception $e) {
+    //         self::rollbackTransaction($conn);
+    //         return false;
+    //     } finally {
+    //         self::cleanupStatement($stmt ?? null);
+    //     }
+    // }
+
+
+    public static function registerUser($conn, array $data): ?int
     {
-        self::validateUserData($data, ['name', 'email', 'password', 'phone_number', 'address', 'profile_image', 'role']);
+        self::validateUserData($data, ['name', 'email', 'phone_number', 'address', 'profile_image', 'role', 'password']);
 
-        try {
-            self::beginTransaction($conn);
-
-            $stmt = oci_parse($conn, self::INSERT_BUYER_QUERY);
-            $userId = null;
-
-            self::bindBuyerParameters($stmt, $data, $userId);
-
-            if (oci_execute($stmt, OCI_NO_AUTO_COMMIT)) {
-                self::commitTransaction($conn);
-                return $userId;
-            }
-
-            throw new Exception("Failed to execute buyer registration query");
-
-        } catch (Exception $e) {
-            self::rollbackTransaction($conn);
-            return false;
-        } finally {
-            self::cleanupStatement($stmt ?? null);
-        }
-    }
-
-    public static function registerSeller($conn, array $data): int
-    {
-        self::validateUserData($data, ['name', 'email', 'phone', 'address', 'password', 'image']);
-
-        $stmt = oci_parse($conn, self::INSERT_SELLER_QUERY);
-
+        $stmt = oci_parse($conn, self::INSERT_USER_QUERY);
         $userId = null;
-        self::bindSellerParameters($stmt, $data, $userId);
+
+        self::bindUserParameters($stmt, $data, $userId);
 
         if (!oci_execute($stmt, OCI_NO_AUTO_COMMIT)) {
-            throw new Exception("Failed to create seller user");
+            throw new Exception("Failed to execute registration query: " . oci_error($stmt)['message']);
         }
 
         return $userId;
     }
+
 
     private static function processOracleDate(string $dateString): string
     {
@@ -194,6 +193,18 @@ class User
                 throw new Exception("Missing required field: $field");
             }
         }
+    }
+
+    private static function bindUserParameters($stmt, array $data, &$userId): void
+    {
+        oci_bind_by_name($stmt, ':name', $data['name']);
+        oci_bind_by_name($stmt, ':email', $data['email']);
+        oci_bind_by_name($stmt, ':phone_number', $data['phone_number']); // Fixed key
+        oci_bind_by_name($stmt, ':address', $data['address']);
+        oci_bind_by_name($stmt, ':profile_image', $data['profile_image']); // Fixed key
+        oci_bind_by_name($stmt, ':password', $data['password']);
+        oci_bind_by_name($stmt, ':role', $data['role']);
+        oci_bind_by_name($stmt, ':user_id', $userId, -1, SQLT_INT);
     }
 
     private static function beginTransaction($conn): void
@@ -216,28 +227,5 @@ class User
         if ($stmt) {
             oci_free_statement($stmt);
         }
-    }
-
-    private static function bindBuyerParameters($stmt, array $data, &$userId): void
-    {
-        oci_bind_by_name($stmt, ':name', $data['name']);
-        oci_bind_by_name($stmt, ':email', $data['email']);
-        oci_bind_by_name($stmt, ':password', $data['password']);
-        oci_bind_by_name($stmt, ':phone_number', $data['phone_number']);
-        oci_bind_by_name($stmt, ':address', $data['address']);
-        oci_bind_by_name($stmt, ':profile_image', $data['profile_image']);
-        oci_bind_by_name($stmt, ':role', $data['role']);
-        oci_bind_by_name($stmt, ':user_id', $userId, -1, SQLT_INT);
-    }
-
-    private static function bindSellerParameters($stmt, array $data, &$userId): void
-    {
-        oci_bind_by_name($stmt, ':name', $data['name']);
-        oci_bind_by_name($stmt, ':email', $data['email']);
-        oci_bind_by_name($stmt, ':phone', $data['phone']);
-        oci_bind_by_name($stmt, ':address', $data['address']);
-        oci_bind_by_name($stmt, ':password', $data['password']);
-        oci_bind_by_name($stmt, ':image', $data['image']);
-        oci_bind_by_name($stmt, ':user_id', $userId, -1, SQLT_INT);
     }
 }

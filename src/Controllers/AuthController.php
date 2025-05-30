@@ -59,11 +59,11 @@ class AuthController
                     $this->handleBuyerRegistration();
                     return;
                 } else {
-                    $_SESSION['login_error'] = "Invalid request. Security token mismatch.";
+                    $_SESSION['register_error'] = "Invalid request. Security token mismatch.";
                     $this->redirect('/register');
                 }
             } else {
-                $_SESSION['login_error'] = "Invalid request. Missing security token.";
+                $_SESSION['register_error'] = "Invalid request. Missing security token.";
                 $this->redirect('/register');
             }
         }
@@ -86,11 +86,11 @@ class AuthController
                     $this->handleSellerRegistration();
                     return;
                 } else {
-                    $_SESSION['login_error'] = "Invalid request. Security token mismatch.";
+                    $_SESSION['register_error'] = "Invalid request. Security token mismatch.";
                     $this->redirect('/register');
                 }
             } else {
-                $_SESSION['login_error'] = "Invalid request. Missing security token.";
+                $_SESSION['register_error'] = "Invalid request. Missing security token.";
                 $this->redirect('/register');
             }
         }
@@ -137,14 +137,14 @@ class AuthController
             $data = $this->validateBuyerInput($_POST);
             $uploadedImage = $this->handleImageUpload('profile_image');
 
-            $userId = User::registerBuyer($conn, [
+            $userId = User::registerUser($conn, [
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'password' => password_hash($data['password'], PASSWORD_DEFAULT),
                 'phone_number' => $data['phone'],
                 'address' => $data['address'],
                 'profile_image' => $uploadedImage,
-                'role' => 'buyer'
+                'role' => 'buyer',
+                'password' => password_hash($data['password'], PASSWORD_DEFAULT),
             ]);
 
             if (!$userId) {
@@ -152,7 +152,7 @@ class AuthController
             }
 
             $this->startUserSession($userId);
-            $this->redirect('/buyer/dashboard');
+            $this->redirect('/dashboard');
 
         } catch (Exception $e) {
             if ($conn) {
@@ -182,13 +182,14 @@ class AuthController
             if ($kitchenImage)
                 $uploadedFiles[] = $kitchenImage;
 
-            $userId = User::registerSeller($conn, [
+            $userId = User::registerUser($conn, [
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'phone' => $data['phone'],
+                'phone_number' => $data['phone'],
                 'address' => $data['address'],
+                'profile_image' => $profileImage,
+                'role' => 'seller',
                 'password' => password_hash($data['password'], PASSWORD_DEFAULT),
-                'image' => $profileImage
             ]);
 
             $kitchenId = Kitchen::create($conn, [

@@ -62,13 +62,15 @@ class Kitchen
                     name, 
                     description, 
                     address, 
-                    kitchen_image
+                    kitchen_image,
+                    is_approved
                 ) VALUES (
                     :owner_id, 
                     :name, 
                     :description, 
                     :address, 
-                    :kitchen_image
+                    :kitchen_image,
+                    0
                 ) 
                 RETURNING kitchen_id INTO :kitchen_id";
 
@@ -158,7 +160,6 @@ class Kitchen
         return $kitchen ? self::processKitchenData($kitchen) : null;
     }
 
-
     public static function create($conn, array $data): int
     {
         self::validateKitchenData($data);
@@ -174,14 +175,15 @@ class Kitchen
         oci_bind_by_name($stmt, ':kitchen_id', $kitchenId, -1, SQLT_INT);
 
         if (!oci_execute($stmt, OCI_NO_AUTO_COMMIT)) {
-            throw new Exception("Failed to create kitchen: " . oci_error($stmt));
+            $err = oci_error($stmt);
+            throw new Exception("Failed to create kitchen: " . $err['message']);
         }
 
-        oci_commit($conn);
         oci_free_statement($stmt);
 
         return $kitchenId;
     }
+
 
     public static function update($conn, int $kitchenId, array $data): bool
     {

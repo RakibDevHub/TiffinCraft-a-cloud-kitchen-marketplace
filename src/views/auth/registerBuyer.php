@@ -15,10 +15,10 @@ $csrfToken = $_SESSION['csrf_token'];
     <div class="w-full max-w-xl bg-white shadow-lg rounded-xl p-8">
         <h2 class="text-2xl font-bold text-center text-blue-800 mb-6">Buyer Registration</h2>
 
-        <?php if (isset($_SESSION['login_error'])): ?>
+        <?php if (isset($_SESSION['register_error'])): ?>
             <div class="bg-red-100 text-red-700 p-2 rounded mb-4">
-                <?= $_SESSION['login_error'] ?>
-                <?php unset($_SESSION['login_error']); ?>
+                <?= $_SESSION['register_error'] ?>
+                <?php unset($_SESSION['register_error']); ?>
             </div>
         <?php endif; ?>
 

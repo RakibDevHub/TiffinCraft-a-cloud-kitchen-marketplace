@@ -8,34 +8,38 @@ ob_start();
 <!-- ADMIN DASHBOARD CONTENT -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
     <!-- Total Users -->
-    <div class="bg-white p-6 rounded-lg shadow">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm font-medium text-gray-500">Total Users</p>
-                <p class="text-2xl font-bold"><?= $users['users_count'] ?></p>
+    <a href="/admin/users">
+        <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Total Users</p>
+                    <p class="text-2xl font-bold"><?= $users['users_count'] ?></p>
+                </div>
+                <div
+                    class="h-[2.5rem] w-[2.5rem] flex items-center justify-center rounded-full bg-primary-100 text-primary-500">
+                    <i class="fas fa-users"></i>
+                </div>
             </div>
-            <div
-                class="h-[2.5rem] w-[2.5rem] flex items-center justify-center rounded-full bg-primary-100 text-primary-500">
-                <i class="fas fa-users"></i>
-            </div>
+            <p class="text-sm text-green-500 mt-2"><i class="fas fa-arrow-up mr-1"></i> 8% from last month</p>
         </div>
-        <p class="text-sm text-green-500 mt-2"><i class="fas fa-arrow-up mr-1"></i> 8% from last month</p>
-    </div>
+    </a>
 
     <!-- Active Kitchens -->
-    <div class="bg-white p-6 rounded-lg shadow">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm font-medium text-gray-500">Active Kitchens</p>
-                <p class="text-2xl font-bold">86</p>
+    <a href="/admin/kitchens">
+        <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Active Kitchens</p>
+                    <p class="text-2xl font-bold">86</p>
+                </div>
+                <div
+                    class="h-[2.5rem] w-[2.5rem] flex items-center justify-center rounded-full bg-green-100 text-green-500">
+                    <i class="fas fa-store"></i>
+                </div>
             </div>
-            <div
-                class="h-[2.5rem] w-[2.5rem] flex items-center justify-center rounded-full bg-green-100 text-green-500">
-                <i class="fas fa-store"></i>
-            </div>
+            <p class="text-sm text-green-500 mt-2"><i class="fas fa-arrow-up mr-1"></i> 5 new this week</p>
         </div>
-        <p class="text-sm text-green-500 mt-2"><i class="fas fa-arrow-up mr-1"></i> 5 new this week</p>
-    </div>
+    </a>
 
     <!-- Pending Approvals -->
     <div class="bg-white p-6 rounded-lg shadow">

@@ -20,21 +20,18 @@ class Database
 
             if (!self::$connection) {
                 $e = oci_error();
-                die("Database connection failed: " . $e['message']);
+                throw new \RuntimeException("Database connection failed: " . $e['message']);
             }
         }
 
         return self::$connection;
     }
 
-    public static function closeConnection()
+    public static function closeConnection(): void
     {
         if (self::$connection !== null) {
             oci_close(self::$connection);
             self::$connection = null;
         }
     }
-
 }
-
-?>
