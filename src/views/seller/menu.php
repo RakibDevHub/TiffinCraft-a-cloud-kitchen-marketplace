@@ -8,8 +8,6 @@
 </head>
 
 <body>
-    data-kitchen='<?= htmlspecialchars(json_encode($kitchen), ENT_QUOTES, 'UTF-8') ?>'
-    onclick="openKitchenModal(<?= htmlspecialchars(json_encode($kitchen), ENT_QUOTES, 'UTF-8') ?>)"
 
 </body>
 

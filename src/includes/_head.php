@@ -1,5 +1,6 @@
 <?php
 $title = $title ?? 'TiffinCraft';
+
 ?>
 
 <meta charset="UTF-8">

@@ -1,41 +1,31 @@
 <?php
 namespace App\Controllers;
 
-use Exception;
 use App\Core\Database;
-use App\Models\User;
-use App\Models\Kitchen;
-use App\Models\ServiceArea;
+use App\Models\Menu;
 
-class UserController
+class MenuController
 {
-
-    // TiffinCraft 
-    public function manageUsers()
+    public function manageMenu()
     {
-        $this->requireLogin('admin');
-
+        $this->requireLogin('seller');
         try {
             $conn = Database::getConnection();
-            $users = User::getUsers($conn);
+            $owner_id = $_SESSION['user_id'];
+            $menuItems = Menu::getItemsByOwner($conn, $owner_id);
 
-            $this->renderView('admin/users', [
-                'users' => $users,
-                'error' => empty($users) ? "No users found in database" : null
+            $this->renderView('seller/menu', [
+                'menuItems' => $menuItems,
+                'error' => empty($kitchens) ? "No items found" : null
             ]);
-
         } catch (Exception $e) {
             error_log($e->getMessage());
-            $this->renderView('admin/users', [
-                'users' => [],
+            $this->renderView('seller/menu', [
+                'menuItems' => [],
                 'error' => "Database error: " . $e->getMessage()
             ]);
         }
-    }
 
-    protected function isLoggedIn(): bool
-    {
-        return isset($_SESSION['user_id']) && isset($_SESSION['role']);
     }
 
     protected function requireLogin(string $requiredRole = null): void
@@ -51,6 +41,11 @@ class UserController
         }
     }
 
+    protected function isLoggedIn(): bool
+    {
+        return isset($_SESSION['user_id']) && isset($_SESSION['role']);
+    }
+
     protected function redirect(string $url): void
     {
         header("Location: $url");
@@ -62,6 +57,6 @@ class UserController
         extract($data);
         include __DIR__ . '/../views/' . $viewPath . '.php';
     }
-
 }
+
 ?>

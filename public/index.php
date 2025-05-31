@@ -15,7 +15,8 @@ require_once BASE_PATH . '/src/controllers/DashboardController.php';
 require_once BASE_PATH . '/src/controllers/UserController.php';
 require_once BASE_PATH . '/src/controllers/KitchenController.php';
 require_once BASE_PATH . '/src/controllers/AuthController.php';
-require_once BASE_PATH . '/src/controllers/PageController.php';
+require_once BASE_PATH . '/src/controllers/MenuController.php';
+require_once BASE_PATH . '/src/controllers/ErrorController.php';
 
 require_once BASE_PATH . '/src/Models/UserModel.php';
 require_once BASE_PATH . '/src/Models/KitchenModel.php';
@@ -27,6 +28,10 @@ use App\Utils\SessionHelper;
 SessionHelper::refreshUserSession();
 
 $router = new Router();
+
+// Database Error
+$router->addRoute('/database-error', 'ErrorController@databaseError');
+$router->addRoute('/unauthorized', 'ErrorController@unauthorizedError');
 
 // Public Routes
 $router->addRoute('/', 'HomeController@tiffincraft');
@@ -47,6 +52,7 @@ $router->addRoute('/business/dashboard', 'DashboardController@businessDashboard'
 $router->addRoute('/admin', 'DashboardController@adminDashboard');
 $router->addRoute('/admin/dashboard', 'DashboardController@adminDashboard');
 $router->addRoute('/admin/users', 'UserController@manageUsers');
+
 $router->addRoute('/admin/orders', 'PageController@manageOrders');
 $router->addRoute('/admin/reports', 'PageController@manageReports');
 $router->addRoute('/admin/dishes', 'PageController@manageDishes');

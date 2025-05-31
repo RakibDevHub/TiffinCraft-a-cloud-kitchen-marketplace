@@ -377,6 +377,7 @@ class AuthController
 
     protected function renderView(string $viewPath, $data = []): void
     {
+        extract($data);
         include __DIR__ . '/../views/' . $viewPath . '.php';
     }
 
