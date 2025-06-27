@@ -10,11 +10,24 @@ ob_start();
                 <img src="<?= htmlspecialchars($kitchen['kitchen_image']) ?>"
                     alt="<?= htmlspecialchars($kitchen['name']) ?>" class="w-full h-full object-cover">
             </div>
-            <div class="p-6">
-                <img src="<?= htmlspecialchars($kitchen['owner_image']) ?>"
-                    alt="<?= htmlspecialchars($kitchen['owner_name']) ?>" class="w-20 h-20">
-                <div class="">
-                    <h1 class="text-2xl font-bold text-gray-800"><?= htmlspecialchars($kitchen['name']) ?></h1>
+            <div class="px-6 py-2 relative">
+                <div class="flex flex-row gap-4">
+                    <img src="<?= htmlspecialchars($kitchen['owner_image']) ?>"
+                        alt="<?= htmlspecialchars($kitchen['owner_name']) ?>"
+                        class="w-28 h-28 rounded-md -mt-10 object-cover border-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800 mb-2"><?= htmlspecialchars($kitchen['name']) ?></h1>
+                        <div class="flex text-sm gap-4 text-gray-500">
+                            <p class="flex items-center"><i class="fas fa-user text-green-500 mr-1 text-xs"></i>
+                                <?= htmlspecialchars($kitchen['owner_name']) ?></p>
+                            <p class="flex items-center"><i class="fas fa-envelope text-blue-500 mr-1 text-xs"></i>
+                                <?= htmlspecialchars($kitchen['owner_email']) ?></p>
+                            <p class="flex items-center"><i class="fas fa-phone text-indigo-500 mr-1 text-xs"></i>
+                                <?= htmlspecialchars($kitchen['owner_phone']) ?></p>
+                        </div>
+                    </div>
+                </div>
+                <div>
                     <p class="text-gray-600 mt-2"><?= htmlspecialchars($kitchen['description']) ?></p>
                     <?php if (!empty($kitchen['service_areas'])): ?>
                         <p class="mt-2 text-sm text-orange-600">

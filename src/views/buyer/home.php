@@ -94,7 +94,8 @@ ob_start();
                                 alt="<?= htmlspecialchars($category['name']) ?>"
                                 class="w-full h-64 object-cover transform group-hover:scale-105 transition duration-500">
                         <?php else: ?>
-                            <div class="w-full h-64 flex items-center justify-center transform group-hover:scale-105 transition duration-500">
+                            <div
+                                class="w-full h-64 flex items-center justify-center transform group-hover:scale-105 transition duration-500">
                                 <i class="fa-solid fa-book-open text-6xl text-orange-500"></i>
                             </div>
                         <?php endif ?>
@@ -122,11 +123,12 @@ ob_start();
         </div>
 
         <!-- Swiper -->
-        <div class="swiper myKitchensSwiper max-w-6xl">
+        <!-- <div class="relative max-w-6xl mx-auto"> -->
+        <div class="swiper myKitchensSwiper relative max-w-6xl mx-auto">
             <div class="swiper-wrapper">
                 <?php foreach ($kitchens as $kitchen): ?>
                     <div class="swiper-slide">
-                        <a href="/kitchens/cooks?view=<?= $kitchen['kitchen_id'] ?>" class="group">
+                        <a href="/kitchens/profile?view=<?= $kitchen['kitchen_id'] ?>" class="group">
                             <div
                                 class="bg-white rounded-xl shadow-sm hover:shadow-md overflow-hidden transition-all duration-300 border border-gray-100 hover:border-orange-100 h-[380px] flex flex-col">
 
@@ -208,16 +210,17 @@ ob_start();
             </div>
 
             <!-- Navigation -->
-            <div class="flex justify-center gap-4 mt-6">
-                <div class="swiper-button-prev !text-orange-500"></div>
-                <div class="swiper-button-next !text-orange-500"></div>
+            <div class="swiper-button-prev !text-orange-500 -mt-12 !left-1 !top-1/2 !-translate-y-1/2 absolute z-10">
+            </div>
+            <div class="swiper-button-next !text-orange-500 -mt-12 !right-1 !top-1/2 !-translate-y-1/2 absolute z-10">
             </div>
 
             <!-- Pagination -->
-            <div class="swiper-pagination mt-4"></div>
+            <div class="relative swiper-pagination mt-4"></div>
         </div>
+        <!-- </div> -->
 
-        <div class="text-center mt-6">
+        <div class="text-center mt-2">
             <a href="/kitchens"
                 class="inline-block bg-orange-500 text-white font-semibold py-3 px-8 rounded-lg hover:bg-orange-600 transition">
                 View All Kitchens
