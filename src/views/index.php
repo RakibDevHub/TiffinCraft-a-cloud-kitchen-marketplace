@@ -12,6 +12,8 @@
         <?= $content ?>
     </main>
     <?php include BASE_PATH . '/src/includes/footer.php' ?>
+
+    <script src="/assets/js/script.js" defer></script>
 </body>
 
 </html>

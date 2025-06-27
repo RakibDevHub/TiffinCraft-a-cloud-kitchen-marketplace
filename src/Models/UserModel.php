@@ -1,7 +1,6 @@
 <?php
 namespace App\Models;
 
-use App\Core\Database;
 use DateTime;
 use Exception;
 
@@ -25,6 +24,22 @@ class User
                                     FROM users
                                     WHERE role = 'buyer' OR role = 'seller'
                                     ORDER BY created_at DESC";
+
+
+    private const ACTIVATE_USER_QUERY = "
+        UPDATE users SET
+            status = 1
+        WHERE user_id = :user_id";
+
+    private const DEACTIVATE_USER_QUERY = "
+        UPDATE users SET
+            status = 0
+        WHERE user_id = :user_id";
+
+    private const SUSPEND_USER_QUERY = "
+        UPDATE users SET
+            status = 2
+        WHERE user_id = :user_id";
 
     public static function getUserCount($conn)
     {
@@ -78,9 +93,16 @@ class User
         }
 
         try {
-            $users = [];
             while ($row = oci_fetch_assoc($stmt)) {
-                $users[] = array_change_key_case($row, CASE_LOWER);
+
+                $userData = array_change_key_case($row, CASE_LOWER);
+
+                // Process dates
+                if (isset($userData['created_at'])) {
+                    $userData['created_at'] = self::processOracleDate($userData['created_at']);
+                }
+
+                $users[] = $userData;
             }
 
             return $users;
@@ -129,35 +151,6 @@ class User
         return $user ? array_change_key_case($user, CASE_LOWER) : false;
     }
 
-    // public static function registerUser($conn, array $data): ?int
-    // {
-    //     self::validateUserData($data, ['name', 'email', 'phone_number', 'address', 'profile_image', 'role', 'password']);
-
-    //     try {
-    //         // self::beginTransaction($conn);
-
-    //         $stmt = oci_parse($conn, self::INSERT_USER_QUERY);
-    //         $userId = null;
-
-    //         self::bindUserParameters($stmt, $data, $userId);
-
-    //         if (!oci_execute($stmt, OCI_NO_AUTO_COMMIT)) {
-    //             throw new Exception("Failed to execute registration query: " . oci_error($stmt)['message']);
-    //         }
-
-    //         self::commitTransaction($conn);
-
-    //         return $userId;
-
-    //     } catch (Exception $e) {
-    //         self::rollbackTransaction($conn);
-    //         return false;
-    //     } finally {
-    //         self::cleanupStatement($stmt ?? null);
-    //     }
-    // }
-
-
     public static function registerUser($conn, array $data): ?int
     {
         self::validateUserData($data, ['name', 'email', 'phone_number', 'address', 'profile_image', 'role', 'password']);
@@ -174,6 +167,22 @@ class User
         return $userId;
     }
 
+    public static function activate($conn, int $userId)
+    {
+        return self::updateUserStatus($conn, $userId, self::ACTIVATE_USER_QUERY);
+    }
+
+    public static function deactivate($conn, int $userId)
+    {
+        return self::updateUserStatus($conn, $userId, self::DEACTIVATE_USER_QUERY);
+    }
+
+    public static function suspend($conn, int $userId)
+    {
+        return self::updateUserStatus($conn, $userId, self::SUSPEND_USER_QUERY);
+    }
+
+
 
     private static function processOracleDate(string $dateString): string
     {
@@ -184,6 +193,20 @@ class User
             error_log("Date processing error: " . $e->getMessage());
             return $dateString;
         }
+    }
+
+    private static function updateUserStatus($conn, int $userId, string $query)
+    {
+        $stmt = oci_parse($conn, $query);
+        oci_bind_by_name($stmt, ':user_id', $userId);
+
+        if (!oci_execute($stmt, OCI_NO_AUTO_COMMIT)) {
+            throw new Exception("Operation failed: " . oci_error($stmt)['message']);
+        }
+
+        oci_commit($conn);
+        oci_free_statement($stmt);
+        return true;
     }
 
     private static function validateUserData(array $data, array $requiredFields): void

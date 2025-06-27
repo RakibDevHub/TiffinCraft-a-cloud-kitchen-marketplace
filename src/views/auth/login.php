@@ -1,5 +1,6 @@
 <?php
 $pageTitle = "TiffinCraft Login";
+$error = $data['error'] ?? null;
 ob_start();
 
 $helper = new App\Utils\Helper();
@@ -15,12 +16,12 @@ $csrfToken = $_SESSION['csrf_token'];
     <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8">
         <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Login to TiffinCraft</h2>
 
-        <?php if (isset($_SESSION['login_error'])): ?>
+        <?php if ($error): ?>
             <div class="bg-red-100 text-red-700 p-2 rounded mb-4">
-                <?= $_SESSION['login_error'] ?>
-                <?php unset($_SESSION['login_error']); ?>
+                <?= htmlspecialchars($error) ?>
             </div>
         <?php endif; ?>
+
         <form action="/login" method="POST" class="space-y-4">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
 

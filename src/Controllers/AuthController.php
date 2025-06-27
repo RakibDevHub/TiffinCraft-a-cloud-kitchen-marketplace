@@ -10,6 +10,12 @@ use App\Models\ServiceArea;
 
 class AuthController
 {
+    private $conn;
+
+    public function __construct()
+    {
+        $this->conn = Database::getConnection();
+    }
 
     public function login()
     {
@@ -19,23 +25,15 @@ class AuthController
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (isset($_POST['csrf_token'])) {
-                $token = $_POST['csrf_token'];
-                $success = Helper::validateCsrfToken($token);
-                if ($success) {
-                    $this->handleLogin();
-                    return;
-                } else {
-                    $_SESSION['login_error'] = "Invalid request. Security token mismatch.";
-                    $this->redirect('/login');
-                }
-            } else {
-                $_SESSION['login_error'] = "Invalid request. Missing security token.";
-                $this->redirect('/login');
-            }
+            $this->validateCsrf();
+            $this->handleLogin();
+            return;
         }
 
-        $this->renderView('auth/login');
+        $this->renderView('auth/login', [
+            'error' => $this->getFlash('error'),
+            'success' => $this->getFlash('success')
+        ]);
     }
 
     public function logout()
@@ -52,23 +50,15 @@ class AuthController
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (isset($_POST['csrf_token'])) {
-                $token = $_POST['csrf_token'];
-                $success = Helper::validateCsrfToken($token);
-                if ($success) {
-                    $this->handleBuyerRegistration();
-                    return;
-                } else {
-                    $_SESSION['register_error'] = "Invalid request. Security token mismatch.";
-                    $this->redirect('/register');
-                }
-            } else {
-                $_SESSION['register_error'] = "Invalid request. Missing security token.";
-                $this->redirect('/register');
-            }
+            $this->validateCsrf();
+            $this->handleBuyerRegistration();
+            return;
         }
 
-        $this->renderView('auth/registerBuyer');
+        $this->renderView('auth/registerBuyer', [
+            'error' => $this->getFlash('error'),
+            'success' => $this->getFlash('success')
+        ]);
     }
 
     public function registerAsSeller()
@@ -79,23 +69,15 @@ class AuthController
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (isset($_POST['csrf_token'])) {
-                $token = $_POST['csrf_token'];
-                $success = Helper::validateCsrfToken($token);
-                if ($success) {
-                    $this->handleSellerRegistration();
-                    return;
-                } else {
-                    $_SESSION['register_error'] = "Invalid request. Security token mismatch.";
-                    $this->redirect('/register');
-                }
-            } else {
-                $_SESSION['register_error'] = "Invalid request. Missing security token.";
-                $this->redirect('/register');
-            }
+            $this->validateCsrf();
+            $this->handleSellerRegistration();
+            return;
         }
 
-        $this->renderView('auth/registerSeller');
+        $this->renderView('auth/registerSeller', [
+            'error' => $this->getFlash('error'),
+            'success' => $this->getFlash('success')
+        ]);
     }
 
     protected function isLoggedIn(): bool
@@ -105,84 +87,104 @@ class AuthController
 
     protected function handleLogin()
     {
-        $conn = Database::getConnection();
         $email = trim($_POST['email'] ?? '');
-        $password = trim($_POST['password'] ?? '');
+        $password = $_POST['password'] ?? '';
 
         if (empty($email) || empty($password)) {
-            $this->setFlashError('login_error', "Email and password are required.");
+            $this->setFlash('error', "Email and password are required.");
             $this->redirect('/login');
         }
 
-        $user = User::findByEmail($conn, $email);
+        $user = User::findByEmail($this->conn, $email);
 
         if (!$user || !password_verify($password, $user['password'])) {
-            $this->setFlashError('login_error', "Invalid email or password.");
+            $this->setFlash('error', "Invalid email or password.");
             $this->redirect('/login');
         }
 
         $this->startUserSession($user['user_id']);
+        $this->setFlash('success', "Login successful!");
         $this->redirectToDashboard($user['role']);
-
     }
 
     protected function handleBuyerRegistration()
     {
-        $conn = Database::getConnection();
-        $uploadedImage = null;
+        $uploadedFilesToCleanup = [];
 
         try {
-            oci_execute(oci_parse($conn, "BEGIN"));
-
             $data = $this->validateBuyerInput($_POST);
-            $uploadedImage = $this->handleImageUpload('profile_image');
 
-            $userId = User::registerUser($conn, [
+            $profileImage = null;
+            if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
+                $profileImage = $this->handleImageUpload('profile_image');
+                $uploadedFilesToCleanup[] = $profileImage;
+            }
+
+            $checkEmail = User::findByEmail($this->conn, $data['email']);
+            if ($checkEmail) {
+                throw new Exception("Email already exists.");
+            }
+
+            $userId = User::registerUser($this->conn, [
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'phone_number' => $data['phone'],
                 'address' => $data['address'],
-                'profile_image' => $uploadedImage,
+                'profile_image' => $profileImage,
                 'role' => 'buyer',
                 'password' => password_hash($data['password'], PASSWORD_DEFAULT),
             ]);
 
             if (!$userId) {
-                throw new Exception("Registration failed.");
+                throw new Exception("Failed to register user.");
             }
 
+            oci_commit($this->conn);
+
             $this->startUserSession($userId);
+            $this->setFlash('success', "Registration successful!");
             $this->redirect('/dashboard');
 
         } catch (Exception $e) {
-            if ($conn) {
-                oci_execute(oci_parse($conn, "ROLLBACK"));
+            if ($this->conn) {
+                oci_rollback($this->conn);
             }
-            $this->cleanupUploadedFiles([$uploadedImage]);
-            $this->setFlashError('register_error', $e->getMessage());
+
+            if (!empty($uploadedFilesToCleanup)) {
+                $this->cleanupUploadedFiles($uploadedFilesToCleanup);
+            }
+
+            $this->setFlash('error', "Registration failed: " . $e->getMessage());
             $this->redirect('/register');
         }
     }
 
     protected function handleSellerRegistration()
     {
-        $conn = Database::getConnection();
-        $uploadedFiles = [];
+        $uploadedFilesToCleanup = [];
 
         try {
-            oci_execute(oci_parse($conn, "BEGIN"));
-
             $data = $this->validateSellerInput($_POST);
 
-            $profileImage = $this->handleImageUpload('profile_image');
-            $kitchenImage = $this->handleImageUpload('kitchen_image');
+            $profileImage = null;
+            $kitchenImage = null;
 
-            if ($profileImage)
-                $uploadedFiles[] = $profileImage;
-            if ($kitchenImage)
-                $uploadedFiles[] = $kitchenImage;
+            if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
+                $profileImage = $this->handleImageUpload('profile_image');
+                $uploadedFilesToCleanup[] = $profileImage;
+            }
 
-            $userId = User::registerUser($conn, [
+            if (isset($_FILES['kitchen_image']) && $_FILES['kitchen_image']['error'] === UPLOAD_ERR_OK) {
+                $kitchenImage = $this->handleImageUpload('kitchen_image');
+                $uploadedFilesToCleanup[] = $kitchenImage;
+            }
+
+            $checkEmail = User::findByEmail($this->conn, $data['email']);
+            if ($checkEmail) {
+                throw new Exception("Email already exists.");
+            }
+
+            $userId = User::registerUser($this->conn, [
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'phone_number' => $data['phone'],
@@ -192,7 +194,11 @@ class AuthController
                 'password' => password_hash($data['password'], PASSWORD_DEFAULT),
             ]);
 
-            $kitchenId = Kitchen::create($conn, [
+            if (!$userId) {
+                throw new Exception("Failed to register user.");
+            }
+
+            $kitchenId = Kitchen::create($this->conn, [
                 'owner_id' => $userId,
                 'name' => $data['kitchen_name'],
                 'address' => $data['kitchen_address'],
@@ -200,31 +206,65 @@ class AuthController
                 'kitchen_image' => $kitchenImage
             ]);
 
-            $this->processServiceAreas($conn, $kitchenId, $data['service_areas']);
+            if (!$kitchenId) {
+                throw new Exception("Failed to create kitchen.");
+            }
 
-            oci_commit($conn);
+            if (!empty($data['service_areas']) && is_array($data['service_areas'])) {
+                $this->processServiceAreas($this->conn, $kitchenId, $data['service_areas']);
+            }
 
-            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            oci_commit($this->conn);
+
             $this->startUserSession($userId);
+            $this->setFlash('success', "Registration successful!");
             $this->redirect('/business/dashboard');
 
         } catch (Exception $e) {
-            if ($conn) {
-                oci_execute(oci_parse($conn, "ROLLBACK"));
+            if ($this->conn) {
+                oci_rollback($this->conn);
             }
-            $this->cleanupUploadedFiles($uploadedFiles);
-            $this->setFlashError('register_error', "Registration failed: " . $e->getMessage());
+
+            if (!empty($uploadedFilesToCleanup)) {
+                $this->cleanupUploadedFiles($uploadedFilesToCleanup);
+            }
+
+            $this->setFlash('error', "Registration failed: " . $e->getMessage());
             $this->redirect('/business/register');
         }
     }
 
+    protected function validateCsrf(): void
+    {
+        if (
+            $_SERVER['REQUEST_METHOD'] !== 'POST' ||
+            !isset($_POST['csrf_token']) ||
+            !Helper::validateCsrfToken($_POST['csrf_token'])
+        ) {
+            $this->setFlash('error', "Invalid or missing CSRF token.");
+            $this->redirect("/");
+        }
+    }
+
+    protected function setFlash(string $type, string $message): void
+    {
+        $_SESSION['flash'][$type] = $message;
+    }
+
+    protected function getFlash(string $type): ?string
+    {
+        $message = $_SESSION['flash'][$type] ?? null;
+        unset($_SESSION['flash'][$type]);
+        return $message;
+    }
+
     protected function validateBuyerInput(array $data): array
     {
-        $name = htmlspecialchars(trim($data['name'] ?? ''));
-        $email = htmlspecialchars(trim($data['email'] ?? ''));
-        $phone = htmlspecialchars(trim($data['phone_number'] ?? ''));
-        $address = htmlspecialchars(trim($data['address'] ?? ''));
-        $password = trim($data['password'] ?? '');
+        $name = trim($data['name'] ?? '');
+        $email = trim($data['email'] ?? '');
+        $phone = trim($data['phone_number'] ?? '');
+        $address = trim($data['address'] ?? '');
+        $password = $data['password'] ?? '';
         $confirm_password = trim($data['confirm_password'] ?? '');
 
         if (!preg_match("/^[a-zA-Z\s.]+$/", $name)) {
@@ -260,10 +300,10 @@ class AuthController
     {
         $validated = $this->validateBuyerInput($data);
 
-        $kitchenName = htmlspecialchars(trim($data['kitchen_name'] ?? ''));
-        $kitchenAddress = htmlspecialchars(trim($data['kitchen_address'] ?? ''));
-        $kitchenDescription = htmlspecialchars(trim($data['kitchen_description'] ?? ''));
-        $serviceAreas = htmlspecialchars(trim($data['service_areas'] ?? ''));
+        $kitchenName = trim($data['kitchen_name'] ?? '');
+        $kitchenAddress = trim($data['kitchen_address'] ?? '');
+        $kitchenDescription = trim($data['kitchen_description'] ?? '');
+        $serviceAreas = trim($data['service_areas'] ?? '');
 
         if (empty($kitchenName) || empty($kitchenAddress) || empty($kitchenDescription)) {
             throw new Exception("Please fill all required fields.");
@@ -279,8 +319,12 @@ class AuthController
 
     protected function handleImageUpload($inputName): string
     {
-        if (!isset($_FILES[$inputName]) || $_FILES[$inputName]['error'] !== UPLOAD_ERR_OK) {
-            return '';
+        if (!isset($_FILES[$inputName])) {
+            throw new Exception('No file was uploaded');
+        }
+
+        if ($_FILES[$inputName]['error'] !== UPLOAD_ERR_OK) {
+            throw new Exception('File upload error');
         }
 
         $file = $_FILES[$inputName];
@@ -318,7 +362,6 @@ class AuthController
             }
 
             try {
-                // Remove leading slash if present and ensure we're using the correct path prefix
                 $relativePath = ltrim(str_replace('/assets/uploads/', '', $file), '/');
                 $absolutePath = realpath($uploadsDir . '/' . $relativePath);
 
@@ -356,17 +399,13 @@ class AuthController
 
     protected function redirectToDashboard(string $role): void
     {
+
         $routes = [
             'buyer' => '/dashboard',
             'seller' => '/business/dashboard',
             'admin' => '/admin',
         ];
         $this->redirect($routes[$role] ?? '/');
-    }
-
-    protected function setFlashError(string $key, string $message): void
-    {
-        $_SESSION[$key] = $message;
     }
 
     protected function redirect(string $url): void

@@ -120,9 +120,9 @@ ob_start();
         <div class="space-y-4">
             <?php
             $recommendedDishes = [
-                ['name' => 'Paneer Butter Masala', 'kitchen' => 'Spicy Kitchen', 'price' => '12.99', 'orders' => '48', 'img' => 'https://via.placeholder.com/60'],
-                ['name' => 'Chicken Biryani', 'kitchen' => 'Delhi Darbar', 'price' => '14.50', 'orders' => '36', 'img' => 'https://via.placeholder.com/60'],
-                ['name' => 'Dal Makhani', 'kitchen' => 'Punjabi Tadka', 'price' => '10.99', 'orders' => '32', 'img' => 'https://via.placeholder.com/60']
+                ['name' => 'Paneer Butter Masala', 'kitchen' => 'Spicy Kitchen', 'price' => '12.99', 'orders' => '48', 'img' => ''],
+                ['name' => 'Chicken Biryani', 'kitchen' => 'Delhi Darbar', 'price' => '14.50', 'orders' => '36', 'img' => ''],
+                ['name' => 'Dal Makhani', 'kitchen' => 'Punjabi Tadka', 'price' => '10.99', 'orders' => '32', 'img' => '']
             ];
 
             foreach ($recommendedDishes as $dish): ?>
@@ -180,10 +180,10 @@ ob_start();
         <div class="grid grid-cols-2 gap-4">
             <?php
             $favoriteKitchens = [
-                ['name' => 'Spicy Kitchen', 'rating' => '4.8', 'img' => 'https://via.placeholder.com/100'],
-                ['name' => 'Delhi Darbar', 'rating' => '4.6', 'img' => 'https://via.placeholder.com/100'],
-                ['name' => 'Punjabi Tadka', 'rating' => '4.5', 'img' => 'https://via.placeholder.com/100'],
-                ['name' => 'South Indian Special', 'rating' => '4.7', 'img' => 'https://via.placeholder.com/100']
+                ['name' => 'Spicy Kitchen', 'rating' => '4.8', 'img' => ''],
+                ['name' => 'Delhi Darbar', 'rating' => '4.6', 'img' => ''],
+                ['name' => 'Punjabi Tadka', 'rating' => '4.5', 'img' => ''],
+                ['name' => 'South Indian Special', 'rating' => '4.7', 'img' => '']
             ];
 
             foreach ($favoriteKitchens as $kitchen): ?>

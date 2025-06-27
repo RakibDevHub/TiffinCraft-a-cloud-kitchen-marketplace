@@ -2,12 +2,10 @@
 namespace App\Models;
 
 use Exception;
-use OCILob;
 use DateTime;
 
 class Kitchen
 {
-    // SQL queries
     private const GET_ALL_KITCHENS = "
         SELECT 
             k.*,
@@ -30,6 +28,7 @@ class Kitchen
             u.name as owner_name,
             u.email as owner_email,
             u.phone_number as owner_phone,
+            u.profile_image as owner_image,
             (SELECT COUNT(*) FROM kitchen_reviews WHERE kitchen_id = k.kitchen_id) as review_count,
             (SELECT AVG(rating) FROM kitchen_reviews WHERE kitchen_id = k.kitchen_id) as avg_rating,
             (SELECT LISTAGG(sa.name, ', ') WITHIN GROUP (ORDER BY sa.name) 
@@ -56,23 +55,23 @@ class Kitchen
         JOIN users u ON k.owner_id = u.user_id
         WHERE k.owner_id = :owner_id";
 
-
-    private const INSERT_KITCHEN_QUERY = "INSERT INTO kitchens (
-                    owner_id, 
-                    name, 
-                    description, 
-                    address, 
-                    kitchen_image,
-                    is_approved
-                ) VALUES (
-                    :owner_id, 
-                    :name, 
-                    :description, 
-                    :address, 
-                    :kitchen_image,
-                    0
-                ) 
-                RETURNING kitchen_id INTO :kitchen_id";
+    private const INSERT_KITCHEN_QUERY = "
+        INSERT INTO kitchens (
+            owner_id, 
+            name, 
+            description, 
+            address, 
+            kitchen_image,
+            is_approved
+        ) VALUES (
+            :owner_id, 
+            :name, 
+            :description, 
+            :address, 
+            :kitchen_image,
+            0
+        ) 
+        RETURNING kitchen_id INTO :kitchen_id";
 
     private const APPROVE_KITCHEN_QUERY = "
         UPDATE kitchens SET
@@ -89,6 +88,260 @@ class Kitchen
             is_approved = 3
         WHERE kitchen_id = :kitchen_id";
 
+    private const GET_KITCHEN_REVIEWS = "
+        SELECT 
+            kr.review_id,
+            kr.rating,
+            kr.comments,
+            kr.created_at,
+            u.name AS reviewer_name,
+            u.profile_image
+        FROM kitchen_reviews kr
+        JOIN users u ON kr.user_id = u.user_id
+        WHERE kr.kitchen_id = :kitchen_id
+        ORDER BY kr.created_at DESC
+    ";
+
+    private static $allowedOrders = [
+        'top' => "avg_rating DESC NULLS LAST, review_count DESC",
+        'newest' => "k.CREATED_AT DESC",
+        'random' => "DBMS_RANDOM.VALUE"
+    ];
+
+
+
+    // /kitchens 
+    public static function getFilteredKitchens($conn, $filters = [])
+    {
+        $query = "
+        SELECT * FROM (
+            SELECT k.*, 
+                   u.name AS owner_name,
+                   (
+                       SELECT LISTAGG(sa.name, ', ') WITHIN GROUP (ORDER BY sa.name)
+                       FROM kitchen_service_areas ksa
+                       JOIN service_areas sa ON ksa.area_id = sa.area_id
+                       WHERE ksa.kitchen_id = k.kitchen_id
+                   ) AS service_areas,
+                   (
+                       SELECT ROUND(AVG(kr.rating), 1)
+                       FROM kitchen_reviews kr
+                       WHERE kr.kitchen_id = k.kitchen_id
+                   ) AS avg_rating,
+                   (
+                       SELECT COUNT(*)
+                       FROM kitchen_reviews kr
+                       WHERE kr.kitchen_id = k.kitchen_id
+                   ) AS review_count,
+                   ROWNUM AS rn
+            FROM kitchens k
+            JOIN users u ON k.owner_id = u.user_id
+            WHERE (k.suspended_until IS NULL OR k.suspended_until < CURRENT_TIMESTAMP)
+    ";
+
+        $bindings = [];
+
+        if (!empty($filters['search'])) {
+            $query .= " AND (LOWER(k.name) LIKE '%' || :search || '%' OR LOWER(k.description) LIKE '%' || :search || '%' OR LOWER(u.name) LIKE '%' || :search || '%')";
+            $bindings[':search'] = strtolower($filters['search']);
+        }
+
+        if (!empty($filters['location'])) {
+            $query .= " AND EXISTS (
+            SELECT 1 FROM kitchen_service_areas ksa
+            JOIN service_areas sa ON ksa.area_id = sa.area_id
+            WHERE ksa.kitchen_id = k.kitchen_id
+              AND LOWER(sa.name) = :location
+        )";
+            $bindings[':location'] = strtolower($filters['location']);
+        }
+
+        // Sorting
+        switch ($filters['sort'] ?? '') {
+            case 'top_rated':
+                $query .= " ORDER BY avg_rating DESC NULLS LAST";
+                break;
+            case 'most_reviews':
+                $query .= " ORDER BY review_count DESC NULLS LAST";
+                break;
+            case 'oldest':
+                $query .= " ORDER BY k.created_at ASC";
+                break;
+            default:
+                $query .= " ORDER BY k.created_at DESC";
+                break;
+        }
+
+        $query .= "
+        )
+        WHERE rn > :offset AND rn <= :offset + :limit
+    ";
+
+        $bindings[':offset'] = ($filters['page'] - 1) * $filters['per_page'];
+        $bindings[':limit'] = $filters['per_page'];
+
+        $stmt = oci_parse($conn, $query);
+        foreach ($bindings as $param => $value) {
+            oci_bind_by_name($stmt, $param, $bindings[$param]);
+        }
+
+        if (!oci_execute($stmt)) {
+            throw new Exception("Query Error: " . oci_error($stmt)['message']);
+        }
+
+        $result = [];
+        while ($row = oci_fetch_assoc($stmt)) {
+            if (!empty($row['SUSPENDED_UNTIL'])) {
+                $row['SUSPENDED_UNTIL'] = self::processOracleDate($row['SUSPENDED_UNTIL']);
+            }
+            $result[] = self::processKitchenData($row);
+        }
+
+        oci_free_statement($stmt);
+        return $result;
+    }
+    public static function getTotalFilteredCount($conn, $filters = [])
+    {
+        $query = "
+        SELECT COUNT(*) AS total
+        FROM kitchens k
+        JOIN users u ON k.owner_id = u.user_id
+        WHERE (k.suspended_until IS NULL OR k.suspended_until < CURRENT_TIMESTAMP)
+    ";
+
+        $bindings = [];
+
+        if (!empty($filters['search'])) {
+            $query .= " AND (LOWER(k.name) LIKE '%' || :search || '%' OR LOWER(k.description) LIKE '%' || :search || '%' OR LOWER(u.name) LIKE '%' || :search || '%')";
+            $bindings[':search'] = strtolower($filters['search']);
+        }
+
+        if (!empty($filters['location'])) {
+            $query .= " AND EXISTS (
+            SELECT 1 FROM kitchen_service_areas ksa
+            JOIN service_areas sa ON ksa.area_id = sa.area_id
+            WHERE ksa.kitchen_id = k.kitchen_id
+              AND LOWER(sa.name) = :location
+        )";
+            $bindings[':location'] = strtolower($filters['location']);
+        }
+
+        $stmt = oci_parse($conn, $query);
+        foreach ($bindings as $param => $value) {
+            oci_bind_by_name($stmt, $param, $bindings[$param]);
+        }
+
+        if (!oci_execute($stmt)) {
+            throw new Exception("Count Query Error: " . oci_error($stmt)['message']);
+        }
+
+        $row = oci_fetch_assoc($stmt);
+        oci_free_statement($stmt);
+
+        return (int) $row['TOTAL'];
+    }
+
+    // /kitchen/profile 
+    public static function getKitchenById($conn, int $kitchenId): ?array
+    {
+        $stmt = oci_parse($conn, self::GET_KITCHEN_BY_ID);
+        oci_bind_by_name($stmt, ':kitchen_id', $kitchenId);
+
+        if (!oci_execute($stmt)) {
+            throw new Exception("Failed to fetch kitchen: " . oci_error($stmt)['message']);
+        }
+
+        $kitchen = oci_fetch_assoc($stmt);
+
+        if ($kitchen && !empty($kitchen['SUSPENDED_UNTIL'])) {
+            $kitchen['SUSPENDED_UNTIL'] = self::processOracleDate($kitchen['SUSPENDED_UNTIL']);
+        }
+
+        oci_free_statement($stmt);
+
+        return $kitchen ? self::processKitchenData($kitchen) : null;
+    }
+
+    public static function getKitchenReviews($conn, $kitchenId)
+    {
+        $stmt = oci_parse($conn, self::GET_KITCHEN_REVIEWS);
+        oci_bind_by_name($stmt, ':kitchen_id', $kitchenId);
+
+        if (!oci_execute($stmt)) {
+            throw new Exception("Failed to fetch kitchen reviews: " . oci_error($stmt)['message']);
+        }
+
+        $reviews = [];
+        while ($row = oci_fetch_assoc($stmt)) {
+            $reviews[] = $row;
+        }
+
+        oci_free_statement($stmt);
+        return $reviews;
+    }
+
+    // TiffinCraft 
+    public static function getKitchensForHomePage($conn, $kitchenType, $limit): array
+    {
+        if (!$conn) {
+            throw new Exception("Database connection failed");
+        }
+
+        $orderClause = self::$allowedOrders[$kitchenType];
+
+        $query = "
+        SELECT * FROM (
+            SELECT 
+                k.*,
+                u.name AS owner_name,
+                u.email AS owner_email,
+                u.phone_number AS owner_phone,
+                (SELECT COUNT(*) FROM kitchen_reviews WHERE kitchen_id = k.kitchen_id) AS review_count,
+                (SELECT AVG(rating) FROM kitchen_reviews WHERE kitchen_id = k.kitchen_id) AS avg_rating,
+                (SELECT LISTAGG(sa.name, ', ') WITHIN GROUP (ORDER BY sa.name)
+                    FROM service_areas sa
+                    JOIN kitchen_service_areas ksa ON sa.area_id = ksa.area_id
+                    WHERE ksa.kitchen_id = k.kitchen_id) AS service_areas
+            FROM kitchens k
+            JOIN users u ON k.owner_id = u.user_id
+            WHERE k.IS_APPROVED = 1
+            AND (k.SUSPENDED_UNTIL IS NULL OR k.SUSPENDED_UNTIL < CURRENT_TIMESTAMP)
+            ORDER BY $orderClause
+        )
+        WHERE ROWNUM <= :limit
+    ";
+
+        $stmt = oci_parse($conn, $query);
+        oci_bind_by_name($stmt, ':limit', $limit);
+
+        if (!$stmt || !oci_execute($stmt)) {
+            throw new Exception("Query failed: " . oci_error($conn)['message']);
+        }
+
+        $kitchens = [];
+        while ($row = oci_fetch_assoc($stmt)) {
+            if (!empty($row['SUSPENDED_UNTIL'])) {
+                $row['SUSPENDED_UNTIL'] = self::processOracleDate($row['SUSPENDED_UNTIL']);
+            }
+            $kitchens[] = self::processKitchenData($row);
+        }
+        oci_free_statement($stmt);
+
+        $hasRatings = false;
+        if ($kitchenType === 'top') {
+            foreach ($kitchens as $k) {
+                if (!empty($k['avg_rating'])) {
+                    $hasRatings = true;
+                    break;
+                }
+            }
+        }
+
+        return [
+            'kitchens' => $kitchens,
+            'hasRatings' => $hasRatings
+        ];
+    }
 
     public static function getAll($conn): array
     {
@@ -118,29 +371,9 @@ class Kitchen
         return $kitchens;
     }
 
+    
 
-    public static function getById($conn, int $kitchenId): ?array
-    {
-        $stmt = oci_parse($conn, self::GET_KITCHEN_BY_ID);
-        oci_bind_by_name($stmt, ':kitchen_id', $kitchenId);
-
-        if (!oci_execute($stmt)) {
-            throw new Exception("Failed to fetch kitchen: " . oci_error($stmt)['message']);
-        }
-
-        $kitchen = oci_fetch_assoc($stmt);
-
-        if ($kitchen && !empty($kitchen['SUSPENDED_UNTIL'])) {
-            $kitchen['SUSPENDED_UNTIL'] = self::processOracleDate($kitchen['SUSPENDED_UNTIL']);
-        }
-
-        oci_free_statement($stmt);
-
-        return $kitchen ? self::processKitchenData($kitchen) : null;
-    }
-
-
-    public static function getByOwnerId($conn, int $userId): ?array
+    public static function getKitchenByOwnerId($conn, int $userId): ?array
     {
         $stmt = oci_parse($conn, self::GET_KITCHEN_BY_OWNER_ID);
         oci_bind_by_name($stmt, ':owner_id', $userId);
@@ -184,7 +417,6 @@ class Kitchen
         return $kitchenId;
     }
 
-
     public static function update($conn, int $kitchenId, array $data): bool
     {
         self::validateKitchenData($data);
@@ -223,7 +455,6 @@ class Kitchen
         return self::updateKitchenStatus($conn, $kitchenId, self::SUSPEND_KITCHEN_QUERY);
     }
 
-
     private static function validateKitchenData(array $data): void
     {
         $requiredFields = ['owner_id', 'name', 'description', 'address', 'kitchen_image'];
@@ -244,7 +475,7 @@ class Kitchen
         $kitchen = array_change_key_case($row, CASE_LOWER);
 
         // Process description (COLOB)
-        $kitchen['description'] = self::processDescription($kitchen['description'] ?? '');
+        $kitchen['description'] = self::processCOLOB($kitchen['description'] ?? '');
 
         // Process dates
         $kitchen['created_at'] = self::processOracleDate($kitchen['created_at'] ?? '');
@@ -264,19 +495,19 @@ class Kitchen
         return $kitchen;
     }
 
-    private static function processDescription($description): string
+    private static function processCOLOB($clob): string
     {
-        if (is_object($description) && get_class($description) === 'OCILob') {
+        if (is_object($clob) && get_class($clob) === 'OCILob') {
             try {
-                return $description->read($description->size()) ?: '';
+                return $clob->read($clob->size()) ?: '';
             } catch (Exception $e) {
                 error_log("Error reading OCILob: " . $e->getMessage());
                 return '';
             } finally {
-                $description->free();
+                $clob->free();
             }
         }
-        return (string) $description;
+        return (string) $clob;
     }
 
     private static function processOracleDate(string $dateString): string

@@ -31,15 +31,15 @@ $views = [
 
 if ($currentRole === 'seller') {
     $views = [
-        'profile' => '/business/profile',
-        'settings' => '/business/settings',
-        'dashboard' => '/business/dashboard'
+        'dashboard' => '/business/dashboard',
+        'profile' => '/business/dashboard/profile',
+        'settings' => '/business/dashboard/settings',
     ];
 } elseif ($currentRole === 'admin') {
     $views = [
-        'profile' => '/admin/profile',
-        'settings' => '/admin/settings',
-        'dashboard' => '/admin/dashboard'
+        'dashboard' => '/admin/dashboard',
+        'profile' => '/admin/dashboard/profile',
+        'settings' => '/admin/dashboard/settings',
     ];
 }
 ?>
@@ -106,20 +106,20 @@ if ($currentRole === 'seller') {
             <!-- Desktop navigation -->
             <?php if (!$isBusinessView && !$isDashboardView): ?>
                 <div class="hidden md:ml-6 md:flex flex-row gap-4">
-                    <a href="/"
+                    <a href="/#"
                         class="border-orange-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Home</a>
-                    <a href="#dishes"
+                    <a href="/dishes"
                         class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Delicious
                         Dishes</a>
-                    <a href="#kitchens"
-                        class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Kitchens</a>
-                    <a href="#how-it-works"
-                        class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">How
-                        It Works</a>
+                    <a href="/kitchens"
+                        class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Browse
+                        Kitchens</a>
+                    <a href="/contact"
+                        class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Contact Us</a>
                 </div>
             <?php endif; ?>
 
-            <!-- Right side (auth) -->
+            <!-- Right side -->
             <div class="flex justify-end">
                 <div class="flex items-center">
                     <?php if ($isLoggedIn): ?>

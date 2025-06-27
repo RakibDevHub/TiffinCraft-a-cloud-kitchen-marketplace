@@ -1,5 +1,7 @@
 <?php
 $pageTitle = "TiffinCraft";
+$categories = $data['categories'] ?? [];
+$kitchens = $data['kitchens'] ?? [];
 ob_start();
 ?>
 
@@ -81,40 +83,147 @@ ob_start();
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            <div class="group relative overflow-hidden rounded-xl shadow-md hover:shadow-lg transition duration-300">
-                <img src="/assets/images/category-rice.jpeg" alt="Rice Meals"
-                    class="w-full h-64 object-cover transform group-hover:scale-105 transition duration-500">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
-                    <h3 class="text-white text-xl font-semibold">Rice Meals</h3>
-                </div>
-            </div>
-
-            <div class="group relative overflow-hidden rounded-xl shadow-md hover:shadow-lg transition duration-300">
-                <img src="/assets/images/category-roti.jpeg" alt="Roti Combos"
-                    class="w-full h-64 object-cover transform group-hover:scale-105 transition duration-500">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
-                    <h3 class="text-white text-xl font-semibold">Roti Combos</h3>
-                </div>
-            </div>
-
-            <div class="group relative overflow-hidden rounded-xl shadow-md hover:shadow-lg transition duration-300">
-                <img src="/assets/images/category-snacks.jpeg" alt="Snacks"
-                    class="w-full h-64 object-cover transform group-hover:scale-105 transition duration-500">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
-                    <h3 class="text-white text-xl font-semibold">Snacks</h3>
-                </div>
-            </div>
-
-            <div class="group relative overflow-hidden rounded-xl shadow-md hover:shadow-lg transition duration-300">
-                <img src="/assets/images/category-special.jpeg" alt="Special Meals"
-                    class="w-full h-64 object-cover transform group-hover:scale-105 transition duration-500">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
-                    <h3 class="text-white text-xl font-semibold">Special Meals</h3>
-                </div>
-            </div>
+            <?php foreach ($categories as $category): ?>
+                <a href="/dishes?categories=<?= htmlspecialchars(urlencode(strtolower($category['name']))) ?>"
+                    class="block focus:outline-none focus:ring-4 focus:ring-amber-400 rounded-xl"
+                    aria-label="View dishes in <?= htmlspecialchars($category['name']) ?> category">
+                    <div
+                        class="group relative overflow-hidden rounded-xl shadow-md hover:shadow-lg transition duration-300">
+                        <?php if ($category['image']): ?>
+                            <img src="<?= htmlspecialchars($category['image']) ?>"
+                                alt="<?= htmlspecialchars($category['name']) ?>"
+                                class="w-full h-64 object-cover transform group-hover:scale-105 transition duration-500">
+                        <?php else: ?>
+                            <div class="w-full h-64 flex items-center justify-center transform group-hover:scale-105 transition duration-500">
+                                <i class="fa-solid fa-book-open text-6xl text-orange-500"></i>
+                            </div>
+                        <?php endif ?>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
+                            <h3 class="text-white text-xl font-semibold"><?= htmlspecialchars($category['name']) ?></h3>
+                        </div>
+                    </div>
+                </a>
+            <?php endforeach; ?>
         </div>
     </div>
     <?php include BASE_PATH . '/src/includes/shape-divider.php' ?>
+</section>
+
+<!-- Local Cooks -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-10">
+            <?php if ($hasRatings): ?>
+                <h2 class="text-3xl font-bold text-gray-800 mb-3">Meet Top Rated Local Kitchens</h2>
+            <?php else: ?>
+                <h2 class="text-2xl font-bold text-gray-800 mb-3">Our Newest Local Kitchens</h2>
+                <p class="text-sm text-gray-600 max-w-2xl mx-auto">No reviews yet — be the first to rate these kitchens!</p>
+            <?php endif; ?>
+        </div>
+
+        <!-- Swiper -->
+        <div class="swiper myKitchensSwiper max-w-6xl">
+            <div class="swiper-wrapper">
+                <?php foreach ($kitchens as $kitchen): ?>
+                    <div class="swiper-slide">
+                        <a href="/kitchens/cooks?view=<?= $kitchen['kitchen_id'] ?>" class="group">
+                            <div
+                                class="bg-white rounded-xl shadow-sm hover:shadow-md overflow-hidden transition-all duration-300 border border-gray-100 hover:border-orange-100 h-[380px] flex flex-col">
+
+                                <!-- Image -->
+                                <div class="relative h-48 overflow-hidden">
+                                    <img src="<?= htmlspecialchars($kitchen['kitchen_image']) ?>"
+                                        alt="<?= htmlspecialchars($kitchen['name']) ?>"
+                                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                                </div>
+
+                                <!-- Content -->
+                                <div class="p-4 flex flex-col justify-between flex-grow">
+                                    <div class="space-y-2">
+                                        <!-- Name and Owner -->
+                                        <div>
+                                            <h3 class="text-lg font-semibold text-gray-800 truncate">
+                                                <?= htmlspecialchars($kitchen['name']) ?>
+                                            </h3>
+                                            <p class="text-sm text-gray-500 flex items-center">
+                                                <i class="fa-solid fa-user mr-1.5 text-green-500"></i>
+                                                <?= htmlspecialchars($kitchen['owner_name']) ?>
+                                            </p>
+                                        </div>
+
+                                        <!-- Description -->
+                                        <p class="text-sm text-gray-600 leading-relaxed line-clamp-2">
+                                            <?= htmlspecialchars($kitchen['description']) ?>
+                                        </p>
+                                    </div>
+
+                                    <!-- Footer:Service Areas, Rating + Address -->
+                                    <div class="">
+                                        <!-- Service Areas -->
+                                        <?php if (!empty($kitchen['service_areas'])): ?>
+                                            <p class="text-xs text-gray-500 flex items-center line-clamp-1">
+                                                <i class="fa-solid fa-person-biking text-orange-500 mr-1"></i>
+                                                <?= htmlspecialchars($kitchen['service_areas']) ?>
+                                            </p>
+                                        <?php endif; ?>
+
+                                        <div class="flex justify-between items-center mt-2">
+                                            <!-- Rating -->
+                                            <div class="flex items-center">
+                                                <?php if ($kitchen['avg_rating']): ?>
+                                                    <div class="flex items-center bg-orange-50 px-2 py-1 rounded-md">
+                                                        <i class="fa-solid fa-star text-orange-400 mr-1 text-sm"></i>
+                                                        <span class="text-sm font-medium text-gray-800">
+                                                            <?= round($kitchen['avg_rating'], 1) ?>
+                                                        </span>
+                                                        <span class="text-xs text-gray-500 ml-1">
+                                                            (<?= $kitchen['review_count'] ?>)
+                                                        </span>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <span class="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">
+                                                        No ratings yet
+                                                    </span>
+                                                <?php endif; ?>
+                                            </div>
+
+                                            <!-- Address -->
+                                            <?php if (!empty($kitchen['address'])): ?>
+                                                <p class="text-xs text-gray-500 flex items-center max-w-[130px] text-right">
+                                                    <i class="fa-solid fa-location-dot mr-1"></i>
+                                                    <span class="line-clamp-1"
+                                                        title="<?= htmlspecialchars($kitchen['address']) ?>">
+                                                        <?= htmlspecialchars($kitchen['address']) ?>
+                                                    </span>
+                                                </p>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <!-- Navigation -->
+            <div class="flex justify-center gap-4 mt-6">
+                <div class="swiper-button-prev !text-orange-500"></div>
+                <div class="swiper-button-next !text-orange-500"></div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="swiper-pagination mt-4"></div>
+        </div>
+
+        <div class="text-center mt-6">
+            <a href="/kitchens"
+                class="inline-block bg-orange-500 text-white font-semibold py-3 px-8 rounded-lg hover:bg-orange-600 transition">
+                View All Kitchens
+            </a>
+        </div>
+    </div>
 </section>
 
 <!-- How It Works -->
@@ -267,6 +376,32 @@ ob_start();
         </a>
     </div>
 </section>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const swiper = new Swiper('.myKitchensSwiper', {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            loop: true,
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            breakpoints: {
+                640: { slidesPerView: 1 },
+                768: { slidesPerView: 2 },
+                1024: { slidesPerView: 3 },
+                1280: { slidesPerView: 4 },
+            },
+        });
+    });
+
+</script>
 
 <?php
 

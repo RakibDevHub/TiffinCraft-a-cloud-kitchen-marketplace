@@ -1,9 +1,36 @@
 <?php
 $pageTitle = "Admin Dashboard";
 $users = $data['users'];
-$error = $data['error'];
+$error = $data['error'] ?? null;
+$success = $data['success'] ?? null;
 ob_start();
 ?>
+
+
+<!-- Status Messages -->
+<?php if ($error): ?>
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+        <div class="flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <div>
+                <p class="font-semibold">Error</p>
+                <p class="text-sm"><?= htmlspecialchars($error) ?></p>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+<?php if ($success): ?>
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded">
+        <div class="flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <div>
+                <p class="font-semibold">Success</p>
+                <p class="text-sm"><?= htmlspecialchars($success) ?></p>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
 
 <!-- ADMIN DASHBOARD CONTENT -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">

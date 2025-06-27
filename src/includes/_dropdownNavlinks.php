@@ -1,6 +1,4 @@
 <?php
-// src/includes/_dropdownNavlinks.php
-
 $user_data = [
     'name' => $_SESSION['name'],
     'role' => $_SESSION['role'],
@@ -8,7 +6,6 @@ $user_data = [
     'profile_image' => $_SESSION['profile_image'] ?? '/assets/images/default-profile.jpg',
 ];
 
-// Extract first and last name
 $fullName = htmlspecialchars($user_data['name']);
 $token = strtok($fullName, ' ');
 $parts = [];
@@ -44,7 +41,6 @@ $user_email = htmlspecialchars($user_data['email']);
     </div>
 
     <!-- Dropdown -->
-
     <div id="notification-dropdown"
         class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-60"
         role="menu" aria-labelledby="notification-button">

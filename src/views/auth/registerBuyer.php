@@ -1,10 +1,11 @@
 <?php
 $pageTitle = "TiffinCraft Register";
+$error = $data['error'] ?? null;
+$success = $data['success'] ?? null;
 ob_start();
 
 $helper = new App\Utils\Helper();
 
-// Generate CSRF token if not exists
 if (empty($_SESSION['csrf_token'])) {
     $helper->generateCsrfToken();
 }
@@ -90,7 +91,6 @@ $csrfToken = $_SESSION['csrf_token'];
 </section>
 
 <script>
-    // Preview image before uploading
     function previewImage(event) {
         const file = event.target.files[0];
         const preview = document.getElementById('imagePreview');
@@ -100,21 +100,20 @@ $csrfToken = $_SESSION['csrf_token'];
         if (file) {
             reader.onload = function (e) {
                 preview.src = e.target.result;
-                preview.style.display = 'block'; // Show the preview image
-                closeButton.style.display = 'block'; // Show the close button
+                preview.style.display = 'block';
+                closeButton.style.display = 'block';
             }
-            reader.readAsDataURL(file); // Read the file as a data URL
+            reader.readAsDataURL(file);
         }
     }
 
-    // Remove preview image
     function removeImage() {
         const preview = document.getElementById('imagePreview');
         const closeButton = document.getElementById('closeButton');
         preview.src = "";
         preview.style.display = 'none';
-        closeButton.style.display = 'none'; // Hide the close button
-        document.getElementById('profile_image').value = ""; // Clear the file input
+        closeButton.style.display = 'none';
+        document.getElementById('profile_image').value = "";
     }
 
 </script>

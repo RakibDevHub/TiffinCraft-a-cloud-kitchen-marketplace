@@ -1,105 +1,167 @@
 <?php
 namespace App\Controllers;
 
+use App\Models\Menu;
 use Exception;
 use App\Core\Database;
-use App\Models\Kitchen;
 use App\Utils\Helper;
+
+use App\Models\Kitchen;
+use App\Models\ServiceArea;
 
 class KitchenController
 {
-    // Admin: View all kitchens
-    public function fetchKitchens()
+    private $conn;
+
+    public function __construct()
     {
-        $this->requireLogin('admin');
+        $this->conn = Database::getConnection();
+    }
 
+    // kitchens
+    public function showKitchenPage()
+    {
         try {
-            $conn = Database::getConnection();
-            $kitchens = Kitchen::getAll($conn);
+            $filters = [
+                'search' => $_GET['search'] ?? null,
+                'location' => $_GET['location'] ?? null,
+                'sort' => $_GET['sort'] ?? 'newest',
+                'page' => isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1,
+                'per_page' => 9
+            ];
 
-            $this->renderView('admin/kitchens', [
+            $kitchens = Kitchen::getFilteredKitchens($this->conn, $filters);
+            $totalItems = Kitchen::getTotalFilteredCount($this->conn, $filters);
+            $totalPages = ceil($totalItems / $filters['per_page']);
+
+            $serviceAreas = ServiceArea::getAll($this->conn);
+
+            $this->renderView('buyer/kitchens', [
                 'kitchens' => $kitchens,
-                'error' => empty($kitchens) ? "No kitchens found" : null
+                'locations' => $serviceAreas,
+                'totalPages' => $totalPages,
+                'totalItems' => $totalItems,
+                'page' => $filters['page']
             ]);
+
         } catch (Exception $e) {
-            error_log($e->getMessage());
-            $this->renderView('admin/kitchens', [
+            $this->renderView('buyer/kitchens', [
                 'kitchens' => [],
-                'error' => "Database error: " . $e->getMessage()
+                'locations' => [],
+                'error' => 'Error: ' . $e->getMessage()
             ]);
         }
     }
 
-    // Admin: Approve a kitchen
+    // kitchens/profile
+    public function showKitchenProfile()
+    {
+        $kitchenId = $_GET['view'] ?? null;
+
+        if (!$kitchenId || !is_numeric($kitchenId)) {
+            header("Location: /kitchens");
+            exit;
+        }
+
+        $kitchen = Kitchen::getKitchenById($this->conn, $kitchenId);
+        $reviews = Kitchen::getKitchenReviews($this->conn, $kitchenId);
+        $menuItems = Menu::getMenuItemsByKitchenId($this->conn, $kitchenId);
+
+        if (!$kitchen) {
+            // Redirect or show 404
+            // require BASE_PATH . '/src/views/404.php';
+            return;
+        }
+
+        $this->renderView('buyer/kitchenProfile', [
+            'kitchen' => $kitchen,
+            'reviews' => $reviews,
+            'menuItems' => $menuItems
+        ]);
+
+        // require BASE_PATH . '/src/views/kitchens/kitchen_profile.php';
+    }
+
+
+    // Admin Kitchen Management
+    public function manageKitchens()
+    {
+        $this->requireLogin('admin');
+
+        try {
+            $kitchens = Kitchen::getAll($this->conn);
+
+            $this->renderView('admin/kitchens', [
+                'kitchens' => $kitchens,
+                'success' => $this->getFlash('success'),
+                'error' => $this->getFlash('error')
+            ]);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            $this->renderView('admin/kitchens', [
+                'error' => 'Failed to load kitchens: ' . $e->getMessage(),
+                'kitchens' => [],
+            ]);
+        }
+    }
+
     public function approveKitchen($id)
     {
         $this->requireLogin('admin');
         $this->validateCsrf();
 
         try {
-            $conn = Database::getConnection();
-            Kitchen::approve($conn, $id);
-            $_SESSION['success'] = "Kitchen approved successfully";
+            $success = Kitchen::approve($this->conn, $id);
+            if ($success) {
+                $this->setFlash('success', 'Kitchen approved successfully');
+            } else {
+                throw new Exception('Failed to approve kitchen');
+            }
         } catch (Exception $e) {
-            $_SESSION['error'] = $e->getMessage();
+            $this->setFlash('error', $e->getMessage());
         }
 
-        $this->redirect("/admin/kitchens");
+        $this->redirect("/admin/dashboard/kitchens");
     }
 
-    // Admin: Reject a kitchen
     public function rejectKitchen($id)
     {
         $this->requireLogin('admin');
         $this->validateCsrf();
 
         try {
-            $conn = Database::getConnection();
-            Kitchen::reject($conn, $id);
-            $_SESSION['success'] = "Kitchen rejected successfully";
+            $success = Kitchen::reject($this->conn, $id);
+            if ($success) {
+                $this->setFlash('success', 'Kitchen rejected successfully');
+            } else {
+                throw new Exception('Failed to reject kitchen');
+            }
         } catch (Exception $e) {
-            $_SESSION['error'] = $e->getMessage();
+            $this->setFlash('error', $e->getMessage());
         }
 
-        $this->redirect("/admin/kitchens");
+        $this->redirect("/admin/dashboard/kitchens");
     }
 
-    // Admin: Suspend a kitchen
     public function suspendKitchen($id)
     {
         $this->requireLogin('admin');
         $this->validateCsrf();
 
         try {
-            $conn = Database::getConnection();
-            Kitchen::suspend($conn, $id);
-            $_SESSION['success'] = "Kitchen suspended successfully";
-        } catch (Exception $e) {
-            $_SESSION['error'] = $e->getMessage();
-        }
-
-        $this->redirect("/admin/kitchens");
-    }
-
-    // Admin: View a kitchen's detail
-    public function viewKitchen($id)
-    {
-        $this->requireLogin('admin');
-
-        try {
-            $conn = Database::getConnection();
-            $kitchen = Kitchen::getById($conn, $id);
-
-            if (!$kitchen) {
-                throw new Exception("Kitchen not found");
+            $success = Kitchen::suspend($this->conn, $id);
+            if ($success) {
+                $this->setFlash('success', 'Kitchen suspended successfully');
+            } else {
+                throw new Exception('Failed to suspend kitchen');
             }
-
-            $this->renderView('admin/viewKitchen', $kitchen);
         } catch (Exception $e) {
-            $_SESSION['error'] = $e->getMessage();
-            $this->redirect("/admin/kitchens");
+            $this->setFlash('error', $e->getMessage());
         }
+
+        $this->redirect("/admin/dashboard/kitchens");
     }
+    // End Admin Kitchen Management
 
     // CSRF Token Validation
     protected function validateCsrf(): void
@@ -109,10 +171,27 @@ class KitchenController
             !isset($_POST['csrf_token']) ||
             !Helper::validateCsrfToken($_POST['csrf_token'])
         ) {
-            $_SESSION['error'] = "Invalid or missing CSRF token.";
+            $this->setFlash('error', "Invalid or missing CSRF token.");
             $this->redirect("/admin/kitchens");
         }
     }
+
+    // Flash message
+    protected function setFlash(string $type, string $message): void
+    {
+        $_SESSION['flash'][$type] = $message;
+    }
+
+    protected function getFlash(string $type): ?string
+    {
+        if (isset($_SESSION['flash'][$type])) {
+            $message = $_SESSION['flash'][$type];
+            unset($_SESSION['flash'][$type]);
+            return $message;
+        }
+        return null;
+    }
+    // End Flash
 
     protected function isLoggedIn(): bool
     {

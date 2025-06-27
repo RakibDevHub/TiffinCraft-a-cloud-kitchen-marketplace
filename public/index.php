@@ -17,10 +17,13 @@ require_once BASE_PATH . '/src/controllers/KitchenController.php';
 require_once BASE_PATH . '/src/controllers/AuthController.php';
 require_once BASE_PATH . '/src/controllers/MenuController.php';
 require_once BASE_PATH . '/src/controllers/ErrorController.php';
+require_once BASE_PATH . '/src/controllers/CategoryController.php';
 
 require_once BASE_PATH . '/src/Models/UserModel.php';
 require_once BASE_PATH . '/src/Models/KitchenModel.php';
 require_once BASE_PATH . '/src/Models/ServiceAreaModel.php';
+require_once BASE_PATH . '/src/Models/MenuModel.php';
+require_once BASE_PATH . '/src/Models/CategoryModel.php';
 
 use App\Core\Router;
 use App\Utils\SessionHelper;
@@ -34,9 +37,13 @@ $router->addRoute('/database-error', 'ErrorController@databaseError');
 $router->addRoute('/unauthorized', 'ErrorController@unauthorizedError');
 
 // Public Routes
-$router->addRoute('/', 'HomeController@tiffincraft');
-$router->addRoute('/home', 'HomeController@tiffincraft');
-$router->addRoute('/business', 'HomeController@tiffincraftBusiness');
+$router->addRoute('/', 'HomeController@showBuyerHome');
+$router->addRoute('/home', 'HomeController@showBuyerHome');
+$router->addRoute('/dishes', 'MenuController@showMenuPage');
+$router->addRoute('/kitchens', 'KitchenController@showKitchenPage');
+$router->addRoute('/kitchens/profile', 'KitchenController@showKitchenProfile');
+
+$router->addRoute('/business', 'HomeController@showSellerHome');
 
 // Authentication Routes
 $router->addRoute('/register', 'AuthController@registerAsBuyer');
@@ -51,19 +58,33 @@ $router->addRoute('/business/dashboard', 'DashboardController@businessDashboard'
 // Admin Routes
 $router->addRoute('/admin', 'DashboardController@adminDashboard');
 $router->addRoute('/admin/dashboard', 'DashboardController@adminDashboard');
-$router->addRoute('/admin/users', 'UserController@manageUsers');
 
-$router->addRoute('/admin/orders', 'PageController@manageOrders');
-$router->addRoute('/admin/reports', 'PageController@manageReports');
-$router->addRoute('/admin/dishes', 'PageController@manageDishes');
+$router->addRoute('/admin/dashboard/users', 'UserController@manageUsers');
+$router->addRoute('/admin/dashboard/users/activate/{id}', 'UserController@activateUser');
+$router->addRoute('/admin/dashboard/users/deactivate/{id}', 'UserController@deactivateUser');
+$router->addRoute('/admin/dashboard/users/suspend/{id}', 'UserController@suspendUser');
+
+$router->addRoute('/admin/dashboard/categories', 'CategoryController@manageCategories');
+$router->addRoute('/admin/dashboard/categories/add', 'CategoryController@addCategory');
+$router->addRoute('/admin/dashboard/categories/edit/{id}', 'CategoryController@editCategory');
+$router->addRoute('/admin/dashboard/categories/delete/{id}', 'CategoryController@deleteCategory');
+
+$router->addRoute('/admin/dashboard/orders', 'PageController@manageOrders');
+$router->addRoute('/admin/dashboard/reports', 'PageController@manageReports');
+$router->addRoute('/admin/dashboard/dishes', 'PageController@manageDishes');
 
 // Kitchen Management Routes
-$router->addRoute('/admin/kitchens', 'KitchenController@fetchKitchens');
-$router->addRoute('/admin/kitchens/approve/{id}', 'KitchenController@approveKitchen');
-$router->addRoute('/admin/kitchens/reject/{id}', 'KitchenController@rejectKitchen');
-$router->addRoute('/admin/kitchens/suspend/{id}', 'KitchenController@suspendKitchen');
+$router->addRoute('/admin/dashboard/kitchens', 'KitchenController@manageKitchens');
+$router->addRoute('/admin/dashboard/kitchens/approve/{id}', 'KitchenController@approveKitchen');
+$router->addRoute('/admin/dashboard/kitchens/reject/{id}', 'KitchenController@rejectKitchen');
+$router->addRoute('/admin/dashboard/kitchens/suspend/{id}', 'KitchenController@suspendKitchen');
 
 // Business Owner Kitchen Routes
+$router->addRoute('/business/dashboard/menu', 'MenuController@manageMenu');
+$router->addRoute('/business/dashboard/menu/add', 'MenuController@addMenuItem');
+$router->addRoute('/business/dashboard/menu/edit/{id}', 'MenuController@editMenuItem');
+$router->addRoute('/business/dashboard/menu/delete/{id}', 'MenuController@deleteMenuItem');
+
 $router->addRoute('/business/kitchens', 'PageController@businessKitchens');
 $router->addRoute('/business/kitchens/create', 'PageController@businessCreateKitchen');
 $router->addRoute('/business/kitchens/edit/{id}', 'PageController@businessEditKitchen');

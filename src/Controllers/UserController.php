@@ -1,36 +1,94 @@
 <?php
 namespace App\Controllers;
 
+use App\Utils\Helper;
 use Exception;
 use App\Core\Database;
 use App\Models\User;
-use App\Models\Kitchen;
-use App\Models\ServiceArea;
 
 class UserController
 {
+    private $conn;
 
-    // TiffinCraft 
+    public function __construct()
+    {
+        $this->conn = Database::getConnection();
+    }
+
     public function manageUsers()
     {
         $this->requireLogin('admin');
 
         try {
-            $conn = Database::getConnection();
-            $users = User::getUsers($conn);
+            $users = User::getUsers($this->conn);
 
             $this->renderView('admin/users', [
                 'users' => $users,
-                'error' => empty($users) ? "No users found in database" : null
+                'success' => $this->getFlash('success'),
+                'error' => $this->getFlash('error')
             ]);
 
         } catch (Exception $e) {
             error_log($e->getMessage());
             $this->renderView('admin/users', [
+                'error' => "Failed to load users:" . $e->getMessage(),
                 'users' => [],
-                'error' => "Database error: " . $e->getMessage()
             ]);
         }
+    }
+
+    public function activateUser($id)
+    {
+        $this->requireLogin('admin');
+        $this->validateCsrf();
+
+        try {
+            $success = User::activate($this->conn, $id);
+            if ($success) {
+                $this->setFlash('success', 'User activate successfully');
+            } else {
+                throw new Exception('Failed to activate user');
+            }
+        } catch (Exception $e) {
+            $this->setFlash('error', $e->getMessage());
+        }
+        $this->redirect("/admin/dashboard/users");
+    }
+
+    public function deactivateUser($id)
+    {
+        $this->requireLogin('admin');
+        $this->validateCsrf();
+
+        try {
+            $success = User::deactivate($this->conn, $id);
+            if ($success) {
+                $this->setFlash('success', 'User deactivate successfully');
+            } else {
+                throw new Exception('Failed to deactivate user');
+            }
+        } catch (Exception $e) {
+            $this->setFlash('error', $e->getMessage());
+        }
+        $this->redirect("/admin/dashboard/users");
+    }
+
+    public function suspendUser($id)
+    {
+        $this->requireLogin('admin');
+        $this->validateCsrf();
+
+        try {
+            $success = User::suspend($this->conn, $id);
+            if ($success) {
+                $this->setFlash('success', 'User suspended successfully');
+            } else {
+                throw new Exception('Failed to suspended user');
+            }
+        } catch (Exception $e) {
+            $this->setFlash('error', $e->getMessage());
+        }
+        $this->redirect("/admin/dashboard/users");
     }
 
     protected function isLoggedIn(): bool
@@ -49,6 +107,34 @@ class UserController
             $this->redirect('/unauthorized');
             exit;
         }
+    }
+
+    protected function validateCsrf(): void
+    {
+        if (
+            $_SERVER['REQUEST_METHOD'] !== 'POST' ||
+            !isset($_POST['csrf_token']) ||
+            !Helper::validateCsrfToken($_POST['csrf_token'])
+        ) {
+            $this->setFlash('error', "Invalid or missing CSRF token.");
+            $this->redirect("/admin/dashboard/users");
+        }
+    }
+
+    // Flash message
+    protected function setFlash(string $type, string $message): void
+    {
+        $_SESSION['flash'][$type] = $message;
+    }
+
+    protected function getFlash(string $type): ?string
+    {
+        if (isset($_SESSION['flash'][$type])) {
+            $message = $_SESSION['flash'][$type];
+            unset($_SESSION['flash'][$type]);
+            return $message;
+        }
+        return null;
     }
 
     protected function redirect(string $url): void

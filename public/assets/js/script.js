@@ -1,19 +1,12 @@
-// MAIN INITIALIZATION
 document.addEventListener("DOMContentLoaded", function () {
-  // CTA Bar functionality (only on home page for guests)
+
   initCTABar();
-
-  // Initialize Dropdown
   initDropdowns();
-
-  // Initialize Sidebar
   initSidebar();
+
 });
 
-/**
- * CTA BAR FUNCTIONALITY
- * Handles the call-to-action bar at the top of the page
- */
+
 function initCTABar() {
   const ctaBar = document.getElementById("ctaBar");
   if (!ctaBar) return;
@@ -57,13 +50,6 @@ function initCTABar() {
   }
 }
 
-/**
- * PROFILE DROPDOWN MENU
- * Handles the user profile dropdown in the navbar
- */
-/**
- * Initializes dropdown menus including user dropdown and notifications
- */
 function initDropdowns() {
   // Initialize user profile dropdown
   const dropdownButton = document.getElementById("user-dropdown-button");
@@ -140,13 +126,9 @@ function startDropdown({ button, menuId, closeOnClickOutside }) {
   document.addEventListener("keydown", handleKeyboard);
 }
 
-// Initialize when DOM is loaded
 document.addEventListener("DOMContentLoaded", initDropdowns);
 
-/**
- * SIDEBAR NAVLINKS
- * Handles the sidebar navlinks functionality
- */
+
 function initSidebar() {
   const sidebarButton = document.getElementById("sidebar-navlinks-button");
   if (!sidebarButton) return;
@@ -161,7 +143,6 @@ function initSidebar() {
 
   let isExpanded = false;
 
-  // Handle dashboard view
   const isDashboardView =
     window.location.pathname.includes("/admin") ||
     window.location.pathname.includes("/dashboard");
@@ -182,7 +163,7 @@ function initSidebar() {
     closeIcon?.classList.remove("hidden");
     menu.classList.remove("hidden");
 
-    void menu.offsetWidth; // Trigger reflow
+    void menu.offsetWidth;
     overlay?.classList.remove("opacity-0");
     menuContainer?.classList.remove("-translate-x-full");
   }
@@ -208,7 +189,6 @@ function initSidebar() {
     }
   }
 
-  // Set up event listeners
   sidebarButton.addEventListener("click", toggleSidebar);
   overlay?.addEventListener("click", closeSidebar);
   document.addEventListener("keydown", handleKeyboard);

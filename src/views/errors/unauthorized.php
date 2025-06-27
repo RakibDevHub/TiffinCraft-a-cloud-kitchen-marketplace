@@ -1,6 +1,6 @@
 <?php
 $pageTitle = "Access Denied - TiffinCraft Business";
-$error = $data['error']; // Optional: only if you're passing custom error info
+$error = $data['error'];
 
 ob_start();
 ?>

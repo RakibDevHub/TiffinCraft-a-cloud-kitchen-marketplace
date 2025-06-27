@@ -1,5 +1,4 @@
 <?php
-// src/includes/_sidebarNavlinks.php
 $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['role']);
 $currentRole = $isLoggedIn ? $_SESSION['role'] : null;
 $requestUri = $_SERVER['REQUEST_URI'];
@@ -66,50 +65,53 @@ $isBusinessView = strpos($requestUri, '/business') !== false;
 
                         <?php elseif ($currentRole === 'seller'): ?>
                             <!-- Seller Navigation -->
-                            <a href="/business/menu"
+                            <a href="/business/dashboard/menu"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Manage
                                 Menu</a>
-                            <a href="/business/orders"
+                            <a href="/business/dashboard/orders"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">View
                                 Orders</a>
-                            <a href="/business/promotions"
+                            <a href="/business/dashboard/promotions"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Promotions</a>
-                            <a href="/business/subscriptions"
+                            <a href="/business/dashboard/subscriptions"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Subscription
                                 Packages</a>
-                            <a href="/business/reviews"
+                            <a href="/business/dashboard/reviews"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Customer
                                 Reviews</a>
-                            <a href="/business/areas"
+                            <a href="/business/dashboard/areas"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Service
                                 Areas</a>
-                            <a href="/business/earnings"
+                            <a href="/business/dashboard/earnings"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Earnings
                                 Report</a>
 
                         <?php elseif ($currentRole === 'admin'): ?>
                             <!-- Admin Navigation -->
-                            <a href="/admin/users"
+                            <a href="/admin/dashboard/users"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Manage
                                 Users</a>
-                            <a href="/admin/kitchens"
+                            <a href="/admin/dashboard/kitchens"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Manage
                                 Kitchens</a>
-                            <a href="/admin/dishes"
+                            <a href="/admin/dashboard/categories"
+                                class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Manage
+                                Categories</a>
+                            <a href="/admin/dashboard/dishes"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Manage
                                 Dishes</a>
-                            <a href="/admin/orders"
+                            <a href="/admin/dashboard/orders"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">View
                                 All Orders</a>
-                            <a href="/admin/reports"
+                            <a href="/admin/dashboard/reports"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Reports</a>
-                            <a href="/admin/promotions"
+                            <a href="/admin/dashboard/promotions"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Platform
                                 Promotions</a>
-                            <a href="/admin/content"
+                            <a href="/admin/dashboard/content"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Content
                                 Management</a>
-                            <a href="/admin/settings"
+                            <a href="/admin/dashboard/settings"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Site
                                 Settings</a>
                         <?php endif; ?>

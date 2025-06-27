@@ -32,7 +32,7 @@ class SessionHelper
             $kitchenSuspendedUntil = null;
 
             if ($user['role'] === 'seller') {
-                $kitchen = Kitchen::getByOwnerId($conn, $user['user_id']);
+                $kitchen = Kitchen::getKitchenByOwnerId($conn, $user['user_id']);
                 if ($kitchen && !empty($kitchen['suspended_until'])) {
                     $timestamp = strtotime($kitchen['suspended_until']);
                     if ($timestamp > time()) {

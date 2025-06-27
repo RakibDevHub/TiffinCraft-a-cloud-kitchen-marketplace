@@ -5,18 +5,22 @@ namespace App\Controllers;
 use Exception;
 use App\Core\Database;
 use App\Models\User;
-use App\Models\Kitchen;
-use App\Models\ServiceArea;
 
 class DashboardController
 {
+    private $conn;
+
+    public function __construct()
+    {
+        $this->conn = Database::getConnection();
+    }
+
     public function dashboard()
     {
         $this->requireLogin('buyer');
 
         if (!empty($_SESSION['user_id'])) {
-            $conn = Database::getConnection();
-            $user = User::findById($conn, $_SESSION['user_id']);
+            $user = User::findById($this->conn, $_SESSION['user_id']);
 
             $isSuspended = false;
             $suspendedUntil = null;
@@ -33,7 +37,10 @@ class DashboardController
             $_SESSION['suspended_until'] = $suspendedUntil;
         }
 
-        $this->renderView('buyer/dashboard');
+        $this->renderView('buyer/dashboard', [
+            'success' => $this->getFlash('success'),
+            'error' => $this->getFlash('error')
+        ]);
     }
 
     public function adminDashboard()
@@ -41,12 +48,12 @@ class DashboardController
         $this->requireLogin('admin');
 
         try {
-            $conn = Database::getConnection();
-            $users = User::getUserCount($conn);
+            $users = User::getUserCount($this->conn);
 
             $this->renderView('admin/dashboard', [
                 'users' => $users,
-                'error' => empty($users) ? "No users found in database" : null
+                'success' => $this->getFlash('success'),
+                'error' => $this->getFlash('error')
             ]);
 
         } catch (Exception $e) {
@@ -62,7 +69,10 @@ class DashboardController
     {
         $this->requireLogin('seller');
 
-        $this->renderView('seller/dashboard');
+        $this->renderView('seller/dashboard', [
+            'success' => $this->getFlash('success'),
+            'error' => $this->getFlash('error')
+        ]);
     }
 
     protected function countUsers()
@@ -86,6 +96,21 @@ class DashboardController
             $this->redirect('/unauthorized');
             exit;
         }
+    }
+
+    protected function setFlash(string $type, string $message): void
+    {
+        $_SESSION['flash'][$type] = $message;
+    }
+
+    protected function getFlash(string $type): ?string
+    {
+        if (isset($_SESSION['flash'][$type])) {
+            $message = $_SESSION['flash'][$type];
+            unset($_SESSION['flash'][$type]);
+            return $message;
+        }
+        return null;
     }
 
     protected function redirect(string $url): void

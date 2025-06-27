@@ -119,9 +119,9 @@ ob_start();
         <div class="space-y-4">
             <?php
             $popularItems = [
-                ['name' => 'Butter Chicken', 'price' => '12.99', 'orders' => '48', 'img' => 'https://via.placeholder.com/60'],
-                ['name' => 'Vegetable Biryani', 'price' => '10.50', 'orders' => '36', 'img' => 'https://via.placeholder.com/60'],
-                ['name' => 'Paneer Tikka', 'price' => '8.99', 'orders' => '32', 'img' => 'https://via.placeholder.com/60']
+                ['name' => 'Butter Chicken', 'price' => '12.99', 'orders' => '48', 'img' => ''],
+                ['name' => 'Vegetable Biryani', 'price' => '10.50', 'orders' => '36', 'img' => ''],
+                ['name' => 'Paneer Tikka', 'price' => '8.99', 'orders' => '32', 'img' => '']
             ];
 
             foreach ($popularItems as $item): ?>

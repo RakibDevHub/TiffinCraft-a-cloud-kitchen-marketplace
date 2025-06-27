@@ -1,10 +1,11 @@
 <?php
 $pageTitle = "TiffinCraft Business Register";
+$error = $data['error'] ?? null;
+$success = $data['success'] ?? null;
 ob_start();
 
 $helper = new App\Utils\Helper();
 
-// Generate CSRF token if not exists
 if (empty($_SESSION['csrf_token'])) {
     $helper->generateCsrfToken();
 }
@@ -15,10 +16,15 @@ $csrfToken = $_SESSION['csrf_token'];
     <div class="w-full max-w-xl bg-white shadow-lg rounded-xl p-8">
         <h2 class="text-2xl font-bold mb-6 text-center">Seller Registration</h2>
 
-        <?php if (!empty($_SESSION['register_error'])): ?>
-            <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
-                <?= $_SESSION['register_error'];
-                unset($_SESSION['register_error']); ?>
+        <?php if ($error): ?>
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <div>
+                        <p class="font-semibold">Error</p>
+                        <p class="text-sm"><?= htmlspecialchars($error) ?></p>
+                    </div>
+                </div>
             </div>
         <?php endif; ?>
 
@@ -123,7 +129,6 @@ $csrfToken = $_SESSION['csrf_token'];
 </section>
 
 <script>
-    // Preview image before uploading
     function previewImage(event) {
         const file = event.target.files[0];
         const preview = document.getElementById('imagePreview');
@@ -140,14 +145,13 @@ $csrfToken = $_SESSION['csrf_token'];
         }
     }
 
-    // Remove preview image
     function removeImage() {
         const preview = document.getElementById('imagePreview');
         const closeButton = document.getElementById('closeButton');
         preview.src = "";
         preview.style.display = 'none';
-        closeButton.style.display = 'none'; // Hide the close button
-        document.getElementById('profile_image').value = ""; // Clear the file input
+        closeButton.style.display = 'none';
+        document.getElementById('profile_image').value = "";
     }
 
     function displaySelectedAreas() {

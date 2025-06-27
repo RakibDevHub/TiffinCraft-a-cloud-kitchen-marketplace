@@ -6,13 +6,34 @@ use App\Core\Database;
 
 class ServiceArea
 {
-    public static function getAll(): array
-    {
-        $conn = Database::getConnection();
-        $stmt = oci_parse($conn, self::getAllAreasQuery());
-        oci_execute($stmt);
 
-        return self::fetchAllResults($stmt);
+    private const GET_ALL_AREAS = "SELECT * FROM service_areas ORDER BY name";
+
+    public static function getAll($conn): array
+    {
+        if (!$conn) {
+            throw new Exception("Database connection failed");
+        }
+
+        $stmt = null;
+        try {
+            $stmt = oci_parse($conn, self::GET_ALL_AREAS);
+
+            if (!oci_execute($stmt)) {
+                throw new Exception("Execute error: " . oci_error($stmt)['message']);
+            }
+
+            $results = [];
+            while ($row = oci_fetch_assoc($stmt)) {
+                $results[] = self::processData($row);
+            }
+
+            return $results;
+        } finally {
+            if (isset($stmt)) {
+                oci_free_statement($stmt);
+            }
+        }
     }
 
     public static function exists($conn, int $kitchenId, string $area): bool
@@ -32,6 +53,14 @@ class ServiceArea
         } catch (Exception $e) {
             throw new Exception("ServiceArea insert failed: " . $e->getMessage());
         }
+    }
+
+    protected static function processData(array $row): array
+    {
+        return [
+            'area_id' => $row['AREA_ID'],
+            'name' => $row['NAME']
+        ];
     }
 
     private static function getAllAreasQuery(): string
