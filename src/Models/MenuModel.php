@@ -24,7 +24,24 @@ class Menu
 
     private const GET_KITCHEN_ID_BY_OWNER = "SELECT KITCHEN_ID FROM KITCHENS WHERE OWNER_ID = :owner_id";
 
-    private const GET_ITEMS_BY_KITCHEN_ID = "SELECT * FROM MENU_ITEMS WHERE KITCHEN_ID = :kitchen_id";
+    private const GET_ITEMS_BY_KITCHEN_ID = "
+        SELECT 
+            mi.*,
+            (
+                SELECT ROUND(AVG(r.rating), 1)
+                FROM item_reviews r
+                WHERE r.item_id = mi.item_id
+            ) AS avg_rating,
+            (
+                SELECT COUNT(*)
+                FROM item_reviews r
+                WHERE r.item_id = mi.item_id
+            ) AS review_count
+        FROM menu_items mi
+        WHERE mi.kitchen_id = :kitchen_id
+        AND mi.available = 1
+        ORDER BY mi.created_at DESC
+        ";
 
     private const GET_ITEM_BY_ID = "SELECT * FROM MENU_ITEMS WHERE ITEM_ID = :item_id AND KITCHEN_ID = :kitchen_id";
 
@@ -56,57 +73,71 @@ class Menu
 
     public static function getFilteredMenuItems($conn, $filters = [])
     {
-        $query = "
-        SELECT * FROM (
-            SELECT mi.*, 
-                   (
-                       SELECT LISTAGG(sa.NAME, ', ') WITHIN GROUP (ORDER BY sa.NAME)
-                       FROM KITCHEN_SERVICE_AREAS ksa
-                       JOIN SERVICE_AREAS sa ON ksa.AREA_ID = sa.AREA_ID
-                       WHERE ksa.KITCHEN_ID = mi.KITCHEN_ID
-                   ) AS service_areas,
-                   ROWNUM AS rn
-            FROM MENU_ITEMS mi
-            JOIN CATEGORIES c ON mi.CATEGORY_ID = c.CATEGORY_ID
-            WHERE mi.AVAILABLE = 1
+        $innerQuery = "
+        SELECT 
+            mi.*, 
+            (
+                SELECT LISTAGG(sa.NAME, ', ') WITHIN GROUP (ORDER BY sa.NAME)
+                FROM KITCHEN_SERVICE_AREAS ksa
+                JOIN SERVICE_AREAS sa ON ksa.AREA_ID = sa.AREA_ID
+                WHERE ksa.KITCHEN_ID = mi.KITCHEN_ID
+            ) AS service_areas,
+            (
+                SELECT ROUND(AVG(r.RATING), 1)
+                FROM ITEM_REVIEWS r
+                WHERE r.ITEM_ID = mi.ITEM_ID
+            ) AS avg_rating,
+            (
+                SELECT COUNT(*)
+                FROM ITEM_REVIEWS r
+                WHERE r.ITEM_ID = mi.ITEM_ID
+            ) AS review_count,
+            ROWNUM AS rn
+        FROM MENU_ITEMS mi
+        JOIN CATEGORIES c ON mi.CATEGORY_ID = c.CATEGORY_ID
+        WHERE mi.AVAILABLE = 1
     ";
 
         $bindings = [];
 
+        // Apply filters in the INNER query
         if (!empty($filters['category'])) {
-            $query .= " AND LOWER(c.NAME) = :category_name";
+            $innerQuery .= " AND LOWER(c.NAME) = :category_name";
             $bindings[':category_name'] = strtolower($filters['category']);
         }
 
         if (!empty($filters['search'])) {
-            $query .= " AND (LOWER(mi.name) LIKE '%' || :search || '%' 
-                    OR LOWER(mi.description) LIKE '%' || :search || '%' 
-                    OR LOWER(mi.tags) LIKE '%' || :search || '%')";
+            $innerQuery .= " AND (
+            LOWER(mi.name) LIKE '%' || :search || '%' 
+            OR LOWER(mi.description) LIKE '%' || :search || '%' 
+            OR LOWER(mi.tags) LIKE '%' || :search || '%')";
             $bindings[':search'] = strtolower($filters['search']);
         }
 
         if (!empty($filters['location'])) {
-            $query .= " AND EXISTS (
-                        SELECT 1 FROM KITCHEN_SERVICE_AREAS ksa
-                        JOIN SERVICE_AREAS sa ON ksa.AREA_ID = sa.AREA_ID
-                        WHERE ksa.KITCHEN_ID = mi.KITCHEN_ID
-                        AND LOWER(sa.NAME) = :location
-                    )";
+            $innerQuery .= " AND EXISTS (
+            SELECT 1 FROM KITCHEN_SERVICE_AREAS ksa
+            JOIN SERVICE_AREAS sa ON ksa.AREA_ID = sa.AREA_ID
+            WHERE ksa.KITCHEN_ID = mi.KITCHEN_ID
+            AND LOWER(sa.NAME) = :location
+        )";
             $bindings[':location'] = strtolower($filters['location']);
         }
 
         // Sorting
-        if ($filters['price_sort'] === 'high_to_low') {
-            $query .= " ORDER BY mi.price DESC";
+        if (!empty($filters['price_sort']) && $filters['price_sort'] === 'high_to_low') {
+            $innerQuery .= " ORDER BY mi.price DESC";
         } else {
-            $query .= " ORDER BY mi.price ASC";
+            $innerQuery .= " ORDER BY mi.price ASC";
         }
 
-        $query .= ") WHERE rn > :offset AND rn <= :offset + :limit";
+        // Wrap it for pagination
+        $query = "SELECT * FROM (
+        $innerQuery
+    ) subquery WHERE rn > :offset AND rn <= :limit";
 
-        // Pagination bindings
         $bindings[':offset'] = ($filters['page'] - 1) * $filters['per_page'];
-        $bindings[':limit'] = $filters['per_page'];
+        $bindings[':limit'] = $filters['page'] * $filters['per_page'];
 
         $stmt = oci_parse($conn, $query);
         foreach ($bindings as $param => $value) {
@@ -125,6 +156,7 @@ class Menu
         oci_free_statement($stmt);
         return $items;
     }
+
 
     public static function getTotalFilteredCount($conn, $filters = [])
     {
@@ -174,6 +206,10 @@ class Menu
         return (int) $row['TOTAL'];
     }
 
+    public static function getItemsReviews($conn)
+    {
+
+    }
 
     public static function getAllMenuItems($conn)
     {
@@ -484,7 +520,9 @@ class Menu
             'available' => (bool) $row['AVAILABLE'],
             'tags' => $row['TAGS'] ?? '',
             'created_at' => $row['CREATED_AT'],
-            'service_areas' => $row['SERVICE_AREAS'] ?? ''
+            'service_areas' => $row['SERVICE_AREAS'] ?? '',
+            'avg_rating' => (float) $row['AVG_RATING'] ?? '',
+            'review_count' => (int) $row['REVIEW_COUNT' ?? '']
         ];
     }
 

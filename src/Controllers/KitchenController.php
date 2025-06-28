@@ -1,8 +1,9 @@
 <?php
 namespace App\Controllers;
 
-use App\Models\Menu;
 use Exception;
+use App\Models\Category;
+use App\Models\Menu;
 use App\Core\Database;
 use App\Utils\Helper;
 
@@ -64,22 +65,26 @@ class KitchenController
         }
 
         $kitchen = Kitchen::getKitchenById($this->conn, $kitchenId);
-        $reviews = Kitchen::getKitchenReviews($this->conn, $kitchenId);
         $menuItems = Menu::getMenuItemsByKitchenId($this->conn, $kitchenId);
+        $reviews = Kitchen::getKitchenReviews($this->conn, $kitchenId);
+        $categories = Category::getAllCategories($this->conn);
 
-        if (!$kitchen) {
-            // Redirect or show 404
-            // require BASE_PATH . '/src/views/404.php';
-            return;
+        $categoryMap = [];
+        foreach ($categories as $category) {
+            $categoryMap[$category['category_id']] = $category['name'];
+        }
+
+        foreach ($menuItems as &$item) {
+            $item['category_name'] = $categoryMap[$item['category_id']] ?? 'Uncategorized';
         }
 
         $this->renderView('buyer/kitchenProfile', [
-            'kitchen' => $kitchen,
             'reviews' => $reviews,
-            'menuItems' => $menuItems
+            'kitchen' => $kitchen,
+            'menuItems' => $menuItems,
+            'categories' => $categories,
         ]);
 
-        // require BASE_PATH . '/src/views/kitchens/kitchen_profile.php';
     }
 
 

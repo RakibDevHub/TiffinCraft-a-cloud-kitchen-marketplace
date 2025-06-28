@@ -30,6 +30,7 @@ class MenuController
                 'search' => $_GET['search'] ?? null,
                 'location' => $_GET['location'] ?? null,
                 'price_sort' => $_GET['price_sort'] ?? null,
+                
                 'per_page' => $perPage,
                 'page' => $page
             ];

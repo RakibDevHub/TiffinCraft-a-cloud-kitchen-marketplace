@@ -184,7 +184,7 @@ ob_start();
                             </p>
 
                             <?php if (!empty($dish['tags'])): ?>
-                                <p class="mb-4 flex flex-wrap gap-1.5 max-h-10 py-1 line-clamp-2">
+                                <p class="mb-2 flex flex-wrap gap-1.5 max-h-10 py-1 line-clamp-2">
                                     <?php
                                     $tags = array_filter(array_map('trim', explode(',', $dish['tags'])));
                                     $colorClasses = [
@@ -209,6 +209,15 @@ ob_start();
                                 </p>
                             <?php endif; ?>
 
+                            <!-- Rating -->
+                            <?php if ($dish['avg_rating']): ?>
+                                <div class="mb-2 flex items-center text-sm text-yellow-600 font-medium">
+                                    <i class="fas fa-star mr-1 text-yellow-400"></i>
+                                    <?= round($dish['avg_rating'], 1) ?>
+                                    <span class="ml-2 text-gray-500">(<?= $dish['review_count'] ?> reviews)</span>
+                                </div>
+                            <?php endif; ?>
+
                             <div class="flex justify-between items-center mt-auto pt-2 border-t border-gray-200">
                                 <span class="text-orange-500 font-bold text-lg">৳<?= htmlspecialchars($dish['price']) ?></span>
                                 <button class="px-4 py-2 bg-orange-500 text-white rounded-md text-sm hover:bg-orange-600">
@@ -217,7 +226,6 @@ ob_start();
                             </div>
                         </div>
                     </div>
-
                 <?php endforeach; ?>
             </div>
 
