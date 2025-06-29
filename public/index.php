@@ -62,6 +62,8 @@ $router->addRoute('/business/dashboard', 'DashboardController@businessDashboard'
 $router->addRoute('/admin', 'DashboardController@adminDashboard');
 $router->addRoute('/admin/dashboard', 'DashboardController@adminDashboard');
 
+$router->addRoute('/admin/dashboard/reviews', 'ReviewController@manageReviews');
+
 $router->addRoute('/admin/dashboard/users', 'UserController@manageUsers');
 $router->addRoute('/admin/dashboard/users/activate/{id}', 'UserController@activateUser');
 $router->addRoute('/admin/dashboard/users/deactivate/{id}', 'UserController@deactivateUser');

@@ -270,14 +270,25 @@ class CategoryController
         return isset($_SESSION['user_id']) && isset($_SESSION['role']);
     }
 
-    protected function requireLogin(string $requiredRole = null): void
+    protected function requireLogin($requiredRoles = null): void
     {
         if (!$this->isLoggedIn()) {
             $this->redirect('/login');
+            exit;
         }
 
-        if ($requiredRole && $_SESSION['role'] !== $requiredRole) {
-            $this->redirect('/unauthorized');
+        if ($requiredRoles) {
+            if (is_array($requiredRoles)) {
+                if (!in_array($_SESSION['role'], $requiredRoles)) {
+                    $this->redirect('/unauthorized');
+                    exit;
+                }
+            } else {
+                if ($_SESSION['role'] !== $requiredRoles) {
+                    $this->redirect('/unauthorized');
+                    exit;
+                }
+            }
         }
     }
 

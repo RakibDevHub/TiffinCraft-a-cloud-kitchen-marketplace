@@ -6,6 +6,33 @@ use Exception;
 
 class Review
 {
+    public static function getAllReviews($conn)
+    {
+        $query = "
+        SELECT 
+            pr.review_id,
+            pr.user_id,
+            pr.comments,
+            pr.rating,
+            pr.status,
+            pr.created_at,
+            u.name AS reviewer_name,
+            u.profile_image AS reviewer_image
+        FROM platform_reviews pr
+        JOIN users u ON pr.user_id = u.user_id
+        ORDER BY pr.created_at DESC
+    ";
+        $stmt = oci_parse($conn, $query);
+        oci_execute($stmt);
+
+        $reviews = [];
+        while ($row = oci_fetch_assoc($stmt)) {
+            $reviews[] = self::processData($row);
+        }
+        oci_free_statement($stmt);
+        return $reviews;
+    }
+
     public static function getPlatFormReviews($conn)
     {
         $query = "
@@ -21,7 +48,7 @@ class Review
         JOIN users u ON pr.user_id = u.user_id
         WHERE pr.status = 'active'
         ORDER BY pr.created_at DESC
-        FETCH FIRST 3 ROWS ONLY
+        FETCH FIRST 5 ROWS ONLY
     ";
 
         $stmt = oci_parse($conn, $query);
@@ -29,7 +56,6 @@ class Review
 
         $reviews = [];
         while ($row = oci_fetch_assoc($stmt)) {
-
             $reviews[] = self::processData($row);
         }
 
@@ -65,6 +91,17 @@ class Review
         $result = oci_execute($stmt);
         oci_free_statement($stmt);
         return $result;
+    }
+
+    public static function updateStatus($conn, $reviewId, $status)
+    {
+        $query = "UPDATE platform_reviews SET status = :status WHERE review_id = :review_id";
+        $stmt = oci_parse($conn, $query);
+        oci_bind_by_name($stmt, ':status', $status);
+        oci_bind_by_name($stmt, ':review_id', $reviewId);
+        $res = oci_execute($stmt);
+        oci_free_statement($stmt);
+        return $res;
     }
 
     private static function processData(array $row)

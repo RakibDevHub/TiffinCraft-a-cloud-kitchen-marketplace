@@ -308,7 +308,7 @@ ob_start();
                 <h2 class="text-3xl font-bold text-gray-800 mb-3">What Our Users Say</h2>
                 <p class="text-gray-600">Loved by both home cooks and food lovers across Bangladesh</p>
             </div>
-            
+
             <!-- First Row -->
             <?php if (!empty($firstRow)): ?>
                 <div
@@ -382,6 +382,7 @@ ob_start();
                 <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow">
                     <h3 class="text-xl font-semibold mb-4 text-gray-800">Share Your Experience</h3>
                     <form action="/reviews" method="POST">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                         <label for="rating" class="block text-sm font-medium text-gray-700 mb-1">Your Rating</label>
                         <select name="rating" id="rating" required
                             class="w-full mb-4 px-4 py-2 border rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500">

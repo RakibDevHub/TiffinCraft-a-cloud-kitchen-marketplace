@@ -3,6 +3,7 @@ namespace App\Controllers;
 
 use App\Core\Database;
 use App\Models\Review;
+use Exception;
 
 class ReviewController
 {
@@ -13,11 +14,33 @@ class ReviewController
         $this->conn = Database::getConnection();
     }
 
+    public function manageReviews()
+    {
+        $this->requireLogin('admin');
+
+        try {
+
+            $this->renderView('admin/reviews', [
+                'reviews' => Review::getAllReviews($this->conn),
+                'success' => $this->getFlash('success'),
+                'error' => $this->getFlash('error'),
+            ]);
+        } catch (Exception $e) {
+            error_log('Failed to load reviews: ' . $e->getMessage());
+            $this->renderView('admin/reviews', [
+                'error' => 'Failed to load reviews: ' . $e->getMessage(),
+                'reviews' => []
+            ]);
+        }
+
+    }
+
     public function addReview()
     {
-        $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['role']);
+        $this->requireLogin(['seller', 'buyer']);
+        $this->validateCsrf();
 
-        if ($isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userId = $_SESSION['user_id'];
             $role = $_SESSION['role'];
             $rating = intval($_POST['rating'] ?? 0);
@@ -39,6 +62,74 @@ class ReviewController
             $this->redirect('/#testimonials');
         }
 
+    }
+
+    public function updateReviewStatus()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['review_id'] ?? null;
+            $newStatus = $_POST['status'] ?? null;
+            if ($id && in_array($newStatus, ['pending', 'active', 'hidden'])) {
+                $result = Review::updateStatus($this->conn, $id, $newStatus);
+                $_SESSION['toast']['message'] = $result ? "Review updated." : "Failed to update review.";
+            }
+            $this->redirect('/admin/reviews');
+        }
+    }
+
+
+    protected function isLoggedIn(): bool
+    {
+        return isset($_SESSION['user_id']) && isset($_SESSION['role']);
+    }
+
+    protected function requireLogin($requiredRoles = null): void
+    {
+        if (!$this->isLoggedIn()) {
+            $this->redirect('/login');
+            exit;
+        }
+
+        if ($requiredRoles) {
+            if (is_array($requiredRoles)) {
+                if (!in_array($_SESSION['role'], $requiredRoles)) {
+                    $this->redirect('/unauthorized');
+                    exit;
+                }
+            } else {
+                if ($_SESSION['role'] !== $requiredRoles) {
+                    $this->redirect('/unauthorized');
+                    exit;
+                }
+            }
+        }
+    }
+
+    protected function validateCsrf(): void
+    {
+        if (
+            $_SERVER['REQUEST_METHOD'] !== 'POST' ||
+            !isset($_POST['csrf_token']) ||
+            !Helper::validateCsrfToken($_POST['csrf_token'])
+        ) {
+            $this->setFlash('error', "Invalid or missing CSRF token.");
+            $this->redirect("/admin/categories");
+        }
+    }
+
+    protected function setFlash(string $type, string $message): void
+    {
+        $_SESSION['flash'][$type] = $message;
+    }
+
+    protected function getFlash(string $type): ?string
+    {
+        if (isset($_SESSION['flash'][$type])) {
+            $message = $_SESSION['flash'][$type];
+            unset($_SESSION['flash'][$type]);
+            return $message;
+        }
+        return null;
     }
 
     protected function redirect(string $url): void

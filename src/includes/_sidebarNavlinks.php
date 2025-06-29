@@ -21,14 +21,15 @@ $isBusinessView = strpos($requestUri, '/business') !== false;
                 <div class="border-t border-gray-200">
                     <a href="/"
                         class="bg-orange-50 border-orange-500 text-orange-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200 ease-in-out">Home</a>
-                    <a href="#dishes"
+                    <a href="/dishes"
                         class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200 ease-in-out">Delicious
                         Dishes</a>
-                    <a href="#kitchens"
-                        class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200 ease-in-out">Kitchens</a>
-                    <a href="#how-it-works"
-                        class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200 ease-in-out">How
-                        It Works</a>
+                    <a href="/kitchens"
+                        class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200 ease-in-out">Browse
+                        Kitchens</a>
+                    <a href="/contact"
+                        class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200 ease-in-out">Contact
+                        Us</a>
                 </div>
             <?php endif; ?>
 
@@ -97,9 +98,9 @@ $isBusinessView = strpos($requestUri, '/business') !== false;
                             <a href="/admin/dashboard/categories"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Manage
                                 Categories</a>
-                            <a href="/admin/dashboard/dishes"
+                            <a href="/admin/dashboard/reviews"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">Manage
-                                Dishes</a>
+                                Reviews</a>
                             <a href="/admin/dashboard/orders"
                                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-orange-50 border-l-4 hover:border-orange-500 transition-colors duration-200 ease-in-out">View
                                 All Orders</a>

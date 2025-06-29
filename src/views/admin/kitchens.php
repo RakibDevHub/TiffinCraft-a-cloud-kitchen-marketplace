@@ -53,7 +53,7 @@ ob_start();
 
 
 
-<!-- Toast Messages -->
+<!-- Flash Messages -->
 <?php if ($success): ?>
     <div id="toast-success"
         class="fixed top-12 right-6 flex items-center w-full max-w-xs p-4 mb-4 text-green-700 bg-white border border-green-200 rounded-lg shadow-md z-50"

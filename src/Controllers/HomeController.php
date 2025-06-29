@@ -1,13 +1,10 @@
 <?php
 namespace App\Controllers;
 
-use App\Models\Menu;
 use Exception;
 use App\Core\Database;
 use App\Models\Category;
-use App\Models\User;
 use App\Models\Kitchen;
-use App\Models\ServiceArea;
 use App\Models\Review;
 
 class HomeController
