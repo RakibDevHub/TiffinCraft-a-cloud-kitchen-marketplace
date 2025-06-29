@@ -2,8 +2,14 @@
 $pageTitle = "TiffinCraft";
 $categories = $data['categories'] ?? [];
 $kitchens = $data['kitchens'] ?? [];
+$platform_reviews = $data['platform_reviews'] ?? [];
+
+$total = count($platform_reviews);
+$firstRow = array_slice($platform_reviews, 0, min(3, $total));
+$secondRow = $total > 3 ? array_slice($platform_reviews, 3, 2) : [];
 
 $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['role']);
+$role = $_SESSION['role'] ?? null;
 
 ob_start();
 ?>
@@ -34,10 +40,10 @@ ob_start();
 </section>
 
 <!-- Value Proposition Cards -->
-<section class="py-16 bg-white">
-    <div class="container mx-auto px-4">
+<section class="py-16 bg-orange-50 mt-[-56px]">
+    <div class="py-10 container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <div class="bg-orange-50 p-8 rounded-xl text-center">
+            <div class="bg-white p-8 rounded-xl text-center">
                 <div class="bg-orange-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-500" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
@@ -49,7 +55,7 @@ ob_start();
                 <p class="text-gray-600">Fresh meals delivered in under 45 minutes</p>
             </div>
 
-            <div class="bg-orange-50 p-8 rounded-xl text-center">
+            <div class="bg-white p-8 rounded-xl text-center">
                 <div class="bg-orange-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-500" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
@@ -61,7 +67,7 @@ ob_start();
                 <p class="text-gray-600">All home chefs pass rigorous quality checks</p>
             </div>
 
-            <div class="bg-orange-50 p-8 rounded-xl text-center">
+            <div class="bg-white p-8 rounded-xl text-center">
                 <div class="bg-orange-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-500" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
@@ -74,11 +80,13 @@ ob_start();
             </div>
         </div>
     </div>
+    <?php $color = '#F9FAFB';
+    include BASE_PATH . '/src/includes/shape-divider.php' ?>
 </section>
 
 <!-- Featured Categories -->
 <section id="explore" class="py-16 bg-gray-50">
-    <div class="container mx-auto px-4">
+    <div class="py-10 container mx-auto px-4">
         <div class="text-center mb-12">
             <h2 class="text-3xl font-bold text-gray-800 mb-3">Explore Our Menu Categories</h2>
             <p class="text-gray-600 max-w-2xl mx-auto">From traditional thalis to regional specialties, discover
@@ -110,11 +118,12 @@ ob_start();
             <?php endforeach; ?>
         </div>
     </div>
-    <?php include BASE_PATH . '/src/includes/shape-divider.php' ?>
+    <?php $color = '#FFF7ED';
+    include BASE_PATH . '/src/includes/shape-divider.php' ?>
 </section>
 
 <!-- Local Cooks -->
-<section class="py-16 bg-white">
+<section class="py-16 bg-orange-50">
     <div class="container mx-auto px-4">
         <div class="text-center mb-10">
             <?php if ($hasRatings): ?>
@@ -127,7 +136,7 @@ ob_start();
 
         <!-- Swiper -->
         <!-- <div class="relative max-w-6xl mx-auto"> -->
-        <div class="swiper myKitchensSwiper relative max-w-6xl mx-auto">
+        <div class="swiper myKitchensSwiper relative max-w-6xl mx-auto pb-4">
             <div class="swiper-wrapper">
                 <?php foreach ($kitchens as $kitchen): ?>
                     <div class="swiper-slide">
@@ -223,17 +232,19 @@ ob_start();
         </div>
         <!-- </div> -->
 
-        <div class="text-center mt-2">
+        <div class="text-center mt-8">
             <a href="/kitchens"
                 class="inline-block bg-orange-500 text-white font-semibold py-3 px-8 rounded-lg hover:bg-orange-600 transition">
                 View All Kitchens
             </a>
         </div>
     </div>
+    <?php $color = '#F9FAFB';
+    include BASE_PATH . '/src/includes/shape-divider.php' ?>
 </section>
 
 <!-- How It Works -->
-<section id="how-it-works" class="py-16 bg-white">
+<section id="how-it-works" class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
         <div class="text-center mb-12">
             <h2 class="text-3xl font-bold text-gray-800 mb-3">How TiffinCraft Works</h2>
@@ -275,87 +286,144 @@ ob_start();
             </div>
         </div>
     </div>
+    <?php $color = '#FFF7ED';
+    include BASE_PATH . '/src/includes/shape-divider.php' ?>
 </section>
 
 <!-- Testimonials -->
 <section class="py-16 bg-orange-50">
-    <div class="container mx-auto px-4">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-gray-800 mb-3">What Our Customers Say</h2>
-            <p class="text-gray-600">Thousands of satisfied customers across Bangladesh</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div class="bg-white p-8 rounded-xl shadow-md">
-                <div class="flex items-center mb-4">
-                    <img src="/assets/images/customer1.jpg" alt="Customer"
-                        class="w-12 h-12 rounded-full object-cover mr-4">
-                    <div>
-                        <h4 class="font-semibold">Ananya Patel</h4>
-                        <div class="flex">
-                            <span class="text-yellow-400">★</span>
-                            <span class="text-yellow-400">★</span>
-                            <span class="text-yellow-400">★</span>
-                            <span class="text-yellow-400">★</span>
-                            <span class="text-yellow-400">★</span>
-                        </div>
-                    </div>
-                </div>
-                <p class="text-gray-600">"As a working professional, TiffinCraft has been a lifesaver. The food tastes
-                    just like home and arrives piping hot. I've discovered amazing home chefs in my area!"</p>
+    <div class="container mx-auto px-4 flex flex-col gap-10">
+        <?php if (!$platform_reviews): ?>
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-gray-800 mb-3">What Our Users Say</h2>
+                <p class="text-gray-600">Loved by both home cooks and food lovers across Bangladesh</p>
             </div>
 
-            <div class="bg-white p-8 rounded-xl shadow-md">
-                <div class="flex items-center mb-4">
-                    <img src="/assets/images/customer2.jpg" alt="Customer"
-                        class="w-12 h-12 rounded-full object-cover mr-4">
-                    <div>
-                        <h4 class="font-semibold">Rahul Sharma</h4>
-                        <div class="flex">
-                            <span class="text-yellow-400">★</span>
-                            <span class="text-yellow-400">★</span>
-                            <span class="text-yellow-400">★</span>
-                            <span class="text-yellow-400">★</span>
-                            <span class="text-yellow-400">★</span>
+            <!-- <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto py-12 border-b">
+                <?php foreach ($platform_reviews as $review): ?>
+                    <div class="bg-white p-8 rounded-xl shadow-md">
+                        <div class="flex items-center mb-4">
+                            <img src="/assets/images/customer1.jpg" alt="Customer"
+                                class="w-12 h-12 rounded-full object-cover mr-4">
+                            <div>
+                                <h4 class="font-semibold">Ananya Patel</h4>
+                                <div class="flex">
+                                    <span class="text-yellow-400">★</span>
+                                    <span class="text-yellow-400">★</span>
+                                    <span class="text-yellow-400">★</span>
+                                    <span class="text-yellow-400">★</span>
+                                    <span class="text-yellow-400">★</span>
+                                </div>
+                            </div>
                         </div>
+                        <p class="text-gray-600">"As a working professional, TiffinCraft has been a lifesaver. The food tastes
+                            just like home and arrives piping hot. I've discovered amazing home chefs in my area!"</p>
+                    </div>
+                <?php endforeach ?>
+            </div> -->
+
+            <!-- First Row -->
+            <?php if (!empty($firstRow)): ?>
+                <div
+                    class="grid grid-cols-1 md:grid-cols-<?= count($firstRow) ?> gap-8 max-w-5xl mx-auto py-12 <?= empty($secondRow) ? '' : 'border-b' ?>">
+                    <?php foreach ($firstRow as $review): ?>
+                        <div class="bg-white p-8 rounded-xl shadow-md">
+                            <div class="flex items-center mb-4">
+                                <img src="<?= htmlspecialchars($review['reviewer_image'] ?? '/assets/images/default-user.png') ?>"
+                                    alt="Customer" class="w-12 h-12 rounded-full object-cover mr-4">
+                                <div>
+                                    <h4 class="font-semibold"><?= htmlspecialchars($review['reviewer_name']) ?></h4>
+                                    <div class="flex">
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <span class="<?= $i <= $review['rating'] ? 'text-yellow-400' : 'text-gray-300' ?>">★</span>
+                                        <?php endfor; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-gray-600">"<?= htmlspecialchars($review['comments']) ?>"</p>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Second Row -->
+            <?php if (!empty($secondRow)): ?>
+                <div class="grid grid-cols-1 md:grid-cols-<?= count($secondRow) ?> gap-8 max-w-3xl mx-auto py-12">
+                    <?php foreach ($secondRow as $review): ?>
+                        <div class="bg-white p-8 rounded-xl shadow-md">
+                            <div class="flex items-center mb-4">
+                                <img src="<?= htmlspecialchars($review['reviewer_image'] ?? '/assets/images/default-user.png') ?>"
+                                    alt="Customer" class="w-12 h-12 rounded-full object-cover mr-4">
+                                <div>
+                                    <h4 class="font-semibold"><?= htmlspecialchars($review['reviewer_name']) ?></h4>
+                                    <div class="flex">
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <span class="<?= $i <= $review['rating'] ? 'text-yellow-400' : 'text-gray-300' ?>">★</span>
+                                        <?php endfor; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-gray-600">"<?= htmlspecialchars($review['comments']) ?>"</p>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+        <?php endif; ?>
+
+
+        <!-- <div class="bg-white p-8 rounded-xl shadow-md">
+            <div class="flex items-center mb-4">
+                <img src="/assets/images/customer2.jpg" alt="Customer" class="w-12 h-12 rounded-full object-cover mr-4">
+                <div>
+                    <h4 class="font-semibold">Rahul Sharma</h4>
+                    <div class="flex">
+                        <span class="text-yellow-400">★</span>
+                        <span class="text-yellow-400">★</span>
+                        <span class="text-yellow-400">★</span>
+                        <span class="text-yellow-400">★</span>
+                        <span class="text-yellow-400">★</span>
                     </div>
                 </div>
-                <p class="text-gray-600">"I love the variety of regional cuisines available. The portion sizes are
-                    generous and the prices are very reasonable compared to restaurants. Highly recommended!"</p>
             </div>
-        </div>
-        <?php if ($isLoggedIn): ?>
-            <div class="max-w-2xl mx-auto mt-16 bg-white p-6 rounded-xl shadow">
-                <h3 class="text-xl font-semibold mb-4 text-gray-800">Share Your Experience</h3>
-                <form action="/submit_platform_review.php" method="POST">
-                    <label for="rating" class="block text-sm font-medium text-gray-700 mb-1">Your Rating</label>
-                    <select name="rating" id="rating" required
-                        class="w-full mb-4 px-4 py-2 border rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500">
-                        <option value="">Select rating</option>
-                        <?php for ($i = 5; $i >= 1; $i--): ?>
-                            <option value="<?= $i ?>"><?= $i ?> Star<?= $i > 1 ? 's' : '' ?></option>
-                        <?php endfor; ?>
-                    </select>
+            <p class="text-gray-600">"I love the variety of regional cuisines available. The portion sizes are
+                generous and the prices are very reasonable compared to restaurants. Highly recommended!"</p>
+        </div> -->
 
-                    <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Your Comment</label>
-                    <textarea name="comment" id="comment" rows="4" required
-                        class="w-full mb-4 px-4 py-2 border rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
-                        placeholder="Write your experience with TiffinCraft..."></textarea>
-
-                    <button type="submit"
-                        class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md font-medium text-sm">
-                        Submit Review
-                    </button>
-                </form>
+        <?php if ($isLoggedIn && ($role === 'buyer' || $role === 'seller')): ?>
+            <div class="w-full">
+                <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Share Your Experience</h3>
+                    <form action="/reviews" method="POST">
+                        <label for="rating" class="block text-sm font-medium text-gray-700 mb-1">Your Rating</label>
+                        <select name="rating" id="rating" required
+                            class="w-full mb-4 px-4 py-2 border rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500">
+                            <option value="">Select rating</option>
+                            <?php for ($i = 5; $i >= 1; $i--): ?>
+                                <option value="<?= $i ?>"><?= $i ?> Star<?= $i > 1 ? 's' : '' ?></option>
+                            <?php endfor; ?>
+                        </select>
+    
+                        <label for="comments" class="block text-sm font-medium text-gray-700 mb-1">Your Comment</label>
+                        <textarea name="comments" id="comments" rows="4" required
+                            class="w-full mb-4 px-4 py-2 border rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
+                            placeholder="Write your experience with TiffinCraft..."></textarea>
+    
+                        <button type="submit"
+                            class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md font-medium text-sm">
+                            Submit Review
+                        </button>
+                    </form>
+                </div>
             </div>
         <?php endif ?>
     </div>
-    <?php $color = '#ffffff';
+    <?php $color = '#F9FAFB';
     include BASE_PATH . '/src/includes/shape-divider.php' ?>
 </section>
 
 <!-- App Download CTA -->
-<section class="py-16 bg-white">
+<section class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
         <div
             class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-8 md:p-12 flex flex-col md:flex-row items-center">
@@ -391,21 +459,22 @@ ob_start();
         </div>
     </div>
     <!-- Shape Divider -->
-    <?php $color = '#f97316';
-    include BASE_PATH . '/src/includes/shape-divider.php' ?>
+
 </section>
 
 <!-- Final CTA -->
-<section class="bg-orange-500 py-16 text-center text-white">
+<section class="bg-gray-50 py-16 text-center text-gray-700">
     <div class="container mx-auto px-4">
         <h2 class="text-3xl font-bold mb-6">Ready to Experience Homemade Goodness?</h2>
-        <p class="text-orange-100 text-xl mb-8 max-w-2xl mx-auto">Join thousands of happy customers enjoying authentic
+        <p class="text-gray-500 text-xl mb-8 max-w-2xl mx-auto">Join thousands of happy customers enjoying authentic
             home-cooked meals today</p>
         <a href="#explore"
-            class="inline-block bg-white text-orange-500 font-semibold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105 hover:bg-gray-100">
+            class="inline-block bg-orange-500 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105 hover:bg-gray-100">
             Order Now
         </a>
     </div>
+    <?php $color = '#FFFBEB';
+    include BASE_PATH . '/src/includes/shape-divider.php' ?>
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>

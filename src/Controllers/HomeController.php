@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\User;
 use App\Models\Kitchen;
 use App\Models\ServiceArea;
+use Src\Models\Review;
 
 class HomeController
 {
@@ -25,6 +26,7 @@ class HomeController
             $categories = Category::getAllCategories($this->conn);
             $kitchenType = 'top';
             $result = Kitchen::getKitchensForHomePage($this->conn, $kitchenType, 10);
+            $reviews = Review::getPlatFormReviews($this->conn);
 
             if (empty($result['kitchens']) || !$result['hasRatings']) {
                 $kitchenType = 'newest';
@@ -36,6 +38,7 @@ class HomeController
                 'categories' => $categories ?? [],
                 'kitchens' => $result['kitchens'] ?? [],
                 'hasRatings' => $result['hasRatings'] ?? false,
+                'platform_reviews' => $reviews ?? [],
                 'error' => null
             ]);
 
@@ -47,6 +50,7 @@ class HomeController
                 'categories' => [],
                 'kitchens' => [],
                 'hasRatings' => false,
+                'platform_reviews' => [],
                 'error' => 'Failed to load categories. Please try again later.'
             ]);
         }

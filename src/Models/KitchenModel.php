@@ -191,15 +191,16 @@ class Kitchen
 
         $result = [];
         while ($row = oci_fetch_assoc($stmt)) {
-            if (!empty($row['SUSPENDED_UNTIL'])) {
-                $row['SUSPENDED_UNTIL'] = self::processOracleDate($row['SUSPENDED_UNTIL']);
-            }
+            // if (!empty($row['SUSPENDED_UNTIL'])) {
+            //     $row['SUSPENDED_UNTIL'] = self::processOracleDate($row['SUSPENDED_UNTIL']);
+            // }
             $result[] = self::processKitchenData($row);
         }
 
         oci_free_statement($stmt);
         return $result;
     }
+
     public static function getTotalFilteredCount($conn, $filters = [])
     {
         $query = "

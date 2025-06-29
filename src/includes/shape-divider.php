@@ -2,7 +2,7 @@
 $color = $color ?? ' #ffffff';
 $rotate = $rotate ?? ' rotate-180';
 $bottom = $bottom ?? ' bottom-[-64px]';
-$bg = $bg ?? ' ';
+$bg = $bg ?? '';
 ?>
 
 <div class="relative left-0 w-full overflow-hidden leading-[0] <?= $bottom,

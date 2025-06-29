@@ -18,12 +18,14 @@ require_once BASE_PATH . '/src/controllers/AuthController.php';
 require_once BASE_PATH . '/src/controllers/MenuController.php';
 require_once BASE_PATH . '/src/controllers/ErrorController.php';
 require_once BASE_PATH . '/src/controllers/CategoryController.php';
+require_once BASE_PATH . '/src/controllers/ReviewController.php';
 
 require_once BASE_PATH . '/src/Models/UserModel.php';
 require_once BASE_PATH . '/src/Models/KitchenModel.php';
 require_once BASE_PATH . '/src/Models/ServiceAreaModel.php';
 require_once BASE_PATH . '/src/Models/MenuModel.php';
 require_once BASE_PATH . '/src/Models/CategoryModel.php';
+require_once BASE_PATH . '/src/Models/ReviewModel.php';
 
 use App\Core\Router;
 use App\Utils\SessionHelper;
@@ -40,6 +42,7 @@ $router->addRoute('/unauthorized', 'ErrorController@unauthorizedError');
 $router->addRoute('/', 'HomeController@showBuyerHome');
 $router->addRoute('/home', 'HomeController@showBuyerHome');
 $router->addRoute('/dishes', 'MenuController@showMenuPage');
+$router->addRoute('/reviews', 'ReviewController@addReview');
 $router->addRoute('/kitchens', 'KitchenController@showKitchenPage');
 $router->addRoute('/kitchens/profile', 'KitchenController@showKitchenProfile');
 
