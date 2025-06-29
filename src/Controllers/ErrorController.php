@@ -6,8 +6,19 @@ use App\Core\Database;
 
 class ErrorController
 {
+    private $conn;
+
+    public function __construct()
+    {
+        $this->conn = Database::getConnection();
+    }
+
     public function databaseError()
     {
+        if ($this->conn) {
+            $this->renderView('buyer/home');
+        }
+
         $error = $_SESSION['database_error'] ?? [
             'message' => 'Database service unavailable',
             'details' => 'Please try again later',

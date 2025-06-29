@@ -175,7 +175,7 @@ ob_start();
                             </div>
                         <?php endif ?>
 
-                        <div class="p-5 flex flex-col flex-grow">
+                        <div class="p-4 flex flex-col flex-grow">
                             <h3 class="text-lg font-semibold text-gray-800"><?= htmlspecialchars($dish['name']) ?></h3>
                             <p class="text-sm text-gray-500 mb-2"><?= htmlspecialchars($dish['category_name']) ?></p>
 

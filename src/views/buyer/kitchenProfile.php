@@ -55,7 +55,7 @@ ob_start();
                             class="fas fa-map-marker-alt text-orange-500 mr-1"></i><?= htmlspecialchars($kitchen['address']) ?>
                     </p>
                     <?php if (!empty($kitchen['service_areas'])): ?>
-                        <p><i class="fas fa-person-biking text-green-500 mr-1"></i>Delivers to:
+                        <p><i class="fas fa-person-biking text-green-500 mr-1"></i>Service areas:
                             <?= htmlspecialchars($kitchen['service_areas']) ?>
                         </p>
                     <?php endif; ?>

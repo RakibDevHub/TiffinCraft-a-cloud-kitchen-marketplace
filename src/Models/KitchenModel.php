@@ -371,8 +371,6 @@ class Kitchen
         return $kitchens;
     }
 
-    
-
     public static function getKitchenByOwnerId($conn, int $userId): ?array
     {
         $stmt = oci_parse($conn, self::GET_KITCHEN_BY_OWNER_ID);
@@ -474,14 +472,13 @@ class Kitchen
     {
         $kitchen = array_change_key_case($row, CASE_LOWER);
 
-        // Process description (COLOB)
+        // Process description
         $kitchen['description'] = self::processCOLOB($kitchen['description'] ?? '');
 
         // Process dates
         $kitchen['created_at'] = self::processOracleDate($kitchen['created_at'] ?? '');
         $kitchen['suspended_until'] = self::processOracleDate($kitchen['suspended_until'] ?? '');
 
-        // Convert numeric strings
         if (isset($kitchen['is_approved'])) {
             $kitchen['is_approved'] = (int) $kitchen['is_approved'];
         }

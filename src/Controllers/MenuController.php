@@ -3,7 +3,6 @@ namespace App\Controllers;
 
 use App\Core\Database;
 use App\Models\Category;
-use App\Models\Kitchen;
 use App\Models\Menu;
 use App\Models\ServiceArea;
 use App\Utils\Helper;
@@ -30,7 +29,7 @@ class MenuController
                 'search' => $_GET['search'] ?? null,
                 'location' => $_GET['location'] ?? null,
                 'price_sort' => $_GET['price_sort'] ?? null,
-                
+
                 'per_page' => $perPage,
                 'page' => $page
             ];
@@ -269,37 +268,6 @@ class MenuController
         }
 
     }
-
-    // public function toggleAvailability($itemId)
-    // {
-    //     $this->requireLogin('seller');
-    //     $this->validateCsrf();
-
-    //     try {
-    //         if (empty($itemId) || !is_numeric($itemId)) {
-    //             throw new Exception('Invalid item ID');
-    //         }
-
-    //         $ownerId = $_SESSION['user_id'];
-    //         if (!Menu::isOwner($this->conn, $itemId, $ownerId)) {
-    //             throw new Exception('You are not authorized to modify this item');
-    //         }
-
-    //         $currentStatus = Menu::getAvailability($this->conn, $itemId);
-    //         $newStatus = $currentStatus ? 0 : 1;
-
-    //         if (Menu::update($this->conn, $itemId, ['available' => $newStatus])) {
-    //             $this->setFlash('success', 'Availability updated successfully');
-    //         } else {
-    //             throw new Exception('Failed to update availability');
-    //         }
-    //     } catch (Exception $e) {
-    //         $this->setFlash('error', $e->getMessage());
-    //     }
-
-    //     $this->redirect('/business/dashboard/menu');
-    // }
-
 
     protected function validateName(string $name): string
     {

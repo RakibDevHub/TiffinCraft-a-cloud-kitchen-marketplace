@@ -45,11 +45,6 @@
 
                 <div class="text-center text-sm text-gray-600">
                     <p>Our technical team has been notified. Please try again later.</p>
-                    <p class="mt-4">
-                        <a href="/" class="text-orange-600 hover:text-orange-500">
-                            <i class="fas fa-arrow-left mr-1"></i> Return to homepage
-                        </a>
-                    </p>
                 </div>
             </div>
         </div>

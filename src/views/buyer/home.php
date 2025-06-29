@@ -2,6 +2,9 @@
 $pageTitle = "TiffinCraft";
 $categories = $data['categories'] ?? [];
 $kitchens = $data['kitchens'] ?? [];
+
+$isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['role']);
+
 ob_start();
 ?>
 
@@ -279,10 +282,10 @@ ob_start();
     <div class="container mx-auto px-4">
         <div class="text-center mb-12">
             <h2 class="text-3xl font-bold text-gray-800 mb-3">What Our Customers Say</h2>
-            <p class="text-gray-600">Thousands of satisfied customers across India</p>
+            <p class="text-gray-600">Thousands of satisfied customers across Bangladesh</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div class="bg-white p-8 rounded-xl shadow-md">
                 <div class="flex items-center mb-4">
                     <img src="/assets/images/customer1.jpg" alt="Customer"
@@ -321,6 +324,31 @@ ob_start();
                     generous and the prices are very reasonable compared to restaurants. Highly recommended!"</p>
             </div>
         </div>
+        <?php if ($isLoggedIn): ?>
+            <div class="max-w-2xl mx-auto mt-16 bg-white p-6 rounded-xl shadow">
+                <h3 class="text-xl font-semibold mb-4 text-gray-800">Share Your Experience</h3>
+                <form action="/submit_platform_review.php" method="POST">
+                    <label for="rating" class="block text-sm font-medium text-gray-700 mb-1">Your Rating</label>
+                    <select name="rating" id="rating" required
+                        class="w-full mb-4 px-4 py-2 border rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500">
+                        <option value="">Select rating</option>
+                        <?php for ($i = 5; $i >= 1; $i--): ?>
+                            <option value="<?= $i ?>"><?= $i ?> Star<?= $i > 1 ? 's' : '' ?></option>
+                        <?php endfor; ?>
+                    </select>
+
+                    <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Your Comment</label>
+                    <textarea name="comment" id="comment" rows="4" required
+                        class="w-full mb-4 px-4 py-2 border rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
+                        placeholder="Write your experience with TiffinCraft..."></textarea>
+
+                    <button type="submit"
+                        class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md font-medium text-sm">
+                        Submit Review
+                    </button>
+                </form>
+            </div>
+        <?php endif ?>
     </div>
     <?php $color = '#ffffff';
     include BASE_PATH . '/src/includes/shape-divider.php' ?>

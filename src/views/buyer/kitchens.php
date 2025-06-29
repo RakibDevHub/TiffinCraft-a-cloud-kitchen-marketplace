@@ -176,7 +176,7 @@ ob_start();
                         </div>
 
                         <!-- Content -->
-                        <div class="p-5 flex flex-col flex-grow">
+                        <div class="p-4 flex flex-col flex-grow justify-between">
                             <div class="space-y-2">
                                 <!-- Name and Owner -->
                                 <div>
@@ -194,36 +194,38 @@ ob_start();
                                 </p>
                             </div>
 
-                            <!-- Service Areas -->
-                            <?php if (!empty($kitchen['service_areas'])): ?>
-                                <div class="mt-4 pt-3 border-t border-gray-100">
-                                    <p class="text-xs text-gray-500 flex items-center">
-                                        <i class="fa-solid fa-person-biking text-orange-500 mr-1"></i>
-                                        <span class="line-clamp-1" title="<?= htmlspecialchars($kitchen['service_areas']) ?>">
-                                            <?= htmlspecialchars($kitchen['service_areas']) ?>
-                                        </span>
-                                    </p>
-                                </div>
-                            <?php endif; ?>
-
-                            <!-- Footer -->
-                            <div class="mt-auto pt-3">
-                                <div class="flex justify-between items-center">
-                                    <!-- Address -->
-                                    <?php if (!empty($kitchen['address'])): ?>
-                                        <p class="text-xs text-gray-500 flex items-center max-w-[130px]">
-                                            <i class="fa-solid fa-location-dot mr-1"></i>
-                                            <span class="line-clamp-1" title="<?= htmlspecialchars($kitchen['address']) ?>">
-                                                <?= htmlspecialchars($kitchen['address']) ?>
+                            <div class="">
+                                <!-- Service Areas -->
+                                <?php if (!empty($kitchen['service_areas'])): ?>
+                                    <div class="mt-2 pt-2 border-t border-gray-100">
+                                        <p class="text-xs text-gray-500 flex items-center">
+                                            <i class="fa-solid fa-person-biking text-orange-500 mr-1"></i>
+                                            <span class="line-clamp-1" title="<?= htmlspecialchars($kitchen['service_areas']) ?>">
+                                                <?= htmlspecialchars($kitchen['service_areas']) ?>
                                             </span>
                                         </p>
-                                    <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
 
-                                    <!-- View Button -->
-                                    <a href="/kitchens/profile?view=<?= $kitchen['kitchen_id'] ?>"
-                                        class="px-4 py-2 bg-orange-500 text-white rounded-md text-sm hover:bg-orange-600">
-                                        View Menu
-                                    </a>
+                                <!-- Footer -->
+                                <div class="mt-auto pt-2">
+                                    <div class="flex justify-between items-center">
+                                        <!-- Address -->
+                                        <?php if (!empty($kitchen['address'])): ?>
+                                            <p class="text-xs text-gray-500 flex items-center max-w-[130px]">
+                                                <i class="fa-solid fa-location-dot mr-1"></i>
+                                                <span class="line-clamp-1" title="<?= htmlspecialchars($kitchen['address']) ?>">
+                                                    <?= htmlspecialchars($kitchen['address']) ?>
+                                                </span>
+                                            </p>
+                                        <?php endif; ?>
+
+                                        <!-- View Button -->
+                                        <a href="/kitchens/profile?view=<?= $kitchen['kitchen_id'] ?>"
+                                            class="px-4 py-2 bg-orange-500 text-white rounded-md text-sm hover:bg-orange-600">
+                                            View Menu
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
