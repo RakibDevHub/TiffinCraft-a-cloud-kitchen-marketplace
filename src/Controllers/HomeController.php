@@ -8,7 +8,7 @@ use App\Models\Category;
 use App\Models\User;
 use App\Models\Kitchen;
 use App\Models\ServiceArea;
-use Src\Models\Review;
+use App\Models\Review;
 
 class HomeController
 {

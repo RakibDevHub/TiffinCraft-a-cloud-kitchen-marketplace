@@ -14,6 +14,16 @@ $role = $_SESSION['role'] ?? null;
 ob_start();
 ?>
 
+<?php if (isset($_SESSION['toast'])): ?>
+    <div
+        class="fixed bottom-5 right-5 bg-white px-6 py-3 rounded shadow-md border-l-4 z-50
+        <?= $_SESSION['toast']['type'] === 'success' ? 'border-green-500 text-green-600' : 'border-red-500 text-red-600' ?>">
+        <?= htmlspecialchars($_SESSION['toast']['message']) ?>
+    </div>
+    <?php unset($_SESSION['toast']); ?>
+<?php endif; ?>
+
+
 <!-- Hero Section with Value Proposition -->
 <section
     class="relative top-[-56px] h-screen flex items-center justify-center bg-cover bg-center bg-[url(/assets/images/HeroBG.jpeg)]">
@@ -291,37 +301,14 @@ ob_start();
 </section>
 
 <!-- Testimonials -->
-<section class="py-16 bg-orange-50">
+<section id="testimonials" class="py-16 bg-orange-50">
     <div class="container mx-auto px-4 flex flex-col gap-10">
-        <?php if (!$platform_reviews): ?>
+        <?php if ($platform_reviews): ?>
             <div class="text-center">
                 <h2 class="text-3xl font-bold text-gray-800 mb-3">What Our Users Say</h2>
                 <p class="text-gray-600">Loved by both home cooks and food lovers across Bangladesh</p>
             </div>
-
-            <!-- <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto py-12 border-b">
-                <?php foreach ($platform_reviews as $review): ?>
-                    <div class="bg-white p-8 rounded-xl shadow-md">
-                        <div class="flex items-center mb-4">
-                            <img src="/assets/images/customer1.jpg" alt="Customer"
-                                class="w-12 h-12 rounded-full object-cover mr-4">
-                            <div>
-                                <h4 class="font-semibold">Ananya Patel</h4>
-                                <div class="flex">
-                                    <span class="text-yellow-400">★</span>
-                                    <span class="text-yellow-400">★</span>
-                                    <span class="text-yellow-400">★</span>
-                                    <span class="text-yellow-400">★</span>
-                                    <span class="text-yellow-400">★</span>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="text-gray-600">"As a working professional, TiffinCraft has been a lifesaver. The food tastes
-                            just like home and arrives piping hot. I've discovered amazing home chefs in my area!"</p>
-                    </div>
-                <?php endforeach ?>
-            </div> -->
-
+            
             <!-- First Row -->
             <?php if (!empty($firstRow)): ?>
                 <div
@@ -403,12 +390,12 @@ ob_start();
                                 <option value="<?= $i ?>"><?= $i ?> Star<?= $i > 1 ? 's' : '' ?></option>
                             <?php endfor; ?>
                         </select>
-    
+
                         <label for="comments" class="block text-sm font-medium text-gray-700 mb-1">Your Comment</label>
                         <textarea name="comments" id="comments" rows="4" required
                             class="w-full mb-4 px-4 py-2 border rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
                             placeholder="Write your experience with TiffinCraft..."></textarea>
-    
+
                         <button type="submit"
                             class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md font-medium text-sm">
                             Submit Review

@@ -1,5 +1,5 @@
 <?php
-namespace Src\Models;
+namespace App\Models;
 
 use DateTime;
 use Exception;
@@ -37,6 +37,18 @@ class Review
         return $reviews;
     }
 
+    public static function hasUserReviewed($conn, $userId)
+    {
+        $query = "SELECT COUNT(*) AS total FROM platform_reviews WHERE user_id = :user_id";
+        $stmt = oci_parse($conn, $query);
+        oci_bind_by_name($stmt, ':user_id', $userId);
+        oci_execute($stmt);
+
+        $row = oci_fetch_assoc($stmt);
+        oci_free_statement($stmt);
+
+        return ($row && intval($row['TOTAL']) > 0);
+    }
 
     public static function submitReview($conn, $userId, $rating, $comments)
     {
