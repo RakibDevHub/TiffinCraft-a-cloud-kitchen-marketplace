@@ -157,7 +157,6 @@ class Menu
         return $items;
     }
 
-
     public static function getTotalFilteredCount($conn, $filters = [])
     {
         $query = "
@@ -189,6 +188,133 @@ class Menu
                         AND LOWER(sa.NAME) = :location
                     )";
             $bindings[':location'] = strtolower($filters['location']);
+        }
+
+        $stmt = oci_parse($conn, $query);
+        foreach ($bindings as $param => $value) {
+            oci_bind_by_name($stmt, $param, $bindings[$param]);
+        }
+
+        if (!oci_execute($stmt)) {
+            throw new Exception("Execute error: " . oci_error($stmt)['message']);
+        }
+
+        $row = oci_fetch_assoc($stmt);
+        oci_free_statement($stmt);
+
+        return (int) $row['TOTAL'];
+    }
+
+    public static function getFilteredItemsForOwner($conn, $filters = [])
+    {
+        $innerQuery = "
+            SELECT 
+                mi.*, 
+                (
+                    SELECT LISTAGG(sa.NAME, ', ') WITHIN GROUP (ORDER BY sa.NAME)
+                    FROM KITCHEN_SERVICE_AREAS ksa
+                    JOIN SERVICE_AREAS sa ON ksa.AREA_ID = sa.AREA_ID
+                    WHERE ksa.KITCHEN_ID = mi.KITCHEN_ID
+                ) AS service_areas,
+                (
+                    SELECT ROUND(AVG(r.RATING), 1)
+                    FROM ITEM_REVIEWS r
+                    WHERE r.ITEM_ID = mi.ITEM_ID
+                ) AS avg_rating,
+                (
+                    SELECT COUNT(*)
+                    FROM ITEM_REVIEWS r
+                    WHERE r.ITEM_ID = mi.ITEM_ID
+                ) AS review_count,
+                ROWNUM AS rn
+            FROM MENU_ITEMS mi
+            JOIN KITCHENS k ON mi.KITCHEN_ID = k.KITCHEN_ID
+            JOIN CATEGORIES c ON mi.CATEGORY_ID = c.CATEGORY_ID
+            WHERE k.OWNER_ID = :owner_id
+            ";
+
+        $bindings = [':owner_id' => $filters['owner_id']];
+
+        // Apply filters in the INNER query
+        if (!empty($filters['category'])) {
+            $innerQuery .= " AND LOWER(c.NAME) = :category_name";
+            $bindings[':category_name'] = strtolower($filters['category']);
+        }
+
+        if (!empty($filters['search'])) {
+            $innerQuery .= " AND (
+            LOWER(mi.name) LIKE '%' || :search || '%' 
+            OR LOWER(mi.description) LIKE '%' || :search || '%' 
+            OR LOWER(mi.tags) LIKE '%' || :search || '%')";
+            $bindings[':search'] = strtolower($filters['search']);
+        }
+
+        // Status filter (available = public/private)
+        if ($filters['status'] === 'public') {
+            $innerQuery .= " AND mi.AVAILABLE = 1";
+        } elseif ($filters['status'] === 'private') {
+            $innerQuery .= " AND mi.AVAILABLE = 0";
+        }
+
+        // Default sorting by creation date (newest first)
+        $innerQuery .= " ORDER BY mi.CREATED_AT DESC";
+
+        // Wrap it for pagination
+        $query = "SELECT * FROM (
+        $innerQuery
+    ) subquery WHERE rn > :offset AND rn <= :limit";
+
+        $bindings[':offset'] = ($filters['page'] - 1) * $filters['per_page'];
+        $bindings[':limit'] = $filters['page'] * $filters['per_page'];
+
+        $stmt = oci_parse($conn, $query);
+        foreach ($bindings as $param => $value) {
+            oci_bind_by_name($stmt, $param, $bindings[$param]);
+        }
+
+        if (!oci_execute($stmt)) {
+            throw new Exception("Execute error: " . oci_error($stmt)['message']);
+        }
+
+        $items = [];
+        while ($row = oci_fetch_assoc($stmt)) {
+            $items[] = self::processData($row);
+        }
+
+        oci_free_statement($stmt);
+        return $items;
+    }
+
+    public static function getFilteredCountForOwner($conn, $filters = [])
+    {
+        $query = "
+            SELECT COUNT(*) AS total
+            FROM MENU_ITEMS mi
+            JOIN KITCHENS k ON mi.KITCHEN_ID = k.KITCHEN_ID
+            JOIN CATEGORIES c ON mi.CATEGORY_ID = c.CATEGORY_ID
+            WHERE k.OWNER_ID = :owner_id
+            ";
+
+        $bindings = [':owner_id' => $filters['owner_id']];
+
+        if (!empty($filters['category'])) {
+            $query .= " AND LOWER(c.NAME) = :category_name";
+            $bindings[':category_name'] = strtolower($filters['category']);
+        }
+
+        if (!empty($filters['search'])) {
+            $query .= " AND (
+            LOWER(mi.name) LIKE '%' || :search || '%' 
+            OR LOWER(mi.description) LIKE '%' || :search || '%' 
+            OR LOWER(mi.tags) LIKE '%' || :search || '%')";
+            $bindings[':search'] = strtolower($filters['search']);
+        }
+
+        // Status filter
+        if ($filters['status'] === 'public') {
+            $query .= " AND mi.AVAILABLE = 1";
+        } elseif ($filters['status'] === 'private') {
+            $query .= " AND mi.AVAILABLE = 0";
         }
 
         $stmt = oci_parse($conn, $query);

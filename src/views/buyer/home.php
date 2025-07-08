@@ -29,11 +29,13 @@ ob_start();
     class="relative top-[-56px] h-screen flex items-center justify-center bg-cover bg-center bg-[url(/assets/images/HeroBG.jpeg)]">
     <div class="absolute inset-0 bg-black bg-opacity-70"></div>
     <div class="relative text-center px-4 z-10 max-w-4xl">
-        <h1 class="text-white text-5xl md:text-6xl font-bold mb-6 leading-tight">Authentic Homemade Meals Delivered to
+        <h1 data-aos="zoom-in" data-aos-delay="0" class="text-white text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            Authentic Homemade Meals Delivered to
             Your Door</h1>
-        <p class="text-white text-xl md:text-2xl mb-8">Discover local home chefs preparing fresh, traditional meals with
+        <p data-aos="zoom-in" data-aos-delay="200" class="text-white text-xl md:text-2xl mb-8">Discover local home chefs
+            preparing fresh, traditional meals with
             love and care</p>
-        <div class="flex flex-wrap justify-center items-center gap-4">
+        <div data-aos="zoom-in" data-aos-delay="400" class="flex flex-wrap justify-center items-center gap-4">
             <a href="#explore"
                 class=" bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105">
                 Browse Our Menu
@@ -53,7 +55,7 @@ ob_start();
 <section class="py-16 bg-orange-50 mt-[-56px]">
     <div class="py-10 container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <div class="bg-white p-8 rounded-xl text-center">
+            <div data-aos="fade-up" data-aos-delay="0" class="bg-white p-8 rounded-xl text-center">
                 <div class="bg-orange-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-500" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
@@ -65,7 +67,7 @@ ob_start();
                 <p class="text-gray-600">Fresh meals delivered in under 45 minutes</p>
             </div>
 
-            <div class="bg-white p-8 rounded-xl text-center">
+            <div data-aos="fade-up" data-aos-delay="200" class="bg-white p-8 rounded-xl text-center">
                 <div class="bg-orange-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-500" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
@@ -77,7 +79,7 @@ ob_start();
                 <p class="text-gray-600">All home chefs pass rigorous quality checks</p>
             </div>
 
-            <div class="bg-white p-8 rounded-xl text-center">
+            <div data-aos="fade-up" data-aos-delay="400" class="bg-white p-8 rounded-xl text-center">
                 <div class="bg-orange-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-500" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
@@ -98,15 +100,18 @@ ob_start();
 <section id="explore" class="py-16 bg-gray-50">
     <div class="py-10 container mx-auto px-4">
         <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-gray-800 mb-3">Explore Our Menu Categories</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto">From traditional thalis to regional specialties, discover
+            <h2 data-aos="zoom-in" data-aos-delay="0" class="text-3xl font-bold text-gray-800 mb-3">Explore Our Menu
+                Categories</h2>
+            <p data-aos="zoom-in" data-aos-delay="200" class="text-gray-600 max-w-2xl mx-auto">From traditional thalis
+                to regional specialties, discover
                 authentic homemade flavors</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             <?php foreach ($categories as $category): ?>
                 <a href="/dishes?categories=<?= htmlspecialchars(urlencode(strtolower($category['name']))) ?>"
-                    class="block focus:outline-none focus:ring-4 focus:ring-amber-400 rounded-xl"
+                    data-aos="zoom-in" data-aos-delay="<?= $index * 200 ?>"
+                    class=" block focus:outline-none focus:ring-4 focus:ring-amber-400 rounded-xl"
                     aria-label="View dishes in <?= htmlspecialchars($category['name']) ?> category">
                     <div
                         class="group relative overflow-hidden rounded-xl shadow-md hover:shadow-lg transition duration-300">
@@ -137,10 +142,13 @@ ob_start();
     <div class="container mx-auto px-4">
         <div class="text-center mb-10">
             <?php if ($hasRatings): ?>
-                <h2 class="text-3xl font-bold text-gray-800 mb-3">Meet Top Rated Local Kitchens</h2>
+                <h2 data-aos="zoom-in" data-aos-delay="0" class="text-3xl font-bold text-gray-800 mb-3">Meet Top Rated Local
+                    Kitchens</h2>
             <?php else: ?>
-                <h2 class="text-2xl font-bold text-gray-800 mb-3">Our Newest Local Kitchens</h2>
-                <p class="text-sm text-gray-600 max-w-2xl mx-auto">No reviews yet — be the first to rate these kitchens!</p>
+                <h2 data-aos="zoom-in" data-aos-delay="0" class="text-2xl font-bold text-gray-800 mb-3">Our Newest Local
+                    Kitchens</h2>
+                <p data-aos="zoom-in" data-aos-delay="200" class="text-sm text-gray-600 max-w-2xl mx-auto">No reviews yet —
+                    be the first to rate these kitchens!</p>
             <?php endif; ?>
         </div>
 
@@ -149,7 +157,7 @@ ob_start();
         <div class="swiper myKitchensSwiper relative max-w-6xl mx-auto pb-4">
             <div class="swiper-wrapper">
                 <?php foreach ($kitchens as $kitchen): ?>
-                    <div class="swiper-slide">
+                    <div class="swiper-slide" data-aos="zoom-in" data-aos-delay="<?= $index * 200 ?>">
                         <a href="/kitchens/profile?view=<?= $kitchen['kitchen_id'] ?>" class="group">
                             <div
                                 class="bg-white rounded-xl shadow-sm hover:shadow-md overflow-hidden transition-all duration-300 border border-gray-100 hover:border-orange-100 h-[380px] flex flex-col">
@@ -242,7 +250,7 @@ ob_start();
         </div>
         <!-- </div> -->
 
-        <div class="text-center mt-8">
+        <div data-aos="zoom-in" data-aos-delay="0" class="text-center mt-8">
             <a href="/kitchens"
                 class="inline-block bg-orange-500 text-white font-semibold py-3 px-8 rounded-lg hover:bg-orange-600 transition">
                 View All Kitchens
@@ -257,12 +265,14 @@ ob_start();
 <section id="how-it-works" class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
         <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-gray-800 mb-3">How TiffinCraft Works</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto">Getting homemade food has never been easier</p>
+            <h2 data-aos="zoom-in" data-aos-delay="0" class="text-3xl font-bold text-gray-800 mb-3">How TiffinCraft
+                Works</h2>
+            <p data-aos="zoom-in" data-aos-delay="200" class="text-gray-600 max-w-2xl mx-auto">Getting homemade food has
+                never been easier</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <div class="text-center p-6">
+            <div data-aos="fade-up" data-aos-delay="0" class="text-center p-6">
                 <div class="relative inline-flex mb-6">
                     <div
                         class="w-20 h-20 bg-orange-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
@@ -273,7 +283,7 @@ ob_start();
                     detailed descriptions.</p>
             </div>
 
-            <div class="text-center p-6">
+            <div data-aos="fade-up" data-aos-delay="200" class="text-center p-6">
                 <div class="relative inline-flex mb-6">
                     <div
                         class="w-20 h-20 bg-orange-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
@@ -284,7 +294,7 @@ ob_start();
                     multiple payment options.</p>
             </div>
 
-            <div class="text-center p-6">
+            <div data-aos="fade-up" data-aos-delay="400" class="text-center p-6">
                 <div class="relative inline-flex mb-6">
                     <div
                         class="w-20 h-20 bg-orange-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
@@ -305,8 +315,10 @@ ob_start();
     <div class="container mx-auto px-4 flex flex-col gap-10">
         <?php if ($platform_reviews): ?>
             <div class="text-center">
-                <h2 class="text-3xl font-bold text-gray-800 mb-3">What Our Users Say</h2>
-                <p class="text-gray-600">Loved by both home cooks and food lovers across Bangladesh</p>
+                <h2 data-aos="zoom-in" data-aos-delay="0" class="text-3xl font-bold text-gray-800 mb-3">What Our Users Say
+                </h2>
+                <p data-aos="zoom-in" data-aos-delay="200" class="text-gray-600">Loved by both home cooks and food lovers
+                    across Bangladesh</p>
             </div>
 
             <!-- First Row -->
@@ -314,7 +326,7 @@ ob_start();
                 <div
                     class="grid grid-cols-1 md:grid-cols-<?= count($firstRow) ?> gap-8 max-w-5xl mx-auto py-12 <?= empty($secondRow) ? '' : 'border-b' ?>">
                     <?php foreach ($firstRow as $review): ?>
-                        <div class="bg-white p-8 rounded-xl shadow-md">
+                        <div data-aos="fade-up" data-aos-delay="<?= $index * 150 ?> class=" bg-white p-8 rounded-xl shadow-md">
                             <div class="flex items-center mb-4">
                                 <img src="<?= htmlspecialchars($review['reviewer_image'] ?? '/assets/images/default-user.png') ?>"
                                     alt="Customer" class="w-12 h-12 rounded-full object-cover mr-4">
@@ -335,7 +347,8 @@ ob_start();
 
             <!-- Second Row -->
             <?php if (!empty($secondRow)): ?>
-                <div class="grid grid-cols-1 md:grid-cols-<?= count($secondRow) ?> gap-8 max-w-3xl mx-auto py-12">
+                <div data-aos="fade-up" data-aos-delay="<?= $index * 150 ?> class=" grid grid-cols-1
+                    md:grid-cols-<?= count($secondRow) ?> gap-8 max-w-3xl mx-auto py-12">
                     <?php foreach ($secondRow as $review): ?>
                         <div class="bg-white p-8 rounded-xl shadow-md">
                             <div class="flex items-center mb-4">
@@ -412,14 +425,16 @@ ob_start();
 
 <!-- App Download CTA -->
 <section class="py-16 bg-gray-50">
-    <div class="container mx-auto px-4">
+    <div data-aos="zoom-in" data-aos-delay="0" class="container mx-auto px-4">
         <div
             class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-8 md:p-12 flex flex-col md:flex-row items-center">
             <div class="md:w-1/2 mb-8 md:mb-0">
-                <h2 class="text-3xl font-bold text-white mb-4">Get the TiffinCraft App</h2>
-                <p class="text-orange-100 mb-6">Download our app for faster ordering, exclusive offers, and to track
+                <h2 data-aos="zoom-in" data-aos-delay="200" class="text-3xl font-bold text-white mb-4">Get the
+                    TiffinCraft App</h2>
+                <p data-aos="zoom-in" data-aos-delay="400" class="text-orange-100 mb-6">Download our app for faster
+                    ordering, exclusive offers, and to track
                     your delivery in real-time.</p>
-                <div class="flex flex-col sm:flex-row gap-4">
+                <div data-aos="zoom-in" data-aos-delay="200" class="flex flex-col sm:flex-row gap-4">
                     <a href="#"
                         class="bg-black hover:bg-gray-900 text-white flex items-center justify-center py-3 px-6 rounded-lg">
                         <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -453,10 +468,10 @@ ob_start();
 <!-- Final CTA -->
 <section class="bg-gray-50 py-16 text-center text-gray-700">
     <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold mb-6">Ready to Experience Homemade Goodness?</h2>
-        <p class="text-gray-500 text-xl mb-8 max-w-2xl mx-auto">Join thousands of happy customers enjoying authentic
+        <h2 data-aos="zoom-in" data-aos-delay="0" class="text-3xl font-bold mb-6">Ready to Experience Homemade Goodness?</h2>
+        <p data-aos="zoom-in" data-aos-delay="200" class="text-gray-500 text-xl mb-8 max-w-2xl mx-auto">Join thousands of happy customers enjoying authentic
             home-cooked meals today</p>
-        <a href="#explore"
+        <a data-aos="zoom-in" data-aos-delay="200" href="#explore"
             class="inline-block bg-orange-500 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105 hover:bg-gray-100">
             Order Now
         </a>

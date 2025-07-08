@@ -16,6 +16,17 @@
     </main>
 
     <script src="/assets/js/script.js" defer></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            offset: 200,
+            duration: 800,
+            easing: "ease-in-sine",
+            delay: 100,
+            once: false,
+            mirror: true
+        });
+    </script>
 </body>
 
 </html>

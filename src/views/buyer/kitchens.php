@@ -70,20 +70,22 @@ ob_start();
                     <label class="block text-sm text-gray-500 mb-1">Search Kitchens</label>
                     <form method="get" action="/kitchens" class="relative inline-block w-full w-full">
                         <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
                             <input type="text" id="searchInput" name="search" placeholder="Search..."
                                 value="<?= htmlspecialchars($searchTerm) ?>"
-                                class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
                             <?php if ($searchTerm): ?>
-                                <button type="button" id="clearSearchBtn"
-                                    class="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                <a href="?<?= http_build_query(array_filter([
+                                    'location' => $selectedLocation,
+                                    'sort' => $sortBy
+                                ])) ?>"
+                                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                                     aria-label="Clear search">
                                     <i class="fas fa-times"></i>
-                                </button>
+                                </a>
                             <?php endif; ?>
-                            <button type="submit"
-                                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                                <i class="fas fa-search"></i>
-                            </button>
                         </div>
 
                         <!-- Preserve other filters in hidden fields -->

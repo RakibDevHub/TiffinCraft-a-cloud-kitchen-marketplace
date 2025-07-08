@@ -1,12 +1,12 @@
 <?php
 $pageTitle = "Delicious Dishes";
 
-$selectedCategory = isset($_GET['categories']) ? urldecode(trim($_GET['categories'])) : null;
+$selectedCategory = isset($_GET['category']) ? urldecode(trim($_GET['category'])) : null;
 $searchTerm = isset($_GET['search']) ? strtolower(trim($_GET['search'])) : null;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 $perPage = 9;
 
-$priceSort = isset($_GET['price_sort']) ? $_GET['price_sort'] : null;
+$priceSort = isset($_GET['price']) ? $_GET['price'] : null;
 $selectedLocation = isset($_GET['location']) ? urldecode(trim($_GET['location'])) : null;
 
 $dishes = $data['menuItems'] ?? [];
@@ -36,17 +36,17 @@ ob_start();
                 <a href="?<?= http_build_query(array_filter([
                     'search' => $searchTerm,
                     'location' => $selectedLocation,
-                    'price_sort' => $priceSort
+                    'price' => $priceSort
                 ])) ?>"
                     class="px-4 py-2 rounded-full text-sm font-medium <?= !$selectedCategory ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 border' ?>">
                     All
                 </a>
                 <?php foreach ($categories as $category): ?>
                     <a href="?<?= http_build_query(array_filter([
-                        'categories' => $category['name'],
+                        'category' => $category['name'],
                         'search' => $searchTerm,
                         'location' => $selectedLocation,
-                        'price_sort' => $priceSort
+                        'price' => $priceSort
                     ])) ?>"
                         class="px-4 py-2 rounded-full text-sm font-medium <?= (strtolower($selectedCategory) === strtolower($category['name'])) ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 border hover:bg-gray-100' ?>">
                         <?= htmlspecialchars($category['name']) ?>
@@ -61,34 +61,38 @@ ob_start();
                     <label class="block text-sm text-gray-500 mb-1">Search Dishes</label>
                     <form method="get" action="/dishes" class="relative inline-block w-full">
                         <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
                             <input type="text" id="searchInput" name="search" placeholder="Search..."
                                 value="<?= htmlspecialchars($searchTerm) ?>"
-                                class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
                             <?php if ($searchTerm): ?>
-                                <button type="button" id="clearSearchBtn"
-                                    class="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                <a href="?<?= http_build_query(array_filter([
+                                    'category' => $selectedCategory,
+                                    'location' => $selectedLocation,
+                                    'price' => $priceSort
+                                ])) ?>"
+                                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                                     aria-label="Clear search">
                                     <i class="fas fa-times"></i>
-                                </button>
+                                </a>
                             <?php endif; ?>
-                            <button type="submit"
-                                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                                <i class="fas fa-search"></i>
-                            </button>
                         </div>
 
                         <!-- Preserve other filters in hidden fields -->
                         <?php if ($selectedCategory): ?>
-                            <input type="hidden" name="categories" value="<?= htmlspecialchars($selectedCategory) ?>">
+                            <input type="hidden" name="category" value="<?= htmlspecialchars($selectedCategory) ?>">
                         <?php endif; ?>
                         <?php if ($selectedLocation): ?>
                             <input type="hidden" name="location" value="<?= htmlspecialchars($selectedLocation) ?>">
                         <?php endif; ?>
                         <?php if ($priceSort): ?>
-                            <input type="hidden" name="price_sort" value="<?= htmlspecialchars($priceSort) ?>">
+                            <input type="hidden" name="price" value="<?= htmlspecialchars($priceSort) ?>">
                         <?php endif; ?>
                     </form>
                 </div>
+
                 <div class="flex flex-col sm:flex-row gap-2 w-full justify-start">
                     <!-- Location Filter -->
                     <div class="w-full sm:w-2/5">
@@ -136,9 +140,9 @@ ob_start();
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-800">
                         Location: <?= htmlspecialchars($selectedLocation) ?>
                         <a href="?<?= http_build_query(array_filter([
-                            'categories' => $selectedCategory,
+                            'category' => $selectedCategory,
                             'search' => $searchTerm,
-                            'price_sort' => $priceSort
+                            'price' => $priceSort
                         ])) ?>" class="ml-2 text-gray-500 hover:text-gray-700">
                             <i class="fas fa-times"></i>
                         </a>
@@ -149,7 +153,7 @@ ob_start();
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-800">
                         Price: <?= $priceSort === 'low_to_high' ? 'Low to High' : 'High to Low' ?>
                         <a href="?<?= http_build_query(array_filter([
-                            'categories' => $selectedCategory,
+                            'category' => $selectedCategory,
                             'search' => $searchTerm,
                             'location' => $selectedLocation
                         ])) ?>" class="ml-2 text-gray-500 hover:text-gray-700">
@@ -267,8 +271,15 @@ ob_start();
 </section>
 
 <script>
-    // Function to update URL with new parameters
-    function updateUrl() {
+    // Event listeners for filter changes
+    document.getElementById('locationFilter').addEventListener('change', function () {
+        updateFilters();
+    });
+    document.getElementById('priceSort').addEventListener('change', function () {
+        updateFilters
+    });
+
+    function updateFilters() {
         const params = new URLSearchParams(window.location.search);
 
         // Get current values
@@ -283,9 +294,9 @@ ob_start();
         }
 
         if (priceSort) {
-            params.set('price_sort', priceSort);
+            params.set('price', priceSort);
         } else {
-            params.delete('price_sort');
+            params.delete('price');
         }
 
         // Remove page parameter when filters change
@@ -295,19 +306,6 @@ ob_start();
         window.location.search = params.toString();
     }
 
-    // Clear search button functionality
-    document.getElementById('clearSearchBtn')?.addEventListener('click', function () {
-        const form = this.closest('form');
-        const searchInput = form.querySelector('#searchInput');
-        searchInput.value = '';
-
-        // Submit the form while preserving other filters
-        form.submit();
-    });
-
-    // Event listeners for filter changes
-    document.getElementById('locationFilter').addEventListener('change', updateUrl);
-    document.getElementById('priceSort').addEventListener('change', updateUrl);
 </script>
 
 <?php

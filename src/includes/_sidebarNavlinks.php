@@ -6,7 +6,7 @@ $isDashboardView = (strpos($requestUri, '/admin') !== false) || (strpos($request
 $isBusinessView = strpos($requestUri, '/business') !== false;
 ?>
 
-<!-- Sidebar -->
+<!-- Mobile Nav -->
 <div class="md:hidden top-[56px] fixed inset-0 z-40 hidden" id="sidebar-navlinks">
     <!-- Overlay -->
     <div class="fixed inset-0 bg-black bg-opacity-50 top-[56px] transition-opacity duration-300 ease-in-out opacity-0"

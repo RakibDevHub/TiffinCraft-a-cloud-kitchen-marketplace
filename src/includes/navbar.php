@@ -1,5 +1,4 @@
 <?php
-// src/includes/navbar.php
 $requestUri = $_SERVER['REQUEST_URI'];
 $isHomeView = ($requestUri === '/' || $requestUri === '/home');
 $isDashboardView = (strpos($requestUri, '/admin') !== false) || (strpos($requestUri, '/dashboard') !== false);
@@ -115,7 +114,8 @@ if ($currentRole === 'seller') {
                         class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Browse
                         Kitchens</a>
                     <a href="/contact"
-                        class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Contact Us</a>
+                        class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Contact
+                        Us</a>
                 </div>
             <?php endif; ?>
 
@@ -136,6 +136,5 @@ if ($currentRole === 'seller') {
             </div>
         </div>
     </div>
-
-    <?php include BASE_PATH . '/src/includes/_sidebarNavlinks.php'; ?>
 </nav>
+<?php include BASE_PATH . '/src/includes/_sidebarNavlinks.php'; ?>

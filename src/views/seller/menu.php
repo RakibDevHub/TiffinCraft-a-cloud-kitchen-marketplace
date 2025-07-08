@@ -1,10 +1,19 @@
 <?php
 $pageTitle = "Manage Menu";
+
+$selectedCategory = isset($_GET['category']) ? urldecode(trim($_GET['category'])) : null;
+$searchTerm = isset($_GET['search']) ? trim($_GET['search']) : null;
+$statusFilter = isset($_GET['status']) ? $_GET['status'] : 'all';
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+$perPage = 6;
+
 $menuItems = $data['menuItems'] ?? [];
 $categories = $data['categories'] ?? [];
 $error = $data['error'] ?? null;
 $success = $data['success'] ?? null;
-ob_start();
+
+$totalItems = $data['totalItems'] ?? 0;
+$totalPages = $data['totalPages'] ?? 1;
 
 $helper = new App\Utils\Helper();
 $csrfToken = $helper->generateCsrfToken();
@@ -26,6 +35,7 @@ $deleteItem = $deleteId
     ? current(array_filter($menuItems, fn($item) => $item['item_id'] == $deleteId))
     : null;
 
+ob_start();
 ?>
 
 <!-- Toast Messages -->
@@ -73,35 +83,62 @@ $deleteItem = $deleteId
                 </button>
             </div>
 
-            <!-- Search Bar & Filters -->
+            <!-- In the filters section -->
             <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 <!-- Search Bar -->
-                <div class="relative w-full">
+                <form method="get" action="/business/dashboard/menu" class="relative w-full">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <i class="fas fa-search text-gray-400"></i>
                     </div>
-                    <input id="searchInput" type="text" placeholder="Search items..."
-                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
-                </div>
+                    <input type="text" name="search" placeholder="Search items..."
+                        value="<?= htmlspecialchars($searchTerm) ?>"
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <?php if ($searchTerm): ?>
+                        <a href="?<?= http_build_query(array_filter([
+                            'category' => $selectedCategory,
+                            'status' => $statusFilter
+                        ])) ?>"
+                            class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    <?php endif; ?>
+
+                    <!-- Preserve other filters in hidden fields -->
+                    <?php if ($selectedCategory): ?>
+                        <input type="hidden" name="category" value="<?= $selectedCategory ?>">
+                    <?php endif; ?>
+                    <?php if ($statusFilter && $statusFilter !== 'all'): ?>
+                        <input type="hidden" name="status" value="<?= $statusFilter ?>">
+                    <?php endif; ?>
+                </form>
 
                 <!-- Status Filter -->
-                <select id="statusFilter"
+                <select name="status" id="statusFilter"
                     class="w-full sm:w-40 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
-                    <option value="all">All Statuses</option>
-                    <option value="public">Public Only</option>
-                    <option value="private">Private Only</option>
+                    <option value="all" <?= $statusFilter === 'all' ? 'selected' : '' ?>>All Statuses</option>
+                    <option value="public" <?= $statusFilter === 'public' ? 'selected' : '' ?>>Public Only</option>
+                    <option value="private" <?= $statusFilter === 'private' ? 'selected' : '' ?>>Private Only</option>
                 </select>
 
                 <!-- Category Filter -->
-                <select id="categoryFilter"
+                <select name="category" id="categoryFilter"
                     class="w-full sm:w-40 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
-                    <option value="all">All Categories</option>
+                    <option value="">All Categories</option>
                     <?php foreach ($categories as $category): ?>
-                        <option value="<?= $category['category_id'] ?>">
+                        <option value="<?= htmlspecialchars($category['name']) ?>"
+                            <?= strtolower($selectedCategory) === strtolower($category['name']) ? 'selected' : '' ?>>
                             <?= htmlspecialchars($category['name']) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
+
+                <!-- Clear All Filters Button -->
+                <div class="flex justify-center sm:justify-end items-end">
+                    <a href="/business/dashboard/menu"
+                        class="px-8 py-2 bg-gray-300 text-gray-700 rounded-full hover:bg-gray-300 text-center">
+                        Clear
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -335,6 +372,32 @@ $deleteItem = $deleteId
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination Controls -->
+        <?php if ($totalPages > 1): ?>
+            <div class="flex justify-center items-center gap-3 mt-8">
+                <!-- Previous Button -->
+                <?php if ($page > 1): ?>
+                    <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page - 1])) ?>"
+                        class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">&laquo; Prev</a>
+                <?php else: ?>
+                    <span class="px-4 py-2 bg-gray-300 text-gray-400 rounded cursor-not-allowed">&laquo; Prev</span>
+                <?php endif; ?>
+
+                <!-- Page Info -->
+                <span class="px-4 py-2 bg-gray-100 rounded text-gray-800 border">
+                    Page <?= $page ?> of <?= $totalPages ?>
+                </span>
+
+                <!-- Next Button -->
+                <?php if ($page < $totalPages): ?>
+                    <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page + 1])) ?>"
+                        class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">Next &raquo;</a>
+                <?php else: ?>
+                    <span class="px-4 py-2 bg-gray-300 text-gray-400 rounded cursor-not-allowed">Next &raquo;</span>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
     <?php endif; ?>
 </div>
 
@@ -818,6 +881,41 @@ $deleteItem = $deleteId
             });
         }
     });
+
+    // Event listeners for filter changes
+    document.getElementById('statusFilter').addEventListener('change', function () {
+        updateFilters();
+    });
+
+    document.getElementById('categoryFilter').addEventListener('change', function () {
+        updateFilters();
+    });
+
+    function updateFilters() {
+        const params = new URLSearchParams(window.location.search);
+
+        // Update status filter
+        const status = document.getElementById('statusFilter').value;
+        if (status && status !== 'all') {
+            params.set('status', status);
+        } else {
+            params.delete('status');
+        }
+
+        // Update category filter
+        const category = document.getElementById('categoryFilter').value;
+        if (category) {
+            params.set('category', category);
+        } else {
+            params.delete('category');
+        }
+
+        // Reset to first page when filters change
+        params.delete('page');
+
+        window.location.search = params.toString();
+    }
+
 </script>
 
 <?php

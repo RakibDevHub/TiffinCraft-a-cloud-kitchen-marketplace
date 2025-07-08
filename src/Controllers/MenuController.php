@@ -25,10 +25,10 @@ class MenuController
             $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 
             $filters = [
-                'category' => $_GET['categories'] ?? null,
-                'search' => $_GET['search'] ?? null,
-                'location' => $_GET['location'] ?? null,
-                'price_sort' => $_GET['price_sort'] ?? null,
+                'category' => isset($_GET['category']) ? $_GET['category'] : null,
+                'search' => isset($_GET['search']) ? trim($_GET['search']) : null,
+                'location' => isset($_GET['location']) ? $_GET['location'] : null,
+                'price' => isset($_GET['price']) ? $_GET['price'] : null,
 
                 'per_page' => $perPage,
                 'page' => $page
@@ -58,6 +58,7 @@ class MenuController
                 'menuItems' => $menuItems,
                 'categories' => $categories,
                 'locations' => $serviceAreas,
+                'totalItems' => $totalItems,
                 'totalPages' => $totalPages,
                 'currentPage' => $page
             ]);
@@ -82,9 +83,29 @@ class MenuController
 
         try {
             $owner_id = $_SESSION['user_id'];
-            $menuItems = Menu::getItemsByOwner($this->conn, $owner_id);
+            $perPage = 6;
+            $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+
+            // Get filter parameters
+            $filters = [
+                'owner_id' => $owner_id,
+                'category' => isset($_GET['category']) ? $_GET['category'] : null,
+                'search' => isset($_GET['search']) ? trim($_GET['search']) : null,
+                'status' => isset($_GET['status']) ? $_GET['status'] : null,
+                'per_page' => $perPage,
+                'page' => $page
+            ];
+
+            // Get filtered items and counts
+            $totalItems = Menu::getFilteredCountForOwner($this->conn, $filters);
+            $totalPages = max(1, ceil($totalItems / $perPage));
+            $page = max(1, min($page, $totalPages));
+            $filters['page'] = $page;
+
+            $menuItems = Menu::getFilteredItemsForOwner($this->conn, $filters);
             $categories = Category::getAllCategories($this->conn);
 
+            // Map category IDs to names
             $categoryMap = [];
             foreach ($categories as $category) {
                 $categoryMap[$category['category_id']] = $category['name'];
@@ -97,6 +118,9 @@ class MenuController
             $this->renderView('seller/menu', [
                 'menuItems' => $menuItems,
                 'categories' => $categories,
+                'totalItems' => $totalItems,
+                'totalPages' => $totalPages,
+                'currentPage' => $page,
                 'success' => $success,
                 'error' => $error
             ]);
