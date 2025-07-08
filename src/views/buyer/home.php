@@ -26,16 +26,16 @@ ob_start();
 
 <!-- Hero Section with Value Proposition -->
 <section
-    class="relative top-[-56px] h-screen flex items-center justify-center bg-cover bg-center bg-[url(/assets/images/HeroBG.jpeg)]">
+    class="relative h-screen flex items-start justify-center bg-cover bg-center bg-[url(/assets/images/HeroBG.jpeg)]">
     <div class="absolute inset-0 bg-black bg-opacity-70"></div>
-    <div class="relative text-center px-4 z-10 max-w-4xl">
-        <h1 data-aos="zoom-in" data-aos-delay="0" class="text-white text-5xl md:text-6xl font-bold mb-6 leading-tight">
+    <div class="relative text-center px-4 z-10 max-w-4xl lg:top-[20%] top-[10%]">
+        <h1 data-aos="zoom-in" data-aos-delay="0" class="text-white text-4xl md:text-6xl font-bold mb-6 leading-tight">
             Authentic Homemade Meals Delivered to
             Your Door</h1>
         <p data-aos="zoom-in" data-aos-delay="200" class="text-white text-xl md:text-2xl mb-8">Discover local home chefs
             preparing fresh, traditional meals with
             love and care</p>
-        <div data-aos="zoom-in" data-aos-delay="400" class="flex flex-wrap justify-center items-center gap-4">
+        <div data-aos="zoom-in" data-aos-delay="200" class="flex flex-wrap justify-center items-center gap-4">
             <a href="#explore"
                 class=" bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105">
                 Browse Our Menu
@@ -52,7 +52,7 @@ ob_start();
 </section>
 
 <!-- Value Proposition Cards -->
-<section class="py-16 bg-orange-50 mt-[-56px]">
+<section class="py-16 bg-orange-50">
     <div class="py-10 container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             <div data-aos="fade-up" data-aos-delay="0" class="bg-white p-8 rounded-xl text-center">
@@ -107,7 +107,7 @@ ob_start();
                 authentic homemade flavors</p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             <?php foreach ($categories as $category): ?>
                 <a href="/dishes?categories=<?= htmlspecialchars(urlencode(strtolower($category['name']))) ?>"
                     data-aos="zoom-in" data-aos-delay="<?= $index * 200 ?>"
@@ -371,25 +371,6 @@ ob_start();
 
         <?php endif; ?>
 
-
-        <!-- <div class="bg-white p-8 rounded-xl shadow-md">
-            <div class="flex items-center mb-4">
-                <img src="/assets/images/customer2.jpg" alt="Customer" class="w-12 h-12 rounded-full object-cover mr-4">
-                <div>
-                    <h4 class="font-semibold">Rahul Sharma</h4>
-                    <div class="flex">
-                        <span class="text-yellow-400">★</span>
-                        <span class="text-yellow-400">★</span>
-                        <span class="text-yellow-400">★</span>
-                        <span class="text-yellow-400">★</span>
-                        <span class="text-yellow-400">★</span>
-                    </div>
-                </div>
-            </div>
-            <p class="text-gray-600">"I love the variety of regional cuisines available. The portion sizes are
-                generous and the prices are very reasonable compared to restaurants. Highly recommended!"</p>
-        </div> -->
-
         <?php if ($isLoggedIn && ($role === 'buyer' || $role === 'seller')): ?>
             <div class="w-full">
                 <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow">
@@ -468,8 +449,10 @@ ob_start();
 <!-- Final CTA -->
 <section class="bg-gray-50 py-16 text-center text-gray-700">
     <div class="container mx-auto px-4">
-        <h2 data-aos="zoom-in" data-aos-delay="0" class="text-3xl font-bold mb-6">Ready to Experience Homemade Goodness?</h2>
-        <p data-aos="zoom-in" data-aos-delay="200" class="text-gray-500 text-xl mb-8 max-w-2xl mx-auto">Join thousands of happy customers enjoying authentic
+        <h2 data-aos="zoom-in" data-aos-delay="0" class="text-3xl font-bold mb-6">Ready to Experience Homemade Goodness?
+        </h2>
+        <p data-aos="zoom-in" data-aos-delay="200" class="text-gray-500 text-xl mb-8 max-w-2xl mx-auto">Join thousands
+            of happy customers enjoying authentic
             home-cooked meals today</p>
         <a data-aos="zoom-in" data-aos-delay="200" href="#explore"
             class="inline-block bg-orange-500 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105 hover:bg-gray-100">
@@ -496,10 +479,8 @@ ob_start();
                 clickable: true,
             },
             breakpoints: {
-                640: { slidesPerView: 1 },
-                768: { slidesPerView: 2 },
+                640: { slidesPerView: 2 },
                 1024: { slidesPerView: 3 },
-                1280: { slidesPerView: 4 },
             },
         });
     });

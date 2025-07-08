@@ -45,9 +45,9 @@ if ($currentRole === 'seller') {
 
 <?php if ($isHomeView && !$isLoggedIn): ?>
     <div id="ctaBar"
-        class="h-12 fixed top-0 left-0 w-full bg-orange-100 text-orange-800 z-50 flex items-center justify-between shadow transition-all duration-300 transform -translate-y-full opacity-0">
+        class="h-16 sm:h-12 fixed top-0 left-0 w-full bg-orange-100 text-orange-800 z-50 flex items-center justify-between shadow transition-all duration-300 transform -translate-y-full opacity-0">
         <div class="flex items-center justify-between w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div>
+            <div> 
                 <span class="font-semibold">Own a Tiffin Business?</span>
                 <a href="/business" class="ml-2 text-orange-700 underline hover:text-orange-900">Join TiffinCraft
                     Business</a>
@@ -65,7 +65,7 @@ if ($currentRole === 'seller') {
             <div class="flex gap-2 items-center">
                 <div class="flex items-center <?= $isDashboardView ? '' : 'md:hidden' ?>">
                     <button id="sidebar-navlinks-button" type="button"
-                        class="<?= $isDashboardView ? '' : 'md:hidden' ?> inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500 transition-colors duration-200"
+                        class="<?= $isDashboardView ? '' : 'md:hidden' ?> inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-900 bg-gray-100 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500 transition-colors duration-200"
                         aria-expanded="false" aria-controls="sidebar-navlinks">
                         <span class="sr-only">Open main menu</span>
                         <!-- Hamburger icon -->
@@ -88,7 +88,7 @@ if ($currentRole === 'seller') {
                     class="text-xl font-bold text-gray-800 hover:text-orange-500 transition-colors flex items-centergroup">
 
                     <!-- Logo Image - Added hover effect and better sizing -->
-                    <img class="h-8 sm:h-10 w-auto ml-[-5px]" src="/assets/images/main-logo.png"
+                    <img class="h-10 w-auto ml-[-5px]" src="/assets/images/main-logo.png"
                         alt="TiffinCraft <?= $isBusinessView ? 'Business' : 'Home' ?>">
 
                     <!-- Text Logo - Only shown in business view -->

@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initCTABar();
   initSidebar();
   initDropdowns();
+  initSmoothAnchorOffset();
 });
 
 // CTA BAR LOGIC
@@ -196,5 +197,43 @@ function closeAllDropdowns() {
     if (button?._dropdownState?.isOpen()) {
       button._dropdownState.hide();
     }
+  });
+}
+
+// SCROLL POSITION LOGIC
+function initSmoothAnchorOffset() {
+  const OFFSET_SELECTOR = "#ctaBar";
+
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener("click", function (e) {
+      const targetId = this.getAttribute("href").slice(1);
+      const targetElement = document.getElementById(targetId);
+      if (!targetElement) return;
+
+      e.preventDefault();
+
+      const ctaBar = document.querySelector(OFFSET_SELECTOR);
+      const ctaHeight =
+        ctaBar && !ctaBar.classList.contains("opacity-0")
+          ? ctaBar.offsetHeight
+          : 0;
+
+      // Set custom offset buffer based on section
+      let OFFSET_BUFFER = 100;
+      if (targetId === "explore") {
+        OFFSET_BUFFER = 50;
+      }
+
+      const scrollY =
+        targetElement.getBoundingClientRect().top +
+        window.pageYOffset -
+        ctaHeight -
+        OFFSET_BUFFER;
+
+      window.scrollTo({
+        top: scrollY,
+        behavior: "smooth",
+      });
+    });
   });
 }

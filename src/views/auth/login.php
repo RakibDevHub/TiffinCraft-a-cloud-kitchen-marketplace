@@ -12,7 +12,7 @@ if (empty($_SESSION['csrf_token'])) {
 $csrfToken = $_SESSION['csrf_token'];
 ?>
 
-<section class="relative h-max py-10">
+<section class="relative h-max py-36">
     <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8">
         <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Login to TiffinCraft</h2>
 
