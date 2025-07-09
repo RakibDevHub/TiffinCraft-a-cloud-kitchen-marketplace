@@ -31,13 +31,11 @@ $isBusinessView = strpos($_SERVER['REQUEST_URI'], '/business') !== false;
             <div>
                 <h3 class="font-semibold text-md mb-4">Quick Links</h3>
                 <ul class="space-y-2 text-sm">
-                    <?php if ($isBusinessView): ?>
-                        <li><a href="/" class="hover:underline">TiffinCraft</a></li>
-                    <?php endif; ?>
-                    <li><a href="/dishes" class="hover:underline">Browse Dishes</a></li>
-                    <li><a href="/vendors" class="hover:underline">Browse Vendors</a></li>
-                    <li><a href="/login" class="hover:underline">Login to Your Account</a></li>
-                    <li><a href="/register" class="hover:underline">Register Now</a></li>
+                        <li><a href="/" class="<?= $requestUri === '/' ? 'underline decoration-orange-500 font-semibold':'hover:underline'?>">TiffinCraft</a></li>
+                    <li><a href="/dishes" class="<?= strpos($requestUri, '/dishes') === 0 ? 'underline decoration-orange-500':'hover:underline'?>">Browse Dishes</a></li>
+                    <li><a href="/kitchens" class="<?= strpos($requestUri, '/kitchens') === 0 ? 'underline decoration-orange-500':'hover:underline'?>">Browse Kitchens</a></li>
+                    <li><a href="/login" class="<?= strpos($requestUri, '/login') === 0 ? 'underline decoration-orange-500':'hover:underline'?>">Login to Your Account</a></li>
+                    <li><a href="/register" class="<?= strpos($requestUri, '/register') === 0 ? 'underline decoration-orange-500':'hover:underline'?>">Register Now</a></li>
                 </ul>
             </div>
 
@@ -45,9 +43,9 @@ $isBusinessView = strpos($_SERVER['REQUEST_URI'], '/business') !== false;
             <div>
                 <h3 class="font-semibold text-md mb-4">TiffinCraft Business</h3>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="/business" class="hover:underline">Sell on Our Platform</a></li>
-                    <li><a href="/business/login" class="hover:underline">Login to Your Account</a></li>
-                    <li><a href="/business/register" class="hover:underline">Open a Business Account</a></li>
+                    <li><a href="/business" class="<?= strpos($requestUri, '/business') === 0 ? 'underline decoration-orange-500':'hover:underline'?>">Sell on Our Platform</a></li>
+                    <li><a href="/business/login" class="<?= strpos($requestUri, '/business/login') === 0 ? 'underline decoration-orange-500':'hover:underline'?>">Login to Your Account</a></li>
+                    <li><a href="/business/register" class="<?= strpos($requestUri, '/business/register') === 0 ? 'underline decoration-orange-500':'hover:underline'?>">Open a Business Account</a></li>
                 </ul>
             </div>
 

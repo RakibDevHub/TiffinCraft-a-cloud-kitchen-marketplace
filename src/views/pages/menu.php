@@ -7,6 +7,7 @@ $searchTerm = isset($_GET['search']) ? strtolower(trim($_GET['search'])) : null;
 $priceSort = isset($_GET['price']) ? $_GET['price'] : null;
 $selectedLocation = isset($_GET['location']) ? urldecode(trim($_GET['location'])) : null;
 
+// Fetched Data
 $dishes = $data['menuItems'] ?? [];
 $categories = $data['categories'] ?? [];
 $serviceAreas = $data['locations'] ?? [];

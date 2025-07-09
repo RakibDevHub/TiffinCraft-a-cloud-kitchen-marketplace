@@ -1,6 +1,7 @@
 <?php
 $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['role']);
 $currentRole = $isLoggedIn ? $_SESSION['role'] : null;
+
 $requestUri = $_SERVER['REQUEST_URI'];
 $isDashboardView = (strpos($requestUri, '/admin') !== false) || (strpos($requestUri, '/dashboard') !== false);
 $isBusinessView = strpos($requestUri, '/business') !== false;
@@ -20,16 +21,24 @@ $isBusinessView = strpos($requestUri, '/business') !== false;
                 <!-- Public Navigation -->
                 <div class="border-t border-gray-200">
                     <a href="/"
-                        class="bg-orange-50 border-orange-500 text-orange-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200 ease-in-out">Home</a>
+                        class="<?= $requestUri === '/' ? 'bg-orange-50 border-orange-500 text-orange-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' ?> block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200 ease-in-out">
+                        Home
+                    </a>
+
                     <a href="/dishes"
-                        class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200 ease-in-out">Delicious
-                        Dishes</a>
+                        class="<?= strpos($requestUri, '/dishes') === 0 ? 'bg-orange-50 border-orange-500 text-orange-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' ?> block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200 ease-in-out">
+                        Delicious Dishes
+                    </a>
+
                     <a href="/kitchens"
-                        class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200 ease-in-out">Browse
-                        Kitchens</a>
+                        class="<?= strpos($requestUri, '/kitchens') === 0 ? 'bg-orange-50 border-orange-500 text-orange-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' ?> block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200 ease-in-out">
+                        Browse Kitchens
+                    </a>
+
                     <a href="/contact"
-                        class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200 ease-in-out">Contact
-                        Us</a>
+                        class="<?= strpos($requestUri, '/contact') === 0 ? 'bg-orange-50 border-orange-500 text-orange-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' ?> block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200 ease-in-out">
+                        Contact Us
+                    </a>
                 </div>
             <?php endif; ?>
 

@@ -47,7 +47,7 @@ if ($currentRole === 'seller') {
     <div id="ctaBar"
         class="h-16 sm:h-12 fixed top-0 left-0 w-full bg-orange-100 text-orange-800 z-50 flex items-center justify-between shadow transition-all duration-300 transform -translate-y-full opacity-0">
         <div class="flex items-center justify-between w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div> 
+            <div>
                 <span class="font-semibold">Own a Tiffin Business?</span>
                 <a href="/business" class="ml-2 text-orange-700 underline hover:text-orange-900">Join TiffinCraft
                     Business</a>
@@ -106,15 +106,18 @@ if ($currentRole === 'seller') {
             <?php if (!$isBusinessView && !$isDashboardView): ?>
                 <div class="hidden md:ml-6 md:flex flex-row gap-4">
                     <a href="/"
-                        class="border-orange-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Home</a>
+                        class="<?= $requestUri === '/' ? 'border-orange-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' ?> inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Home</a>
+
                     <a href="/dishes"
-                        class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Delicious
+                        class="<?= strpos($requestUri, '/dishes') === 0 ? 'border-orange-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' ?> inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Delicious
                         Dishes</a>
+
                     <a href="/kitchens"
-                        class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Browse
+                        class="<?= strpos($requestUri, '/kitchens') === 0 ? 'border-orange-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' ?> inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Browse
                         Kitchens</a>
+
                     <a href="/contact"
-                        class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Contact
+                        class="<?= strpos($requestUri, '/contact') === 0 ? 'border-orange-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' ?> inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Contact
                         Us</a>
                 </div>
             <?php endif; ?>
@@ -126,9 +129,9 @@ if ($currentRole === 'seller') {
                         <?php include BASE_PATH . '/src/includes/_dropdownNavlinks.php'; ?>
                     <?php else: ?>
                         <div class="hidden <?= $isBusinessView ? 'min-[450px]:flex' : 'min-[350px]:flex' ?> items-center">
-                            <a href="/login"
+                            <a href="/<?= $isBusinessView ? 'business/login' : 'login'?>"
                                 class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">Login</a>
-                            <a href="/register"
+                            <a href="/<?= $isBusinessView ? 'business/register' : 'register'?>"
                                 class="bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-orange-700">Register</a>
                         </div>
                     <?php endif; ?>

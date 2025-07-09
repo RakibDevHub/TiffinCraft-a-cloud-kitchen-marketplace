@@ -6,6 +6,7 @@ $searchTerm = isset($_GET['search']) ? strtolower(trim($_GET['search'])) : null;
 $sortBy = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
 $selectedLocation = isset($_GET['location']) ? urldecode(trim($_GET['location'])) : null;
 
+// Fetched Data
 $kitchens = $data['kitchens'] ?? [];
 $serviceAreas = $data['locations'] ?? [];
 
@@ -22,12 +23,15 @@ ob_start();
     <div class="container mx-auto px-4 max-w-6xl">
         <!-- Page Header -->
         <div class="text-center mb-4">
-            <h2 data-aos="zoom-in" data-aos-delay="100" class="text-3xl font-bold text-gray-800 mb-3">Discover Local Kitchens</h2>
-            <p data-aos="zoom-in" data-aos-delay="200" class="text-gray-600">Explore meals prepared by talented home cooks in your community.</p>
+            <h2 data-aos="zoom-in" data-aos-delay="100" class="text-3xl font-bold text-gray-800 mb-3">Discover Local
+                Kitchens</h2>
+            <p data-aos="zoom-in" data-aos-delay="200" class="text-gray-600">Explore meals prepared by talented home
+                cooks in your community.</p>
         </div>
 
         <!-- Filters Section -->
-        <div data-aos="zoom-in" data-aos-delay="300" class="flex flex-col justify-between items-center gap-6 bg-white p-4 rounded-lg shadow-sm mb-4">
+        <div data-aos="zoom-in" data-aos-delay="300"
+            class="flex flex-col justify-between items-center gap-6 bg-white p-4 rounded-lg shadow-sm mb-4">
             <!-- Sorting Options -->
             <div class="flex flex-wrap gap-2 w-full items-center justify-center">
                 <a href="?<?= http_build_query(array_filter([
@@ -131,7 +135,8 @@ ob_start();
         <?php if ($selectedLocation || ($sortBy && $sortBy !== 'newest')): ?>
             <div class="flex flex-wrap gap-2 mb-6">
                 <?php if ($selectedLocation): ?>
-                    <span data-aos="fade-right" data-aos-delay="100" class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-800">
+                    <span data-aos="fade-right" data-aos-delay="100"
+                        class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-800">
                         Location: <?= htmlspecialchars($selectedLocation) ?>
                         <a href="?<?= http_build_query(array_filter([
                             'search' => $searchTerm,
@@ -143,7 +148,8 @@ ob_start();
                 <?php endif; ?>
 
                 <?php if ($sortBy && $sortBy !== 'newest'): ?>
-                    <span data-aos="fade-right" data-aos-delay="150" class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-800">
+                    <span data-aos="fade-right" data-aos-delay="150"
+                        class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-800">
                         Sort: <?= ucfirst(str_replace('_', ' ', $sortBy)) ?>
                         <a href="?<?= http_build_query(array_filter([
                             'search' => $searchTerm,
@@ -187,7 +193,8 @@ ob_start();
                             <div class="space-y-2">
                                 <!-- Name and Owner -->
                                 <div>
-                                    <h3 class="text-lg font-semibold text-gray-800"><?= htmlspecialchars($kitchen['name']) ?></h3>
+                                    <h3 class="text-lg font-semibold text-gray-800"><?= htmlspecialchars($kitchen['name']) ?>
+                                    </h3>
                                     <p class="text-sm text-gray-500 flex items-center">
                                         <i class="fa-solid fa-user mr-1.5 text-green-500"></i>
                                         <?= htmlspecialchars($kitchen['owner_name']) ?>
