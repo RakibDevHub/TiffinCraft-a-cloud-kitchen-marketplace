@@ -18,7 +18,7 @@ class MenuController
     }
 
     // dishes
-    public function showMenuPage()
+    public function MenuItemPage()
     {
         try {
             $perPage = 9;
@@ -54,7 +54,7 @@ class MenuController
                 $item['category_name'] = $categoryMap[$item['category_id']] ?? 'Uncategorized';
             }
 
-            $this->renderView('buyer/dishes', [
+            $this->renderView('pages/menu', [
                 'menuItems' => $menuItems,
                 'categories' => $categories,
                 'locations' => $serviceAreas,
@@ -64,7 +64,7 @@ class MenuController
             ]);
 
         } catch (Exception $e) {
-            $this->renderView('buyer/dishes', [
+            $this->renderView('pages/menu', [
                 'menuItems' => [],
                 'categories' => [],
                 'locations' => [],
@@ -74,7 +74,7 @@ class MenuController
     }
 
     // business/dashboard/menu
-    public function manageMenu()
+    public function manageMenuPage()
     {
         $this->requireLogin('seller');
 

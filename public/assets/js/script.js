@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initCTABar();
   initSidebar();
   initDropdowns();
+  initSmartPageScroll();
   initSmoothAnchorOffset();
 });
 
@@ -201,6 +202,20 @@ function closeAllDropdowns() {
 }
 
 // SCROLL POSITION LOGIC
+function initSmartPageScroll() {
+  document.querySelectorAll('a[href^="/"]').forEach((link) => {
+    link.addEventListener("click", function (e) {
+      const href = this.getAttribute("href");
+      const currentPath = window.location.pathname;
+
+      if (href === currentPath || href === currentPath + "/") {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    });
+  });
+}
+
 function initSmoothAnchorOffset() {
   const OFFSET_SELECTOR = "#ctaBar";
 

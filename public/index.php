@@ -1,4 +1,6 @@
 <?php
+
+use App\Controllers\HomeController;
 // public/index.php 
 
 session_start();
@@ -39,19 +41,21 @@ $router->addRoute('/database-error', 'ErrorController@databaseError');
 $router->addRoute('/unauthorized', 'ErrorController@unauthorizedError');
 
 // Public Routes
-$router->addRoute('/', 'HomeController@showBuyerHome');
-$router->addRoute('/home', 'HomeController@showBuyerHome');
-$router->addRoute('/dishes', 'MenuController@showMenuPage');
+$router->addRoute('/', 'HomeController@landingPage');
+$router->addRoute('/home', 'HomeController@landingPage');
+$router->addRoute('/dishes', 'MenuController@MenuItemPage');
 $router->addRoute('/reviews', 'ReviewController@addReview');
-$router->addRoute('/kitchens', 'KitchenController@showKitchenPage');
-$router->addRoute('/kitchens/profile', 'KitchenController@showKitchenProfile');
+$router->addRoute('/kitchens', 'KitchenController@kitchenPage');
+$router->addRoute('/kitchen/profile', 'KitchenController@showKitchenProfile');
+$router->addRoute('/contact', 'HomeController@showContactPage');
 
-$router->addRoute('/business', 'HomeController@showSellerHome');
+$router->addRoute('/business', 'HomeController@businessPage');
 
 // Authentication Routes
 $router->addRoute('/register', 'AuthController@registerAsBuyer');
 $router->addRoute('/business/register', 'AuthController@registerAsSeller');
 $router->addRoute('/login', 'AuthController@login');
+$router->addRoute('/business/login', 'AuthController@login');
 $router->addRoute('/logout', 'AuthController@logout');
 
 // Dashboard Routes
@@ -85,7 +89,7 @@ $router->addRoute('/admin/dashboard/kitchens/reject/{id}', 'KitchenController@re
 $router->addRoute('/admin/dashboard/kitchens/suspend/{id}', 'KitchenController@suspendKitchen');
 
 // Business Owner Kitchen Routes
-$router->addRoute('/business/dashboard/menu', 'MenuController@manageMenu');
+$router->addRoute('/business/dashboard/menu', 'MenuController@manageMenuPage');
 $router->addRoute('/business/dashboard/menu/add', 'MenuController@addMenuItem');
 $router->addRoute('/business/dashboard/menu/edit/{id}', 'MenuController@editMenuItem');
 $router->addRoute('/business/dashboard/menu/delete/{id}', 'MenuController@deleteMenuItem');

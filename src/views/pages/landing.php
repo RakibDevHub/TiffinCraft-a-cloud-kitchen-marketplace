@@ -1,47 +1,60 @@
 <?php
 $pageTitle = "TiffinCraft";
+
+// Data 
 $categories = $data['categories'] ?? [];
 $kitchens = $data['kitchens'] ?? [];
 $platform_reviews = $data['platform_reviews'] ?? [];
 
-$total = count($platform_reviews);
-$firstRow = array_slice($platform_reviews, 0, min(3, $total));
-$secondRow = $total > 3 ? array_slice($platform_reviews, 3, 2) : [];
-
+// Session and authentication
 $isLoggedIn = isset($_SESSION['user_id']) && isset($_SESSION['role']);
 $role = $_SESSION['role'] ?? null;
+
+// Prepare review data for display
+$totalReviews = count($platform_reviews);
+$firstRow = array_slice($platform_reviews, 0, min(3, $totalReviews));
+$secondRow = $totalReviews > 3 ? array_slice($platform_reviews, 3, 2) : [];
+
+// Check if any kitchens have ratings
+$hasRatings = false;
+foreach ($kitchens as $kitchen) {
+    if (!empty($kitchen['avg_rating'])) {
+        $hasRatings = true;
+        break;
+    }
+}
 
 ob_start();
 ?>
 
+<!-- TOAST NOTIFICATION -->
 <?php if (isset($_SESSION['toast'])): ?>
     <div
-        class="fixed bottom-5 right-5 bg-white px-6 py-3 rounded shadow-md border-l-4 z-50
-        <?= $_SESSION['toast']['type'] === 'success' ? 'border-green-500 text-green-600' : 'border-red-500 text-red-600' ?>">
+        class="fixed bottom-5 right-5 bg-white px-6 py-3 rounded shadow-md border-l-4 z-50 
+                <?= $_SESSION['toast']['type'] === 'success' ? 'border-green-500 text-green-600' : 'border-red-500 text-red-600' ?>">
         <?= htmlspecialchars($_SESSION['toast']['message']) ?>
     </div>
     <?php unset($_SESSION['toast']); ?>
 <?php endif; ?>
 
-
-<!-- Hero Section with Value Proposition -->
+<!-- HERO SECTION -->
 <section
     class="relative h-screen flex items-start justify-center bg-cover bg-center bg-[url(/assets/images/HeroBG.jpeg)]">
     <div class="absolute inset-0 bg-black bg-opacity-70"></div>
     <div class="relative text-center px-4 z-10 max-w-4xl lg:top-[20%] top-[10%]">
         <h1 data-aos="zoom-in" data-aos-delay="0" class="text-white text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            Authentic Homemade Meals Delivered to
-            Your Door</h1>
-        <p data-aos="zoom-in" data-aos-delay="200" class="text-white text-xl md:text-2xl mb-8">Discover local home chefs
-            preparing fresh, traditional meals with
-            love and care</p>
+            Authentic Homemade Meals Delivered to Your Door
+        </h1>
+        <p data-aos="zoom-in" data-aos-delay="200" class="text-white text-xl md:text-2xl mb-8">
+            Discover local home chefs preparing fresh, traditional meals with love and care
+        </p>
         <div data-aos="zoom-in" data-aos-delay="200" class="flex flex-wrap justify-center items-center gap-4">
             <a href="#explore"
-                class=" bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105">
+                class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105">
                 Browse Our Menu
             </a>
             <a href="#how-it-works"
-                class=" bg-transparent border-2 border-white hover:bg-white hover:text-orange-500 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 hover:scale-105">
+                class="bg-transparent border-2 border-white hover:bg-white hover:text-orange-500 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 hover:scale-105">
                 How It Works
             </a>
         </div>
@@ -51,10 +64,11 @@ ob_start();
     </div>
 </section>
 
-<!-- Value Proposition Cards -->
+<!-- VALUE PROPOSITIONS -->
 <section class="py-16 bg-orange-50">
     <div class="py-10 container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <!-- Fast Delivery Card -->
             <div data-aos="fade-up" data-aos-delay="0" class="bg-white p-8 rounded-xl text-center">
                 <div class="bg-orange-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-500" fill="none"
@@ -67,6 +81,7 @@ ob_start();
                 <p class="text-gray-600">Fresh meals delivered in under 45 minutes</p>
             </div>
 
+            <!-- Quality Assured Card -->
             <div data-aos="fade-up" data-aos-delay="200" class="bg-white p-8 rounded-xl text-center">
                 <div class="bg-orange-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-500" fill="none"
@@ -79,6 +94,7 @@ ob_start();
                 <p class="text-gray-600">All home chefs pass rigorous quality checks</p>
             </div>
 
+            <!-- Affordable Prices Card -->
             <div data-aos="fade-up" data-aos-delay="400" class="bg-white p-8 rounded-xl text-center">
                 <div class="bg-orange-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-500" fill="none"
@@ -93,25 +109,23 @@ ob_start();
         </div>
     </div>
     <?php $color = '#F9FAFB';
-    include BASE_PATH . '/src/includes/shape-divider.php' ?>
+    include BASE_PATH . '/src/includes/shape-divider.php'; ?>
 </section>
 
-<!-- Featured Categories -->
+<!-- FEATURED CATEGORIES -->
 <section id="explore" class="py-16 bg-gray-50">
     <div class="py-10 container mx-auto px-4">
         <div class="text-center mb-12">
             <h2 data-aos="zoom-in" data-aos-delay="0" class="text-3xl font-bold text-gray-800 mb-3">Explore Our Menu
                 Categories</h2>
             <p data-aos="zoom-in" data-aos-delay="200" class="text-gray-600 max-w-2xl mx-auto">From traditional thalis
-                to regional specialties, discover
-                authentic homemade flavors</p>
+                to regional specialties, discover authentic homemade flavors</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             <?php foreach ($categories as $category): ?>
-                <a href="/dishes?categories=<?= htmlspecialchars(urlencode(strtolower($category['name']))) ?>"
-                    data-aos="zoom-in" data-aos-delay="<?= $index * 200 ?>"
-                    class=" block focus:outline-none focus:ring-4 focus:ring-amber-400 rounded-xl"
+                <a href="/dishes?category=<?= htmlspecialchars(urlencode($category['name'])) ?>"
+                    data-aos="zoom-in" class="block focus:outline-none focus:ring-4 focus:ring-amber-400 rounded-xl"
                     aria-label="View dishes in <?= htmlspecialchars($category['name']) ?> category">
                     <div
                         class="group relative overflow-hidden rounded-xl shadow-md hover:shadow-lg transition duration-300">
@@ -134,10 +148,10 @@ ob_start();
         </div>
     </div>
     <?php $color = '#FFF7ED';
-    include BASE_PATH . '/src/includes/shape-divider.php' ?>
+    include BASE_PATH . '/src/includes/shape-divider.php'; ?>
 </section>
 
-<!-- Local Cooks -->
+<!-- LOCAL KITCHENS -->
 <section class="py-16 bg-orange-50">
     <div class="container mx-auto px-4">
         <div class="text-center mb-10">
@@ -152,27 +166,24 @@ ob_start();
             <?php endif; ?>
         </div>
 
-        <!-- Swiper -->
-        <!-- <div class="relative max-w-6xl mx-auto"> -->
+        <!-- Kitchen Swiper -->
         <div class="swiper myKitchensSwiper relative max-w-6xl mx-auto pb-4">
             <div class="swiper-wrapper">
                 <?php foreach ($kitchens as $kitchen): ?>
-                    <div class="swiper-slide" data-aos="zoom-in" data-aos-delay="<?= $index * 200 ?>">
-                        <a href="/kitchens/profile?view=<?= $kitchen['kitchen_id'] ?>" class="group">
+                    <div class="swiper-slide" data-aos="zoom-in">
+                        <a href="/kitchen/profile?view=<?= $kitchen['kitchen_id'] ?>" class="group">
                             <div
                                 class="bg-white rounded-xl shadow-sm hover:shadow-md overflow-hidden transition-all duration-300 border border-gray-100 hover:border-orange-100 h-[380px] flex flex-col">
-
-                                <!-- Image -->
+                                <!-- Kitchen Image -->
                                 <div class="relative h-48 overflow-hidden">
                                     <img src="<?= htmlspecialchars($kitchen['kitchen_image']) ?>"
                                         alt="<?= htmlspecialchars($kitchen['name']) ?>"
                                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                                 </div>
 
-                                <!-- Content -->
+                                <!-- Kitchen Details -->
                                 <div class="p-4 flex flex-col justify-between flex-grow">
                                     <div class="space-y-2">
-                                        <!-- Name and Owner -->
                                         <div>
                                             <h3 class="text-lg font-semibold text-gray-800 truncate">
                                                 <?= htmlspecialchars($kitchen['name']) ?>
@@ -182,16 +193,13 @@ ob_start();
                                                 <?= htmlspecialchars($kitchen['owner_name']) ?>
                                             </p>
                                         </div>
-
-                                        <!-- Description -->
                                         <p class="text-sm text-gray-600 leading-relaxed line-clamp-2">
                                             <?= htmlspecialchars($kitchen['description']) ?>
                                         </p>
                                     </div>
 
-                                    <!-- Footer:Service Areas, Rating + Address -->
-                                    <div class="">
-                                        <!-- Service Areas -->
+                                    <!-- Footer with Service Areas and Rating -->
+                                    <div>
                                         <?php if (!empty($kitchen['service_areas'])): ?>
                                             <p class="text-xs text-gray-500 flex items-center line-clamp-1">
                                                 <i class="fa-solid fa-person-biking text-orange-500 mr-1"></i>
@@ -200,7 +208,6 @@ ob_start();
                                         <?php endif; ?>
 
                                         <div class="flex justify-between items-center mt-2">
-                                            <!-- Rating -->
                                             <div class="flex items-center">
                                                 <?php if ($kitchen['avg_rating']): ?>
                                                     <div class="flex items-center bg-orange-50 px-2 py-1 rounded-md">
@@ -219,7 +226,6 @@ ob_start();
                                                 <?php endif; ?>
                                             </div>
 
-                                            <!-- Address -->
                                             <?php if (!empty($kitchen['address'])): ?>
                                                 <p class="text-xs text-gray-500 flex items-center max-w-[130px] text-right">
                                                     <i class="fa-solid fa-location-dot mr-1"></i>
@@ -234,21 +240,17 @@ ob_start();
                                 </div>
                             </div>
                         </a>
-
                     </div>
                 <?php endforeach; ?>
             </div>
 
-            <!-- Navigation -->
+            <!-- Swiper Navigation -->
             <div class="swiper-button-prev !text-orange-500 -mt-12 !left-1 !top-1/2 !-translate-y-1/2 absolute z-10">
             </div>
             <div class="swiper-button-next !text-orange-500 -mt-12 !right-1 !top-1/2 !-translate-y-1/2 absolute z-10">
             </div>
-
-            <!-- Pagination -->
             <div class="relative swiper-pagination mt-4"></div>
         </div>
-        <!-- </div> -->
 
         <div data-aos="zoom-in" data-aos-delay="0" class="text-center mt-8">
             <a href="/kitchens"
@@ -258,10 +260,10 @@ ob_start();
         </div>
     </div>
     <?php $color = '#F9FAFB';
-    include BASE_PATH . '/src/includes/shape-divider.php' ?>
+    include BASE_PATH . '/src/includes/shape-divider.php'; ?>
 </section>
 
-<!-- How It Works -->
+<!-- HOW IT WORKS -->
 <section id="how-it-works" class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
         <div class="text-center mb-12">
@@ -272,6 +274,7 @@ ob_start();
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <!-- Step 1 -->
             <div data-aos="fade-up" data-aos-delay="0" class="text-center p-6">
                 <div class="relative inline-flex mb-6">
                     <div
@@ -283,6 +286,7 @@ ob_start();
                     detailed descriptions.</p>
             </div>
 
+            <!-- Step 2 -->
             <div data-aos="fade-up" data-aos-delay="200" class="text-center p-6">
                 <div class="relative inline-flex mb-6">
                     <div
@@ -294,6 +298,7 @@ ob_start();
                     multiple payment options.</p>
             </div>
 
+            <!-- Step 3 -->
             <div data-aos="fade-up" data-aos-delay="400" class="text-center p-6">
                 <div class="relative inline-flex mb-6">
                     <div
@@ -307,10 +312,10 @@ ob_start();
         </div>
     </div>
     <?php $color = '#FFF7ED';
-    include BASE_PATH . '/src/includes/shape-divider.php' ?>
+    include BASE_PATH . '/src/includes/shape-divider.php'; ?>
 </section>
 
-<!-- Testimonials -->
+<!-- TESTIMONIALS -->
 <section id="testimonials" class="py-16 bg-orange-50">
     <div class="container mx-auto px-4 flex flex-col gap-10">
         <?php if ($platform_reviews): ?>
@@ -321,12 +326,12 @@ ob_start();
                     across Bangladesh</p>
             </div>
 
-            <!-- First Row -->
+            <!-- First Row of Testimonials -->
             <?php if (!empty($firstRow)): ?>
                 <div
                     class="grid grid-cols-1 md:grid-cols-<?= count($firstRow) ?> gap-8 max-w-5xl mx-auto py-12 <?= empty($secondRow) ? '' : 'border-b' ?>">
                     <?php foreach ($firstRow as $review): ?>
-                        <div data-aos="fade-up" data-aos-delay="<?= $index * 150 ?> class=" bg-white p-8 rounded-xl shadow-md">
+                        <div data-aos="fade-up" class="bg-white p-8 rounded-xl shadow-md">
                             <div class="flex items-center mb-4">
                                 <img src="<?= htmlspecialchars($review['reviewer_image'] ?? '/assets/images/default-user.png') ?>"
                                     alt="Customer" class="w-12 h-12 rounded-full object-cover mr-4">
@@ -345,10 +350,10 @@ ob_start();
                 </div>
             <?php endif; ?>
 
-            <!-- Second Row -->
+            <!-- Second Row of Testimonials -->
             <?php if (!empty($secondRow)): ?>
-                <div data-aos="fade-up" data-aos-delay="<?= $index * 150 ?> class=" grid grid-cols-1
-                    md:grid-cols-<?= count($secondRow) ?> gap-8 max-w-3xl mx-auto py-12">
+                <div data-aos="fade-up"
+                    class="grid grid-cols-1 md:grid-cols-<?= count($secondRow) ?> gap-8 max-w-3xl mx-auto py-12">
                     <?php foreach ($secondRow as $review): ?>
                         <div class="bg-white p-8 rounded-xl shadow-md">
                             <div class="flex items-center mb-4">
@@ -368,15 +373,16 @@ ob_start();
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
-
         <?php endif; ?>
 
+        <!-- Review Form for Logged-in Users -->
         <?php if ($isLoggedIn && ($role === 'buyer' || $role === 'seller')): ?>
             <div class="w-full">
                 <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow">
                     <h3 class="text-xl font-semibold mb-4 text-gray-800">Share Your Experience</h3>
                     <form action="/reviews" method="POST">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+
                         <label for="rating" class="block text-sm font-medium text-gray-700 mb-1">Your Rating</label>
                         <select name="rating" id="rating" required
                             class="w-full mb-4 px-4 py-2 border rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500">
@@ -401,10 +407,10 @@ ob_start();
         <?php endif ?>
     </div>
     <?php $color = '#F9FAFB';
-    include BASE_PATH . '/src/includes/shape-divider.php' ?>
+    include BASE_PATH . '/src/includes/shape-divider.php'; ?>
 </section>
 
-<!-- App Download CTA -->
+<!-- APP DOWNLOAD BUTTONS -->
 <section class="py-16 bg-gray-50">
     <div data-aos="zoom-in" data-aos-delay="0" class="container mx-auto px-4">
         <div
@@ -412,9 +418,9 @@ ob_start();
             <div class="md:w-1/2 mb-8 md:mb-0">
                 <h2 data-aos="zoom-in" data-aos-delay="200" class="text-3xl font-bold text-white mb-4">Get the
                     TiffinCraft App</h2>
-                <p data-aos="zoom-in" data-aos-delay="400" class="text-orange-100 mb-6">Download our app for faster
-                    ordering, exclusive offers, and to track
-                    your delivery in real-time.</p>
+                <p data-aos="zoom-in" data-aos-delay="400" class="text-orange-100 mb-6">
+                    Download our app for faster ordering, exclusive offers, and to track your delivery in real-time.
+                </p>
                 <div data-aos="zoom-in" data-aos-delay="200" class="flex flex-col sm:flex-row gap-4">
                     <a href="#"
                         class="bg-black hover:bg-gray-900 text-white flex items-center justify-center py-3 px-6 rounded-lg">
@@ -442,29 +448,29 @@ ob_start();
             </div>
         </div>
     </div>
-    <!-- Shape Divider -->
-
 </section>
 
-<!-- Final CTA -->
+<!-- CTA BUTTONS -->
 <section class="bg-gray-50 py-16 text-center text-gray-700">
     <div class="container mx-auto px-4">
         <h2 data-aos="zoom-in" data-aos-delay="0" class="text-3xl font-bold mb-6">Ready to Experience Homemade Goodness?
         </h2>
-        <p data-aos="zoom-in" data-aos-delay="200" class="text-gray-500 text-xl mb-8 max-w-2xl mx-auto">Join thousands
-            of happy customers enjoying authentic
-            home-cooked meals today</p>
+        <p data-aos="zoom-in" data-aos-delay="200" class="text-gray-500 text-xl mb-8 max-w-2xl mx-auto">
+            Join thousands of happy customers enjoying authentic home-cooked meals today
+        </p>
         <a data-aos="zoom-in" data-aos-delay="200" href="#explore"
             class="inline-block bg-orange-500 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105 hover:bg-gray-100">
             Order Now
         </a>
     </div>
     <?php $color = '#FFFBEB';
-    include BASE_PATH . '/src/includes/shape-divider.php' ?>
+    include BASE_PATH . '/src/includes/shape-divider.php'; ?>
 </section>
 
+<!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
+    // Initialize Swiper for kitchens slider
     document.addEventListener('DOMContentLoaded', () => {
         const swiper = new Swiper('.myKitchensSwiper', {
             slidesPerView: 1,
@@ -485,11 +491,16 @@ ob_start();
         });
     });
 
+    // Auto-hide toast after 5 seconds
+    <?php if (isset($_SESSION['toast'])): ?>
+        setTimeout(() => {
+            const toast = document.querySelector('.fixed.bottom-5.right-5');
+            if (toast) toast.remove();
+        }, 5000);
+    <?php endif; ?>
 </script>
 
 <?php
-
 $content = ob_get_clean();
 include BASE_PATH . '/src/views/index.php';
-
 ?>

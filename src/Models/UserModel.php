@@ -6,38 +6,72 @@ use Exception;
 
 class User
 {
-    private const USER_COUNT = "SELECT
-                                    SUM(CASE WHEN role = 'buyer' THEN 1 ELSE 0 END) AS buyer_count,
-                                    SUM(CASE WHEN role = 'seller' THEN 1 ELSE 0 END) AS seller_count,
-                                    COUNT(*) AS users_count
-                                    FROM users
-                                    WHERE role IN ('buyer', 'seller')";
+    private const USER_COUNT =
+        "SELECT
+            SUM(CASE WHEN role = 'buyer' THEN 1 ELSE 0 END) AS buyer_count,
+            SUM(CASE WHEN role = 'seller' THEN 1 ELSE 0 END) AS seller_count,
+            COUNT(*) AS users_count
+        FROM users
+        WHERE role IN ('buyer', 'seller')";
 
-    private const FIND_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = :email";
-    private const FIND_BY_ID_QUERY = "SELECT * FROM users WHERE user_id = :user_id";
+    private const FIND_BY_EMAIL_QUERY =
+        "SELECT * FROM users WHERE email = :email";
+    private const FIND_BY_ID_QUERY =
+        "SELECT * FROM users WHERE user_id = :user_id";
 
-    private const INSERT_USER_QUERY = "INSERT INTO users (name, email, password, phone_number, address, profile_image, role, status) 
-                                      VALUES (:name, :email, :password, :phone_number, :address, :profile_image, :role, 1)
-                                      RETURNING user_id INTO :user_id";
+    private const INSERT_USER_QUERY =
+        "INSERT INTO users 
+        (
+            name, 
+            email, 
+            password, 
+            phone_number, 
+            address, 
+            profile_image, 
+            role, 
+            status
+        ) 
+        VALUES 
+        (
+            :name, 
+            :email, 
+            :password, 
+            :phone_number, 
+            :address, 
+            :profile_image, 
+            :role, 1
+        )
+        RETURNING user_id INTO :user_id";
 
-    private const GET_ALL_USERS = "SELECT user_id, name, email, role, status, phone_number, profile_image, address, created_at, suspended_until
-                                    FROM users
-                                    WHERE role = 'buyer' OR role = 'seller'
-                                    ORDER BY created_at DESC";
+    private const GET_ALL_USERS =
+        "SELECT 
+            user_id, 
+            name, 
+            email, 
+            role, 
+            status, 
+            phone_number, 
+            profile_image, 
+            address, 
+            created_at, 
+            suspended_until
+        FROM users
+        WHERE role = 'buyer' OR role = 'seller'
+        ORDER BY created_at DESC";
 
 
-    private const ACTIVATE_USER_QUERY = "
-        UPDATE users SET
+    private const ACTIVATE_USER_QUERY =
+        "UPDATE users SET
             status = 1
         WHERE user_id = :user_id";
 
-    private const DEACTIVATE_USER_QUERY = "
-        UPDATE users SET
+    private const DEACTIVATE_USER_QUERY =
+        "UPDATE users SET
             status = 0
         WHERE user_id = :user_id";
 
-    private const SUSPEND_USER_QUERY = "
-        UPDATE users SET
+    private const SUSPEND_USER_QUERY =
+        "UPDATE users SET
             status = 2
         WHERE user_id = :user_id";
 
@@ -181,8 +215,6 @@ class User
     {
         return self::updateUserStatus($conn, $userId, self::SUSPEND_USER_QUERY);
     }
-
-
 
     private static function processOracleDate(string $dateString): string
     {

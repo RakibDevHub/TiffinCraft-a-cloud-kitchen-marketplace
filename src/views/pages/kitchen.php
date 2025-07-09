@@ -1,32 +1,33 @@
 <?php
-$pageTitle = "Browse Kitchens";
+$pageTitle = "Browse Kitchens - TiffinCraft";
 
+// Data preparation
 $searchTerm = isset($_GET['search']) ? strtolower(trim($_GET['search'])) : null;
-$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
-$perPage = 9;
-
 $sortBy = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
 $selectedLocation = isset($_GET['location']) ? urldecode(trim($_GET['location'])) : null;
 
 $kitchens = $data['kitchens'] ?? [];
 $serviceAreas = $data['locations'] ?? [];
+
+// Pagination data
 $totalItems = $data['totalItems'] ?? 0;
 $totalPages = $data['totalPages'] ?? 1;
-$page = $data['page'] ?? 1;
-
+$currentPage = $data['page'] ?? 1;
 
 ob_start();
 ?>
+
+<!-- Main Content Section -->
 <section class="pt-8 pb-12 bg-gray-50 min-h-[92vh]">
     <div class="container mx-auto px-4 max-w-6xl">
         <!-- Page Header -->
         <div class="text-center mb-4">
-            <h2 class="text-3xl font-bold text-gray-800 mb-3">Discover Local Kitchens</h2>
-            <p class="text-gray-600">Explore meals prepared by talented home cooks in your community.</p>
+            <h2 data-aos="zoom-in" data-aos-delay="100" class="text-3xl font-bold text-gray-800 mb-3">Discover Local Kitchens</h2>
+            <p data-aos="zoom-in" data-aos-delay="200" class="text-gray-600">Explore meals prepared by talented home cooks in your community.</p>
         </div>
 
         <!-- Filters Section -->
-        <div class="flex flex-col justify-between items-center gap-6 bg-white p-4 rounded-lg shadow-sm mb-4">
+        <div data-aos="zoom-in" data-aos-delay="300" class="flex flex-col justify-between items-center gap-6 bg-white p-4 rounded-lg shadow-sm mb-4">
             <!-- Sorting Options -->
             <div class="flex flex-wrap gap-2 w-full items-center justify-center">
                 <a href="?<?= http_build_query(array_filter([
@@ -34,7 +35,8 @@ ob_start();
                     'location' => $selectedLocation,
                     'sort' => null
                 ])) ?>"
-                    class="px-4 py-2 rounded-full text-sm font-medium <?= !$sortBy || $sortBy === 'newest' ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 border hover:bg-gray-100' ?>">
+                    class="px-4 py-2 rounded-full text-sm font-medium <?= !$sortBy || $sortBy === 'newest' ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 border hover:bg-gray-100' ?>"
+                    data-aos="zoom-in" data-aos-delay="100">
                     Newest
                 </a>
                 <a href="?<?= http_build_query(array_filter([
@@ -42,7 +44,8 @@ ob_start();
                     'location' => $selectedLocation,
                     'sort' => 'top_rated'
                 ])) ?>"
-                    class="px-4 py-2 rounded-full text-sm font-medium <?= $sortBy === 'top_rated' ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 border hover:bg-gray-100' ?>">
+                    class="px-4 py-2 rounded-full text-sm font-medium <?= $sortBy === 'top_rated' ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 border hover:bg-gray-100' ?>"
+                    data-aos="zoom-in" data-aos-delay="150">
                     Top Rated
                 </a>
                 <a href="?<?= http_build_query(array_filter([
@@ -50,7 +53,8 @@ ob_start();
                     'location' => $selectedLocation,
                     'sort' => 'most_reviews'
                 ])) ?>"
-                    class="px-4 py-2 rounded-full text-sm font-medium <?= $sortBy === 'most_reviews' ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 border hover:bg-gray-100' ?>">
+                    class="px-4 py-2 rounded-full text-sm font-medium <?= $sortBy === 'most_reviews' ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 border hover:bg-gray-100' ?>"
+                    data-aos="zoom-in" data-aos-delay="200">
                     Most Reviews
                 </a>
                 <a href="?<?= http_build_query(array_filter([
@@ -58,7 +62,8 @@ ob_start();
                     'location' => $selectedLocation,
                     'sort' => 'oldest'
                 ])) ?>"
-                    class="px-4 py-2 rounded-full text-sm font-medium <?= $sortBy === 'oldest' ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 border hover:bg-gray-100' ?>">
+                    class="px-4 py-2 rounded-full text-sm font-medium <?= $sortBy === 'oldest' ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 border hover:bg-gray-100' ?>"
+                    data-aos="zoom-in" data-aos-delay="250">
                     Oldest
                 </a>
             </div>
@@ -66,9 +71,9 @@ ob_start();
             <!-- Advanced Filters -->
             <div class="flex flex-col md:flex-row items-center justify-between gap-8 w-full">
                 <!-- Search Box -->
-                <div class="w-full">
+                <div class="w-full" data-aos="zoom-in" data-aos-delay="300">
                     <label class="block text-sm text-gray-500 mb-1">Search Kitchens</label>
-                    <form method="get" action="/kitchens" class="relative inline-block w-full w-full">
+                    <form method="get" action="/kitchens" class="relative inline-block w-full">
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                 <i class="fas fa-search text-gray-400"></i>
@@ -99,8 +104,7 @@ ob_start();
                 </div>
                 <div class="flex flex-row gap-4 w-full justify-start">
                     <!-- Location Filter -->
-                    <!-- <div class="w-full sm:w-2/5"> -->
-                    <div class="w-full">
+                    <div class="w-full" data-aos="zoom-in" data-aos-delay="350">
                         <label class="block text-sm text-gray-500 mb-1">Select a Location: </label>
                         <select id="locationFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                             <option value="">All Locations</option>
@@ -113,7 +117,7 @@ ob_start();
                     </div>
 
                     <!-- Clear All Filters Button -->
-                    <div class="flex items-end">
+                    <div class="flex items-end" data-aos="zoom-in" data-aos-delay="400">
                         <a href="/kitchens"
                             class="px-8 py-2 bg-gray-300 text-gray-700 rounded-full hover:bg-gray-300 text-center">
                             Clear
@@ -124,10 +128,10 @@ ob_start();
         </div>
 
         <!-- Active Filters Display -->
-        <?php if ($selectedLocation || $sortBy): ?>
+        <?php if ($selectedLocation || ($sortBy && $sortBy !== 'newest')): ?>
             <div class="flex flex-wrap gap-2 mb-6">
                 <?php if ($selectedLocation): ?>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-800">
+                    <span data-aos="fade-right" data-aos-delay="100" class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-800">
                         Location: <?= htmlspecialchars($selectedLocation) ?>
                         <a href="?<?= http_build_query(array_filter([
                             'search' => $searchTerm,
@@ -139,7 +143,7 @@ ob_start();
                 <?php endif; ?>
 
                 <?php if ($sortBy && $sortBy !== 'newest'): ?>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-800">
+                    <span data-aos="fade-right" data-aos-delay="150" class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-800">
                         Sort: <?= ucfirst(str_replace('_', ' ', $sortBy)) ?>
                         <a href="?<?= http_build_query(array_filter([
                             'search' => $searchTerm,
@@ -153,9 +157,10 @@ ob_start();
         <?php endif; ?>
 
         <?php if (!empty($kitchens)): ?>
+            <!-- Kitchen Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-auto">
-                <?php foreach ($kitchens as $kitchen): ?>
-                    <div
+                <?php foreach ($kitchens as $index => $kitchen): ?>
+                    <div data-aos="zoom-in" data-aos-delay="100"
                         class="group bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 border border-gray-100 hover:border-orange-100 h-full flex flex-col hover:shadow-md">
                         <!-- Image -->
                         <div class="relative h-48 overflow-hidden">
@@ -182,8 +187,7 @@ ob_start();
                             <div class="space-y-2">
                                 <!-- Name and Owner -->
                                 <div>
-                                    <h3 class="text-lg font-semibold text-gray-800"><?= htmlspecialchars($kitchen['name']) ?>
-                                    </h3>
+                                    <h3 class="text-lg font-semibold text-gray-800"><?= htmlspecialchars($kitchen['name']) ?></h3>
                                     <p class="text-sm text-gray-500 flex items-center">
                                         <i class="fa-solid fa-user mr-1.5 text-green-500"></i>
                                         <?= htmlspecialchars($kitchen['owner_name']) ?>
@@ -237,24 +241,25 @@ ob_start();
 
             <!-- Pagination Controls -->
             <?php if ($totalPages > 1): ?>
-                <div class="flex justify-center items-center gap-3 mt-10">
-                    <?php if ($page > 1): ?>
-                        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page - 1])) ?>"
+                <div class="flex justify-center items-center gap-3 mt-10" data-aos="zoom-in" data-aos-delay="100">
+                    <?php if ($currentPage > 1): ?>
+                        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $currentPage - 1])) ?>"
                             class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">&laquo; Prev</a>
                     <?php endif; ?>
 
                     <span class="px-4 py-2 bg-gray-200 rounded text-gray-700">
-                        Page <?= $page ?> of <?= $totalPages ?>
+                        Page <?= $currentPage ?> of <?= $totalPages ?>
                     </span>
 
-                    <?php if ($page < $totalPages): ?>
-                        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page + 1])) ?>"
+                    <?php if ($currentPage < $totalPages): ?>
+                        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $currentPage + 1])) ?>"
                             class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">Next &raquo;</a>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
         <?php else: ?>
-            <div class="text-center text-gray-500 mt-32">
+            <!-- Empty State -->
+            <div class="text-center text-gray-500 mt-32" data-aos="zoom-in" data-aos-delay="100">
                 <i class="fas fa-utensils text-5xl mb-4"></i>
                 <p class="text-lg">No kitchens found</p>
                 <a href="/kitchens" class="text-orange-500 hover:underline mt-2 inline-block">Clear all filters</a>
@@ -263,40 +268,43 @@ ob_start();
     </div>
 </section>
 
+<!-- Scripts -->
 <script>
-    // Function to update URL with new parameters
-    function updateUrl() {
-        const params = new URLSearchParams(window.location.search);
+    // Initialize AOS animations
+    document.addEventListener('DOMContentLoaded', () => {
+        AOS.init({
+            offset: 250,
+            duration: 800,
+            easing: 'ease-in-sine',
+            delay: 100,
+            once: false,
+            mirror: true
+        });
 
-        // Get current values
-        const location = document.getElementById('locationFilter').value;
+        // Function to update URL with new parameters
+        function updateUrl() {
+            const params = new URLSearchParams(window.location.search);
 
-        // Update parameters
-        if (location) {
-            params.set('location', location);
-        } else {
-            params.delete('location');
+            // Get current values
+            const location = document.getElementById('locationFilter').value;
+
+            // Update parameters
+            if (location) {
+                params.set('location', location);
+            } else {
+                params.delete('location');
+            }
+
+            // Remove page parameter when filters change
+            params.delete('page');
+
+            // Update URL
+            window.location.search = params.toString();
         }
 
-        // Remove page parameter when filters change
-        params.delete('page');
-
-        // Update URL
-        window.location.search = params.toString();
-    }
-
-    // Clear search button functionality
-    document.getElementById('clearSearchBtn')?.addEventListener('click', function () {
-        const form = this.closest('form');
-        const searchInput = form.querySelector('#searchInput');
-        searchInput.value = '';
-
-        // Submit the form while preserving other filters
-        form.submit();
+        // Event listeners for filter changes
+        document.getElementById('locationFilter').addEventListener('change', updateUrl);
     });
-
-    // Event listeners for filter changes
-    document.getElementById('locationFilter').addEventListener('change', updateUrl);
 </script>
 
 <?php

@@ -1,11 +1,9 @@
 <?php
-$pageTitle = "Delicious Dishes";
+$pageTitle = "Delicious Dishes - TiffinCraft";
 
+// Data preparation
 $selectedCategory = isset($_GET['category']) ? urldecode(trim($_GET['category'])) : null;
 $searchTerm = isset($_GET['search']) ? strtolower(trim($_GET['search'])) : null;
-$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
-$perPage = 9;
-
 $priceSort = isset($_GET['price']) ? $_GET['price'] : null;
 $selectedLocation = isset($_GET['location']) ? urldecode(trim($_GET['location'])) : null;
 
@@ -13,24 +11,29 @@ $dishes = $data['menuItems'] ?? [];
 $categories = $data['categories'] ?? [];
 $serviceAreas = $data['locations'] ?? [];
 
+// Pagination data
 $totalItems = $data['totalItems'] ?? 0;
 $totalPages = $data['totalPages'] ?? 1;
-$page = $data['page'] ?? 1;
+$currentPage = $data['page'] ?? 1;
 
 ob_start();
 ?>
+
+<!-- Main Content Section -->
 <section class="pt-8 pb-12 bg-gray-50 min-h-[92vh]">
     <div class="container mx-auto px-4 max-w-6xl">
         <!-- Page Header -->
         <div class="text-center mb-4">
-            <h2 class="text-3xl font-bold text-gray-800 mb-3">
+            <h2 data-aos="zoom-in" data-aos-delay="100" class="text-3xl font-bold text-gray-800 mb-3">
                 <?= $selectedCategory ? htmlspecialchars($selectedCategory) . ' Dishes' : 'Our Delicious Menu' ?>
             </h2>
-            <p class="text-gray-600">Explore meals handcrafted by local home chefs.</p>
+            <p data-aos="zoom-in" data-aos-delay="200" class="text-gray-600">Explore meals handcrafted by local home
+                chefs.</p>
         </div>
 
         <!-- Filters Section -->
-        <div class="flex flex-col justify-between items-center gap-6 bg-white p-4 rounded-lg shadow-sm mb-4">
+        <div data-aos="zoom-in" data-aos-delay="300"
+            class="flex flex-col justify-between items-center gap-6 bg-white p-4 rounded-lg shadow-sm mb-4">
             <!-- Category Filter -->
             <div class="flex flex-wrap gap-2 items-center justify-center">
                 <a href="?<?= http_build_query(array_filter([
@@ -38,17 +41,19 @@ ob_start();
                     'location' => $selectedLocation,
                     'price' => $priceSort
                 ])) ?>"
-                    class="px-4 py-2 rounded-full text-sm font-medium <?= !$selectedCategory ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 border' ?>">
+                    class="px-4 py-2 rounded-full text-sm font-medium <?= !$selectedCategory ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 border' ?>"
+                    data-aos="zoom-in" data-aos-delay="100">
                     All
                 </a>
-                <?php foreach ($categories as $category): ?>
+                <?php foreach ($categories as $index => $category): ?>
                     <a href="?<?= http_build_query(array_filter([
                         'category' => $category['name'],
                         'search' => $searchTerm,
                         'location' => $selectedLocation,
                         'price' => $priceSort
                     ])) ?>"
-                        class="px-4 py-2 rounded-full text-sm font-medium <?= (strtolower($selectedCategory) === strtolower($category['name'])) ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 border hover:bg-gray-100' ?>">
+                        class="px-4 py-2 rounded-full text-sm font-medium <?= (strtolower($selectedCategory) === strtolower($category['name'])) ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 border hover:bg-gray-100' ?>"
+                        data-aos="zoom-in" data-aos-delay="<?= 150 + ($index * 50) ?>">
                         <?= htmlspecialchars($category['name']) ?>
                     </a>
                 <?php endforeach; ?>
@@ -57,7 +62,7 @@ ob_start();
             <!-- Advanced Filters -->
             <div class="flex flex-col md:flex-row items-center justify-between gap-8 w-full">
                 <!-- Search Box -->
-                <div class="w-full">
+                <div class="w-full" data-aos="zoom-in" data-aos-delay="200">
                     <label class="block text-sm text-gray-500 mb-1">Search Dishes</label>
                     <form method="get" action="/dishes" class="relative inline-block w-full">
                         <div class="relative">
@@ -95,7 +100,7 @@ ob_start();
 
                 <div class="flex flex-col sm:flex-row gap-2 w-full justify-start">
                     <!-- Location Filter -->
-                    <div class="w-full sm:w-2/5">
+                    <div class="w-full sm:w-2/5" data-aos="zoom-in" data-aos-delay="250">
                         <label class="block text-sm text-gray-500 mb-1">Select a Location: </label>
                         <select id="locationFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                             <option value="">All Locations</option>
@@ -108,28 +113,25 @@ ob_start();
                     </div>
 
                     <!-- Price Sort Filter -->
-                    <div class="w-full sm:w-2/5">
+                    <div class="w-full sm:w-2/5" data-aos="zoom-in" data-aos-delay="300">
                         <label class="block text-sm text-gray-500 mb-1">Sort by Price: </label>
                         <select id="priceSort" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                             <option value="">None</option>
-                            <option value="low_to_high" <?= $priceSort === 'low_to_high' ? 'selected' : '' ?>>Low to
-                                High
+                            <option value="low_to_high" <?= $priceSort === 'low_to_high' ? 'selected' : '' ?>>Low to High
                             </option>
-                            <option value="high_to_low" <?= $priceSort === 'high_to_low' ? 'selected' : '' ?>>High to
-                                Low
+                            <option value="high_to_low" <?= $priceSort === 'high_to_low' ? 'selected' : '' ?>>High to Low
                             </option>
                         </select>
                     </div>
 
                     <!-- Clear All Filters Button -->
-                    <div class="flex justify-center sm:justify-end items-end">
+                    <div class="flex justify-center sm:justify-end items-end" data-aos="zoom-in" data-aos-delay="350">
                         <a href="/dishes"
                             class="px-8 py-2 bg-gray-300 text-gray-700 rounded-full hover:bg-gray-300 text-center">
                             Clear
                         </a>
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -137,7 +139,8 @@ ob_start();
         <?php if ($selectedLocation || $priceSort): ?>
             <div class="flex flex-wrap gap-2 mb-6">
                 <?php if ($selectedLocation): ?>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-800">
+                    <span data-aos="fade-right" data-aos-delay="100"
+                        class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-800">
                         Location: <?= htmlspecialchars($selectedLocation) ?>
                         <a href="?<?= http_build_query(array_filter([
                             'category' => $selectedCategory,
@@ -150,7 +153,8 @@ ob_start();
                 <?php endif; ?>
 
                 <?php if ($priceSort): ?>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-800">
+                    <span data-aos="fade-right" data-aos-delay="150"
+                        class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-800">
                         Price: <?= $priceSort === 'low_to_high' ? 'Low to High' : 'High to Low' ?>
                         <a href="?<?= http_build_query(array_filter([
                             'category' => $selectedCategory,
@@ -165,13 +169,14 @@ ob_start();
         <?php endif; ?>
 
         <?php if (!empty($dishes)): ?>
+            <!-- Menu Card View -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-auto">
-                <?php foreach ($dishes as $dish): ?>
-                    <div
-                        class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition duration-300 flex flex-col">
+                <?php foreach ($dishes as $index => $dish): ?>
+                    <div data-aos="zoom-in" data-aos-delay="100"
+                        class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition duration-300 flex flex-col group">
                         <?php if ($dish['item_image']): ?>
                             <img src="<?= htmlspecialchars($dish['item_image']) ?>" alt="<?= htmlspecialchars($dish['name']) ?>"
-                                class="w-full h-56 object-cover shadow-sm">
+                                class="w-full h-56 object-cover shadow-sm transition-transform duration-300 group-hover:scale-105">
                         <?php else: ?>
                             <div
                                 class="w-full h-56 flex items-center shadow-sm justify-center text-gray-400 group-hover:text-gray-500 transition-colors">
@@ -235,7 +240,7 @@ ob_start();
 
             <!-- Pagination Controls -->
             <?php if ($totalPages > 1): ?>
-                <div class="flex justify-center items-center gap-3 mt-10">
+                <div class="flex justify-center items-center gap-3 mt-10" data-aos="zoom-in" data-aos-delay="100">
                     <!-- Previous Button -->
                     <?php if ($currentPage > 1): ?>
                         <a href="?<?= http_build_query(array_merge($_GET, ['page' => $currentPage - 1])) ?>"
@@ -258,54 +263,66 @@ ob_start();
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
-
         <?php else: ?>
-            <div class="text-center text-gray-500 mt-32">
+            <!-- Empty State -->
+            <div class="text-center text-gray-500 mt-32" data-aos="zoom-in" data-aos-delay="100">
                 <i class="fas fa-utensils text-5xl mb-4"></i>
                 <p class="text-lg">No dishes found with the current filters</p>
                 <a href="/dishes" class="text-orange-500 hover:underline mt-2 inline-block">Clear all filters</a>
             </div>
         <?php endif; ?>
-
     </div>
 </section>
 
+<!-- Scripts -->
 <script>
-    // Event listeners for filter changes
-    document.getElementById('locationFilter').addEventListener('change', function () {
-        updateFilters();
-    });
-    document.getElementById('priceSort').addEventListener('change', function () {
-        updateFilters
-    });
+    // Initialize AOS animations
+    document.addEventListener('DOMContentLoaded', () => {
+        AOS.init({
+            offset: 250,
+            duration: 800,
+            easing: 'ease-in-sine',
+            delay: 100,
+            once: false,
+            mirror: true
+        });
 
-    function updateFilters() {
-        const params = new URLSearchParams(window.location.search);
+        // Event listeners for filter changes
+        document.getElementById('locationFilter').addEventListener('change', function () {
+            updateFilters();
+        });
 
-        // Get current values
-        const location = document.getElementById('locationFilter').value;
-        const priceSort = document.getElementById('priceSort').value;
+        document.getElementById('priceSort').addEventListener('change', function () {
+            updateFilters();
+        });
 
-        // Update parameters
-        if (location) {
-            params.set('location', location);
-        } else {
-            params.delete('location');
+        function updateFilters() {
+            const params = new URLSearchParams(window.location.search);
+
+            // Get current values
+            const location = document.getElementById('locationFilter').value;
+            const priceSort = document.getElementById('priceSort').value;
+
+            // Update parameters
+            if (location) {
+                params.set('location', location);
+            } else {
+                params.delete('location');
+            }
+
+            if (priceSort) {
+                params.set('price', priceSort);
+            } else {
+                params.delete('price');
+            }
+
+            // Remove page parameter when filters change
+            params.delete('page');
+
+            // Update URL
+            window.location.search = params.toString();
         }
-
-        if (priceSort) {
-            params.set('price', priceSort);
-        } else {
-            params.delete('price');
-        }
-
-        // Remove page parameter when filters change
-        params.delete('page');
-
-        // Update URL
-        window.location.search = params.toString();
-    }
-
+    });
 </script>
 
 <?php

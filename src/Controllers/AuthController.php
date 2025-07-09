@@ -30,7 +30,7 @@ class AuthController
             return;
         }
 
-        $this->renderView('auth/login', [
+        $this->renderView('pages/login', [
             'error' => $this->getFlash('error'),
             'success' => $this->getFlash('success')
         ]);
@@ -55,7 +55,7 @@ class AuthController
             return;
         }
 
-        $this->renderView('auth/registerBuyer', [
+        $this->renderView('pages/register', [
             'error' => $this->getFlash('error'),
             'success' => $this->getFlash('success')
         ]);
@@ -74,7 +74,7 @@ class AuthController
             return;
         }
 
-        $this->renderView('auth/registerSeller', [
+        $this->renderView('pages/register', [
             'error' => $this->getFlash('error'),
             'success' => $this->getFlash('success')
         ]);

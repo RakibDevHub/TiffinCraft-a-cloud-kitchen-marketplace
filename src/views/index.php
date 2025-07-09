@@ -27,8 +27,6 @@
 
         window.addEventListener('load', AOS.refresh);
     </script>
-
-
 </body>
 
 </html>

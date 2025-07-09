@@ -17,7 +17,7 @@ class HomeController
     }
 
     // TiffinCraft 
-    public function showBuyerHome()
+    public function landingPage()
     {
         try {
             $categories = Category::getAllCategories($this->conn);
@@ -30,7 +30,7 @@ class HomeController
                 $result = Kitchen::getKitchensForHomePage($this->conn, $kitchenType, 10);
             }
 
-            $this->renderView('buyer/home', [
+            $this->renderView('pages/landing', [
                 'pageTitle' => 'TiffinCraft - Home',
                 'categories' => $categories ?? [],
                 'kitchens' => $result['kitchens'] ?? [],
@@ -42,7 +42,7 @@ class HomeController
         } catch (Exception $e) {
             error_log('Failed to load home data: ' . $e->getMessage());
 
-            $this->renderView('buyer/home', [
+            $this->renderView('pages/landing', [
                 'pageTitle' => 'TiffinCraft - Home',
                 'categories' => [],
                 'kitchens' => [],
@@ -54,9 +54,36 @@ class HomeController
     }
 
     // TiffinCraft Business
-    public function showSellerHome()
+    public function businessPage()
     {
-        $this->renderView('seller/home');
+        $this->renderView('pages/business');
+    }
+
+    public function showContactPage()
+    {
+
+        // if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        //     $this->validateCsrf();
+        //     $this->handleLogin();
+        //     return;
+        // }
+
+        $this->renderView('pages/contact', [
+            'error' => $this->getFlash('error'),
+            'success' => $this->getFlash('success')
+        ]);
+    }
+
+    protected function setFlash(string $type, string $message): void
+    {
+        $_SESSION['flash'][$type] = $message;
+    }
+
+    protected function getFlash(string $type): ?string
+    {
+        $message = $_SESSION['flash'][$type] ?? null;
+        unset($_SESSION['flash'][$type]);
+        return $message;
     }
 
     protected function renderView(string $viewPath, $data = []): void

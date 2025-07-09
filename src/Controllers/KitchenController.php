@@ -20,7 +20,7 @@ class KitchenController
     }
 
     // kitchens
-    public function showKitchenPage()
+    public function kitchenPage()
     {
         try {
             $filters = [
@@ -37,7 +37,7 @@ class KitchenController
 
             $serviceAreas = ServiceArea::getAll($this->conn);
 
-            $this->renderView('buyer/kitchens', [
+            $this->renderView('pages/kitchen', [
                 'kitchens' => $kitchens,
                 'locations' => $serviceAreas,
                 'totalPages' => $totalPages,
@@ -46,7 +46,7 @@ class KitchenController
             ]);
 
         } catch (Exception $e) {
-            $this->renderView('buyer/kitchens', [
+            $this->renderView('pages/kitchen', [
                 'kitchens' => [],
                 'locations' => [],
                 'error' => 'Error: ' . $e->getMessage()
