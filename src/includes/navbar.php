@@ -102,7 +102,7 @@ if ($currentRole === 'seller') {
                 </a>
             </div>
 
-            <!-- Desktop navigation -->
+            <!-- Desktop nav links -->
             <?php if (!$isBusinessView && !$isDashboardView): ?>
                 <div class="hidden md:ml-6 md:flex flex-row gap-4">
                     <a href="/"
@@ -126,18 +126,20 @@ if ($currentRole === 'seller') {
             <div class="flex justify-end">
                 <div class="flex items-center">
                     <?php if ($isLoggedIn): ?>
-                        <?php include BASE_PATH . '/src/includes/_dropdownNavlinks.php'; ?>
+                        <?php include BASE_PATH . '/src/includes/navbar-dropdown.php'; ?>
                     <?php else: ?>
                         <div class="hidden <?= $isBusinessView ? 'min-[450px]:flex' : 'min-[350px]:flex' ?> items-center">
-                            <a href="/<?= $isBusinessView ? 'business/login' : 'login'?>"
+                            <a href="/<?= $isBusinessView ? 'business/login' : 'login' ?>"
                                 class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">Login</a>
-                            <a href="/<?= $isBusinessView ? 'business/register' : 'register'?>"
+                            <a href="/<?= $isBusinessView ? 'business/register' : 'register' ?>"
                                 class="bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-orange-700">Register</a>
                         </div>
                     <?php endif; ?>
                 </div>
             </div>
+
+            <!-- Mobile menu nav links  -->
+            <?php include BASE_PATH . '/src/includes/mobile-menu.php'; ?>
         </div>
     </div>
 </nav>
-<?php include BASE_PATH . '/src/includes/_sidebarNavlinks.php'; ?>

@@ -4,44 +4,53 @@ namespace App\Core;
 class Database
 {
     private static $connection = null;
+    private static $attempted = false;
 
     public static function getConnection()
     {
-        if (self::$connection === null) {
-            try {
-                // Load configuration from environment variables
-                $username = $_ENV['DB_USERNAME'] ?? 'rakib';
-                $password = $_ENV['DB_PASSWORD'] ?? '4006';
-                $connectionString = $_ENV['DB_CONNECTION_STRING'] ?? "
-                    (DESCRIPTION =
-                        (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521))
-                        (CONNECT_DATA = (SERVICE_NAME = MYPDB))
-                    )";
-                $charset = $_ENV['DB_CHARSET'] ?? 'AL32UTF8';
+        if (self::$connection !== null) {
+            return self::$connection;
+        }
 
-                // Attempt connection
-                self::$connection = oci_connect($username, $password, $connectionString, $charset);
+        // Prevent retries within same request
+        if (self::$attempted) {
+            return false;
+        }
 
-                if (!self::$connection) {
-                    $e = oci_error();
-                    throw new \RuntimeException("Database connection failed: " . $e['message']);
-                }
+        self::$attempted = true;
 
-                // Set session variables for connection tracking
-                $_SESSION['db_connection_time'] = time();
+        try {
+            $username = $_ENV['DB_USERNAME'] ?? 'rakib';
+            $password = $_ENV['DB_PASSWORD'] ?? '4006';
+            $connectionString = $_ENV['DB_CONNECTION_STRING'] ?? "
+                (DESCRIPTION =
+                    (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521))
+                    (CONNECT_DATA = (SERVICE_NAME = MYPDB))
+                )";
+            $charset = $_ENV['DB_CHARSET'] ?? 'AL32UTF8';
 
-            } catch (\RuntimeException $e) {
-                // Log the error before redirecting
-                error_log('Database connection error: ' . $e->getMessage());
+            self::$connection = @oci_connect($username, $password, $connectionString, $charset);
 
-                // Store error in session for display
+            if (!self::$connection) {
+                $e = oci_error();
+                throw new \RuntimeException("Database connection failed: " . $e['message']);
+            }
+
+            $_SESSION['db_connection_time'] = time();
+            unset($_SESSION['db_connection_failed']);
+        } catch (\RuntimeException $e) {
+            error_log('Database connection error: ' . $e->getMessage());
+
+            // Prevent redirect loops
+            if (!isset($_SESSION['db_connection_failed'])) {
+                $_SESSION['db_connection_failed'] = true;
+
                 $_SESSION['database_error'] = [
                     'message' => 'We are experiencing database connectivity issues.',
                     'details' => 'Our team has been notified. Please try again later.',
                     'timestamp' => time()
                 ];
 
-                // Redirect to error page
                 header('Location: /database-error');
                 exit();
             }
@@ -57,7 +66,6 @@ class Database
                 oci_close(self::$connection);
                 self::$connection = null;
 
-                // Log connection closure
                 if (isset($_SESSION['db_connection_time'])) {
                     $duration = time() - $_SESSION['db_connection_time'];
                     error_log("Database connection closed after $duration seconds");
@@ -67,6 +75,9 @@ class Database
                 error_log('Error closing database connection: ' . $e->getMessage());
             }
         }
+
+        // Reset attempt flag
+        self::$attempted = false;
     }
 
     public static function isAvailable(): bool
@@ -78,4 +89,5 @@ class Database
             return false;
         }
     }
+
 }

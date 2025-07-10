@@ -2,32 +2,26 @@
 namespace App\Controllers;
 
 use Exception;
-use App\Core\Database;
 use App\Models\Category;
 use App\Models\Kitchen;
 use App\Models\Review;
 
-class HomeController
+class HomeController extends BaseController
 {
-    private $conn;
-
-    public function __construct()
-    {
-        $this->conn = Database::getConnection();
-    }
-
     // TiffinCraft 
     public function landingPage()
     {
         try {
-            $categories = Category::getAllCategories($this->conn);
+            $conn = $this->db();
+
+            $categories = Category::getAllCategories($conn);
             $kitchenType = 'top';
-            $result = Kitchen::getKitchensForHomePage($this->conn, $kitchenType, 10);
-            $reviews = Review::getPlatFormReviews($this->conn);
+            $result = Kitchen::getKitchensForHomePage($conn, $kitchenType, 10);
+            $reviews = Review::getPlatFormReviews($conn);
 
             if (empty($result['kitchens']) || !$result['hasRatings']) {
                 $kitchenType = 'newest';
-                $result = Kitchen::getKitchensForHomePage($this->conn, $kitchenType, 10);
+                $result = Kitchen::getKitchensForHomePage($conn, $kitchenType, 10);
             }
 
             $this->renderView('pages/landing', [
@@ -38,7 +32,6 @@ class HomeController
                 'platform_reviews' => $reviews ?? [],
                 'error' => null
             ]);
-
         } catch (Exception $e) {
             error_log('Failed to load home data: ' . $e->getMessage());
 
@@ -61,13 +54,6 @@ class HomeController
 
     public function showContactPage()
     {
-
-        // if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        //     $this->validateCsrf();
-        //     $this->handleLogin();
-        //     return;
-        // }
-
         $this->renderView('pages/contact', [
             'error' => $this->getFlash('error'),
             'success' => $this->getFlash('success')
@@ -91,6 +77,4 @@ class HomeController
         extract($data);
         include __DIR__ . '/../views/' . $viewPath . '.php';
     }
-
 }
-?>

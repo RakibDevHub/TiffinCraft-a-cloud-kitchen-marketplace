@@ -3,7 +3,7 @@
 
 <head>
     <?php $title = $pageTitle;
-    include BASE_PATH . '/src/includes/_head.php'; ?>
+    include BASE_PATH . '/src/includes/header.php'; ?>
 </head>
 
 <body class="bg-gray-50">
@@ -11,7 +11,7 @@
 
     <!-- Main Content -->
     <main class="relative top-[56px] max-w-7xl mx-auto p-4 transition-all duration-300 ease-in-out" id="main-content">
-        <?php include BASE_PATH . '/src/includes/_notice.php'; ?>
+        <?php include BASE_PATH . '/src/includes/alert.php'; ?>
         <?= $content ?>
     </main>
 

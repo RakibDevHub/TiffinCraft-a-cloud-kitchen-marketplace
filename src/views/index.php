@@ -3,7 +3,7 @@
 
 <head>
     <?php $title = $pageTitle;
-    include BASE_PATH . '/src/includes/_head.php'; ?>
+    include BASE_PATH . '/src/includes/header.php'; ?>
 </head>
 
 <body class="font-sans">
